@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:safe_beacon/presentation/features/dashboard/dashboard_shell.dart';
 import 'package:safe_beacon/presentation/features/home/routes/home_routes.dart';
-import 'package:safe_beacon/presentation/features/search/routes/search_routes.dart';
 import 'package:safe_beacon/presentation/features/notifications/routes/notifications_routes.dart';
 import 'package:safe_beacon/presentation/features/profile/routes/profile_routes.dart';
+import 'package:safe_beacon/presentation/features/search/routes/search_routes.dart';
 import 'package:safe_beacon/presentation/shared/routes/mock_routes.dart';
 
 part 'app_router.g.dart';

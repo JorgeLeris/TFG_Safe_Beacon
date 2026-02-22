@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:safe_beacon/data/sources/remote/http/interceptors/language_interceptor.dart';
 import 'package:safe_beacon/data/repositories/app_settings_repository.dart';
+import 'package:safe_beacon/data/sources/remote/http/interceptors/language_interceptor.dart';
 
 part 'language_cubit.freezed.dart';
 part 'language_state.dart';

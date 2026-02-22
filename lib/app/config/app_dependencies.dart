@@ -1,13 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:logging/logging.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:safe_beacon/app/config/environment.dart';
 import 'package:safe_beacon/core/language/language.dart';
-import 'package:safe_beacon/data/sources/remote/http/interceptors/language_interceptor.dart';
-import 'package:safe_beacon/data/sources/remote/http/interceptors/mock_interceptor.dart';
 import 'package:safe_beacon/data/repositories/app_settings_repository.dart';
 import 'package:safe_beacon/data/sources/remote/http/dio_client.dart';
+import 'package:safe_beacon/data/sources/remote/http/interceptors/language_interceptor.dart';
+import 'package:safe_beacon/data/sources/remote/http/interceptors/mock_interceptor.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// This class should only include truly global dependencies such as:
 /// - Logger

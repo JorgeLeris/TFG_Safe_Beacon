@@ -1,7 +1,7 @@
 /// The default language code for the application.
 ///
 /// This constant defines the default language code as 'es' (Spanish).
-final defaultAppLanguage = localeSpanish;
+const defaultAppLanguage = localeSpanish;
 
 /// The locale code for the Spanish language.
 ///
