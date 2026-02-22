@@ -1,0 +1,56 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "DEV",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "program": "lib/main_dev.dart",
+      "args": [
+        "--flavor",
+        "dev",
+        "--dart-define=FLAVOR=dev"
+      ]
+    },
+    {
+      "name": "PRE",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "program": "lib/main_pre.dart",
+      "args": [
+        "--flavor",
+        "pre",
+        "--dart-define=FLAVOR=pre"
+      ]
+    },
+    {
+      "name": "Prod",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "program": "lib/main_prod.dart",
+      "args": [
+        "--flavor",
+        "prod",
+        "--dart-define=FLAVOR=prod"
+      ]
+    },
+    // Use this configuration to run the app with mock or PRE when no mock available
+    {
+      "name": "Mock",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "program": "lib/main_pre.dart",
+      "args": [
+        "--flavor",
+        "pre",
+        "--target",
+        "lib/main_pre.dart",
+        "--dart-define=MOCK=true"
+      ]
+    }
+  ]
+}

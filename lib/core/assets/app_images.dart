@@ -1,0 +1,13 @@
+/// A class that holds the paths to images assets used in the application.
+///
+/// This class is abstract and final, meaning it cannot be instantiated or
+/// extended. It provides static constants for the paths to various images
+/// assets.
+abstract final class AppImages {
+  /// The base path for all image assets.
+  static const _basePath = 'assets/images';
+
+  // TODO(Team): replace with real images
+  /// The path to mock image use for onboarding.
+  static const mockImage = '$_basePath/app-icon-dev.png';
+}

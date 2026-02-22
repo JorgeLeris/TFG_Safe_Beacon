@@ -1,0 +1,7 @@
+{
+    "example": {
+        "ok": "example.json",
+        "empty": "example-empty.json",
+        "error": "example-error.json"
+    }
+}
