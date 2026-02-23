@@ -24,6 +24,21 @@ PROD
 flutter run --target lib/main_prod.dart --flavor prod
 ```
 
+## Generate APK
+
+DEV
+```sh
+flutter build apk --flavor dev --target lib/main_dev.dart
+```
+PRE
+```sh
+flutter build apk --flavor pre --target lib/main_pre.dart
+```
+PROD
+```sh
+flutter build apk --flavor prod --target lib/main_prod.dart
+```
+
 ## Localization
 
 Localization files are stored in `lib/core/language/l10n` directory. 
