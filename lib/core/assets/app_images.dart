@@ -7,7 +7,6 @@ abstract final class AppImages {
   /// The base path for all image assets.
   static const _basePath = 'assets/images';
 
-  // TODO(Team): replace with real images
-  /// The path to mock image use for onboarding.
-  static const mockImage = '$_basePath/app-icon-dev.png';
+  /// The path to the app icon image.
+  static const appIconImage = '$_basePath/app-icon.png';
 }

@@ -54,7 +54,7 @@ flavorizr:
     dev:
       app:
         name: "SafeBeacon Dev"
-        icon: "assets/images/app-icon-dev.png"
+        icon: "assets/images/app-icon.png"
       android:
         applicationId: "com.jlerisla.safebeacon.safebeacon.dev"
       ios:
@@ -62,7 +62,7 @@ flavorizr:
     pre:
       app:
         name: "SafeBeacon Pre"
-        icon: "assets/images/app-icon-pre.png"
+        icon: "assets/images/app-icon.png"
       android:
         applicationId: "com.jlerisla.safebeacon.safebeacon.pre"
       ios:
@@ -70,7 +70,7 @@ flavorizr:
     prod:
       app:
         name: "SafeBeacon"
-        icon: "assets/images/app-icon-prod.png"
+        icon: "assets/images/app-icon.png"
       android:
         applicationId: "com.jlerisla.safebeacon.safebeacon"
       ios:
