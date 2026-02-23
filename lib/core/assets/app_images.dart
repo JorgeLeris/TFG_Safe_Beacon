@@ -8,5 +8,5 @@ abstract final class AppImages {
   static const _basePath = 'assets/images';
 
   /// The path to the app icon image.
-  static const appIconImage = '$_basePath/app-icon.png';
+  static const appIconImage = '$_basePath/app-icon-android.png';
 }
