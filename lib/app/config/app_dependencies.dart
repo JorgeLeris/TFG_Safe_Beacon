@@ -56,9 +56,6 @@ class AppDependencies {
     final languageInterceptor = LanguageInterceptor(
       languageCode: languageCode,
       validateLanguageCode: (languageCode) {
-        if (languageCode == localeValencianApi) {
-          return true;
-        }
         return AppLocalizations.supportedLocales.any(
           (element) => element.languageCode == languageCode,
         );

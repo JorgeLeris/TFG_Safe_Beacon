@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 
 class DashboardShell extends StatelessWidget {
   const DashboardShell({super.key, required this.navigationShell});
@@ -14,6 +15,8 @@ class DashboardShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: Container(
@@ -30,31 +33,31 @@ class DashboardShell extends StatelessWidget {
           backgroundColor: Theme.of(context).colorScheme.surface,
           selectedIndex: navigationShell.currentIndex,
           onDestinationSelected: _onTap,
-          destinations: const [
+          destinations: [
             NavigationDestination(
-              icon: Icon(Icons.home_outlined),
-              selectedIcon: Icon(Icons.home),
-              label: 'Home',
+              icon: const Icon(Icons.home_outlined),
+              selectedIcon: const Icon(Icons.home),
+              label: l10n.tabHome,
             ),
             NavigationDestination(
-              icon: Icon(Icons.folder_open_outlined),
-              selectedIcon: Icon(Icons.folder),
-              label: 'Dashboard',
+              icon: const Icon(Icons.folder_open_outlined),
+              selectedIcon: const Icon(Icons.folder),
+              label: l10n.tabControl,
             ),
             NavigationDestination(
-              icon: Icon(Icons.chat_outlined),
-              selectedIcon: Icon(Icons.chat),
-              label: 'Chat',
+              icon: const Icon(Icons.chat_outlined),
+              selectedIcon: const Icon(Icons.chat),
+              label: l10n.tabChat,
             ),
             NavigationDestination(
-              icon: Icon(Icons.settings_outlined),
-              selectedIcon: Icon(Icons.settings),
-              label: 'Settings',
+              icon: const Icon(Icons.settings_outlined),
+              selectedIcon: const Icon(Icons.settings),
+              label: l10n.tabSettings,
             ),
             NavigationDestination(
-              icon: Icon(Icons.person_outline),
-              selectedIcon: Icon(Icons.person),
-              label: 'Profile',
+              icon: const Icon(Icons.person_outline),
+              selectedIcon: const Icon(Icons.person),
+              label: l10n.tabProfile,
             ),
           ],
         ),

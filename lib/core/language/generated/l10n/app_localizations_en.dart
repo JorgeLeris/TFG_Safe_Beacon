@@ -15,10 +15,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tabHome => 'Home';
 
   @override
-  String get tabSearch => 'Search';
+  String get tabControl => 'Dashboard';
 
   @override
-  String get tabAlerts => 'Alerts';
+  String get tabChat => 'Chat';
+
+  @override
+  String get tabSettings => 'Settings';
 
   @override
   String get tabProfile => 'Profile';

@@ -7,6 +7,7 @@ import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
 import 'app_localizations_es.dart';
+import 'app_localizations_fr.dart';
 
 // ignore_for_file: type=lint
 
@@ -96,6 +97,7 @@ abstract class AppLocalizations {
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
     Locale('es'),
+    Locale('fr'),
   ];
 
   /// No description provided for @appTitle.
@@ -110,17 +112,23 @@ abstract class AppLocalizations {
   /// **'Inicio'**
   String get tabHome;
 
-  /// No description provided for @tabSearch.
+  /// No description provided for @tabControl.
   ///
   /// In es, this message translates to:
-  /// **'Buscar'**
-  String get tabSearch;
+  /// **'Panel'**
+  String get tabControl;
 
-  /// No description provided for @tabAlerts.
+  /// No description provided for @tabChat.
   ///
   /// In es, this message translates to:
-  /// **'Avisos'**
-  String get tabAlerts;
+  /// **'Chat'**
+  String get tabChat;
+
+  /// No description provided for @tabSettings.
+  ///
+  /// In es, this message translates to:
+  /// **'Ajustes'**
+  String get tabSettings;
 
   /// No description provided for @tabProfile.
   ///
@@ -140,7 +148,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'es'].contains(locale.languageCode);
+      <String>['en', 'es', 'fr'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -153,6 +161,8 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
       return AppLocalizationsEn();
     case 'es':
       return AppLocalizationsEs();
+    case 'fr':
+      return AppLocalizationsFr();
   }
 
   throw FlutterError(

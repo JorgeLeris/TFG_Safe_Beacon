@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(body: Center(child: Text('Home')));
+    final l10n = context.l10n;
+
+    return Scaffold(body: Center(child: Text(l10n.tabHome)));
   }
 }

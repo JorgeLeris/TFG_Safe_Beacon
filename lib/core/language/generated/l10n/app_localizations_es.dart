@@ -15,10 +15,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get tabHome => 'Inicio';
 
   @override
-  String get tabSearch => 'Buscar';
+  String get tabControl => 'Panel';
 
   @override
-  String get tabAlerts => 'Avisos';
+  String get tabChat => 'Chat';
+
+  @override
+  String get tabSettings => 'Ajustes';
 
   @override
   String get tabProfile => 'Perfil';
