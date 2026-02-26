@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 ThemeData buildTheme({Brightness brightness = Brightness.light}) {
   return ThemeData(
     useMaterial3: true,
-    colorSchemeSeed: const Color(0xFF0066FF),
+    colorSchemeSeed: const Color(0xFF7198ce),
     brightness: brightness,
   );
 }
