@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safe_beacon/app/app.dart';
 import 'package:safe_beacon/app/config/app_dependencies.dart';
 import 'package:safe_beacon/app/config/environment.dart';
+import 'package:safe_beacon/app/monitoring/logging.dart';
 import 'package:safe_beacon/core/language/language.dart';
 import 'package:safe_beacon/data/repositories/app_settings_repository.dart';
 import 'package:safe_beacon/firebase_options.dart';
@@ -22,6 +23,9 @@ Future<void> mainCommon(Environment environment) async {
 
   // Get initial locale (saved, device, or default)
   final locale = await _getInitialAppLocale(appDeps.appSettingsRepository);
+
+  // Set up logging
+  setupLogging();
 
   // Run the app with global dependencies
   runApp(

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:safe_beacon/app/monitoring/logging.dart';
 import 'package:safe_beacon/data/sources/firebase/test/dto/test_firestore_dto.dart';
 import 'package:safe_beacon/data/sources/firebase/test/test_firestore_api.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
@@ -24,14 +25,21 @@ class TestRepositoryImpl implements TestRepository {
   /// if an error occurs.
   @override
   Future<Result<void>> createItem(String name) async {
+    appLogger.fine('Creating TestItem with name: $name');
+
     try {
       await _api.createItem(
         TestFirestoreDto(name: name, createdAt: DateTime.now()),
       );
+
+      appLogger.info('TestItem created successfully: $name');
       return const Result.success(null);
-    } on FirebaseException catch (e) {
+    } on FirebaseException catch (e, st) {
+      appLogger.warning('Firebase error creating TestItem (code: ${e.code})');
+      appLogger.severe('Exception while creating TestItem', e, st);
       return Result.failure(_mapFirebaseError(e));
-    } catch (_) {
+    } catch (e, st) {
+      appLogger.severe('Unexpected error creating TestItem', e, st);
       return const Result.failure(AppFailure.unknown());
     }
   }
@@ -42,6 +50,7 @@ class TestRepositoryImpl implements TestRepository {
   /// or an [AppFailure] if an error occurs.
   @override
   Future<Result<List<TestItem>>> getItems() async {
+    appLogger.fine('Fetching TestItems from Firestore');
     try {
       final docs = await _api.getItems();
 
@@ -49,10 +58,14 @@ class TestRepositoryImpl implements TestRepository {
           .map((doc) => TestItem(name: doc.name, createdAt: doc.createdAt))
           .toList();
 
+      appLogger.info('Fetched ${items.length} TestItems');
       return Result.success(items);
-    } on FirebaseException catch (e) {
+    } on FirebaseException catch (e, st) {
+      appLogger.warning('Firebase error fetching TestItems (code: ${e.code})');
+      appLogger.severe('Exception while fetching TestItems', e, st);
       return Result.failure(_mapFirebaseError(e));
-    } catch (_) {
+    } catch (e, st) {
+      appLogger.severe('Unexpected error fetching TestItems', e, st);
       return const Result.failure(AppFailure.unknown());
     }
   }
