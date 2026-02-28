@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "666649668288",
+    "project_id": "tfg-safe-beacon",
+    "storage_bucket": "tfg-safe-beacon.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:666649668288:android:435389a267f3b4cf469b25",
+        "android_client_info": {
+          "package_name": "com.jlerisla.safebeacon.safebeacon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcjg9r091kpWpEZmkT2Z6MPQTPuwt1Pec"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:666649668288:android:2d798a12f8f390e0469b25",
+        "android_client_info": {
+          "package_name": "com.jlerisla.safebeacon.safebeacon.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcjg9r091kpWpEZmkT2Z6MPQTPuwt1Pec"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:666649668288:android:3e8939bb010d0814469b25",
+        "android_client_info": {
+          "package_name": "com.jlerisla.safebeacon.safebeacon.pre"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDcjg9r091kpWpEZmkT2Z6MPQTPuwt1Pec"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

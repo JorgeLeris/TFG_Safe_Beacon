@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -8,9 +9,13 @@ import 'package:safe_beacon/app/config/app_dependencies.dart';
 import 'package:safe_beacon/app/config/environment.dart';
 import 'package:safe_beacon/core/language/language.dart';
 import 'package:safe_beacon/data/repositories/app_settings_repository.dart';
+import 'package:safe_beacon/firebase_options.dart';
 
 Future<void> mainCommon(Environment environment) async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Initialize global dependencies
   final appDeps = await AppDependencies.initialize(environment);
