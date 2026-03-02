@@ -4,9 +4,9 @@
 /// extended. It provides static constants and final variables for the paths
 /// to various icon assets.
 abstract final class AppIcons {
+  /// The base path for all icon assets.
   static const _basePath = 'assets/icons';
 
-  // TODO(Team): replace with real images
-  /// The path to mock image use for onboarding.
+  /// The path to mock icon.
   static const mockIcon = '$_basePath/mock-icon.svg';
 }

@@ -21,6 +21,8 @@ dependencies:
   shared_preferences: ^2.5.4
   logging: ^1.3.0
   intl: ^0.20.2
+  firebase_core: ^4.4.0
+  cloud_firestore: ^6.1.2
 
 dev_dependencies:
   flutter_test:
@@ -54,24 +56,27 @@ flavorizr:
     dev:
       app:
         name: "SafeBeacon Dev"
-        icon: "assets/images/app-icon-dev.png"
       android:
         applicationId: "com.jlerisla.safebeacon.safebeacon.dev"
+        icon: "assets/images/app-icon-android.png"
       ios:
         bundleId: "com.jlerisla.safebeacon.safebeacon.dev"
+        icon: "assets/images/app-icon-ios.png"
     pre:
       app:
         name: "SafeBeacon Pre"
-        icon: "assets/images/app-icon-pre.png"
       android:
         applicationId: "com.jlerisla.safebeacon.safebeacon.pre"
+        icon: "assets/images/app-icon-android.png"
       ios:
         bundleId: "com.jlerisla.safebeacon.safebeacon.pre"
+        icon: "assets/images/app-icon-ios.png"
     prod:
       app:
         name: "SafeBeacon"
-        icon: "assets/images/app-icon-prod.png"
       android:
         applicationId: "com.jlerisla.safebeacon.safebeacon"
+        icon: "assets/images/app-icon-android.png"
       ios:
         bundleId: "com.jlerisla.safebeacon.safebeacon"
+        icon: "assets/images/app-icon-ios.png"

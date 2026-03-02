@@ -20,6 +20,7 @@ class App extends StatelessWidget {
     return MaterialApp.router(
       title: 'safe_beacon',
       theme: buildTheme(),
+      darkTheme: buildTheme(brightness: Brightness.dark),
       routerConfig: router,
       debugShowCheckedModeBanner: false,
       locale: context.select((LanguageCubit cubit) => cubit.state.locale),

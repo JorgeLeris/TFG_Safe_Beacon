@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:safe_beacon/presentation/features/chat/routes/chat_routes.dart';
+import 'package:safe_beacon/presentation/features/control/routes/control_routes.dart';
 import 'package:safe_beacon/presentation/features/dashboard/dashboard_shell.dart';
 import 'package:safe_beacon/presentation/features/home/routes/home_routes.dart';
-import 'package:safe_beacon/presentation/features/search/routes/search_routes.dart';
-import 'package:safe_beacon/presentation/features/notifications/routes/notifications_routes.dart';
 import 'package:safe_beacon/presentation/features/profile/routes/profile_routes.dart';
+import 'package:safe_beacon/presentation/features/settings/routes/settings_routes.dart';
 import 'package:safe_beacon/presentation/shared/routes/mock_routes.dart';
 
 part 'app_router.g.dart';
@@ -18,19 +18,23 @@ part 'app_router.g.dart';
 /// Structure:
 /// - DashboardShell (bottom navigation)
 ///   - Home branch
-///   - Search branch
-///   - Notifications branch
+///   - Control branch
+///   - Chat branch
+///   - Settings branch
 ///   - Profile branch
 @TypedStatefulShellRoute<DashboardShellRoute>(
   branches: [
     TypedStatefulShellBranch<HomeBranch>(
       routes: [TypedGoRoute<HomeRoute>(path: '/home')],
     ),
-    TypedStatefulShellBranch<SearchBranch>(
-      routes: [TypedGoRoute<SearchRoute>(path: '/search')],
+    TypedStatefulShellBranch<ControlBranch>(
+      routes: [TypedGoRoute<ControlRoute>(path: '/control')],
     ),
-    TypedStatefulShellBranch<NotificationsBranch>(
-      routes: [TypedGoRoute<NotificationsRoute>(path: '/notifications')],
+    TypedStatefulShellBranch<ChatBranch>(
+      routes: [TypedGoRoute<ChatRoute>(path: '/chat')],
+    ),
+    TypedStatefulShellBranch<SettingsBranch>(
+      routes: [TypedGoRoute<SettingsRoute>(path: '/settings')],
     ),
     TypedStatefulShellBranch<ProfileBranch>(
       routes: [TypedGoRoute<ProfileRoute>(path: '/profile')],
@@ -56,16 +60,22 @@ class HomeBranch extends StatefulShellBranchData {
   static const String $initialLocation = '/home';
 }
 
-/// Search branch - Search functionality
-class SearchBranch extends StatefulShellBranchData {
-  const SearchBranch();
-  static const String $initialLocation = '/search';
+/// Control branch - Control functionality
+class ControlBranch extends StatefulShellBranchData {
+  const ControlBranch();
+  static const String $initialLocation = '/control';
 }
 
-/// Notifications branch - User notifications
-class NotificationsBranch extends StatefulShellBranchData {
-  const NotificationsBranch();
-  static const String $initialLocation = '/notifications';
+/// Chat branch - User chat
+class ChatBranch extends StatefulShellBranchData {
+  const ChatBranch();
+  static const String $initialLocation = '/chat';
+}
+
+/// Settings branch - User settings
+class SettingsBranch extends StatefulShellBranchData {
+  const SettingsBranch();
+  static const String $initialLocation = '/settings';
 }
 
 /// Profile branch - User profile and settings

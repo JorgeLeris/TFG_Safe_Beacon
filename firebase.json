@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"android":{"default":{"projectId":"tfg-safe-beacon","appId":"1:666649668288:android:3565caa2296d2479469b25","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"tfg-safe-beacon","configurations":{"android":"1:666649668288:android:3565caa2296d2479469b25","ios":"1:666649668288:ios:5a93a1c083e42398469b25"}}}}}}

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safe_beacon/core/extensions/context_extensions.dart';
+import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 
 class DashboardShell extends StatelessWidget {
   const DashboardShell({super.key, required this.navigationShell});
@@ -14,33 +16,53 @@ class DashboardShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final theme = context.theme;
+
     return Scaffold(
       body: navigationShell,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: navigationShell.currentIndex,
-        onDestinationSelected: _onTap,
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Home',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          border: Border(
+            top: BorderSide(
+              color: theme.colorScheme.outlineVariant,
+              width: 0.75,
+            ),
           ),
-          NavigationDestination(
-            icon: Icon(Icons.search_outlined),
-            selectedIcon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.notifications_outlined),
-            selectedIcon: Icon(Icons.notifications),
-            label: 'Alerts',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
+        ),
+        child: NavigationBar(
+          backgroundColor: theme.colorScheme.surface,
+          selectedIndex: navigationShell.currentIndex,
+          onDestinationSelected: _onTap,
+          destinations: [
+            NavigationDestination(
+              icon: const Icon(Icons.home_outlined),
+              selectedIcon: const Icon(Icons.home),
+              label: l10n.tabHome,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.folder_open_outlined),
+              selectedIcon: const Icon(Icons.folder),
+              label: l10n.tabControl,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.chat_outlined),
+              selectedIcon: const Icon(Icons.chat),
+              label: l10n.tabChat,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.settings_outlined),
+              selectedIcon: const Icon(Icons.settings),
+              label: l10n.tabSettings,
+            ),
+            NavigationDestination(
+              icon: const Icon(Icons.person_outline),
+              selectedIcon: const Icon(Icons.person),
+              label: l10n.tabProfile,
+            ),
+          ],
+        ),
       ),
     );
   }

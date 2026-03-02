@@ -1,0 +1,9 @@
+{
+  "@@locale": "fr",
+  "appTitle": "safe_beacon",
+  "tabHome": "Accueil",
+  "tabControl": "Tableau",
+  "tabChat": "Chat",
+  "tabSettings": "Paramètres",
+  "tabProfile": "Profil"
+}

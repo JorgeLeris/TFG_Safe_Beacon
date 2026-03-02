@@ -2,7 +2,8 @@
   "@@locale": "en",
   "appTitle": "safe_beacon",
   "tabHome": "Home",
-  "tabSearch": "Search",
-  "tabAlerts": "Alerts",
+  "tabControl": "Dashboard",
+  "tabChat": "Chat",
+  "tabSettings": "Settings",
   "tabProfile": "Profile"
 }
