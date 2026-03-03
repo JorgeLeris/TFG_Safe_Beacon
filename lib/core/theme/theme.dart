@@ -3,9 +3,21 @@ import 'package:flutter/material.dart';
 // TODO: Add cubit to manage the dark mode state (by default, if nothing is saved locally, use the device setting; otherwise, use the one saved in local storage).
 
 ThemeData buildTheme({Brightness brightness = Brightness.light}) {
+  final isDark = brightness == Brightness.dark;
+
+  final base = ColorScheme.fromSeed(
+    seedColor: const Color(0xFF86A7D5),
+    brightness: brightness,
+  );
+
   return ThemeData(
     useMaterial3: true,
-    colorSchemeSeed: const Color(0xFF7198ce),
     brightness: brightness,
+    colorScheme: base.copyWith(
+      primary: isDark ? const Color(0xFF1D264D) : const Color(0xFF86A7D5),
+      secondary: isDark ? const Color(0xFF3B486F) : const Color(0xFF48527A),
+      onPrimary: isDark ? Colors.white : Colors.black,
+      onSecondary: Colors.white,
+    ),
   );
 }
