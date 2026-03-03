@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safe_beacon/presentation/features/auth/routes/auth_routes.dart';
 import 'package:safe_beacon/presentation/features/chat/routes/chat_routes.dart';
 import 'package:safe_beacon/presentation/features/control/routes/control_routes.dart';
 import 'package:safe_beacon/presentation/features/dashboard/dashboard_shell.dart';
@@ -99,7 +100,7 @@ GoRouter buildAppRouter() {
       : <RouteBase>[];
 
   return GoRouter(
-    routes: [...$appRoutes, ...mockRoutes],
-    initialLocation: HomeBranch.$initialLocation,
+    routes: [...$appRoutes, $authRoute, ...mockRoutes],
+    initialLocation: '/login',
   );
 }
