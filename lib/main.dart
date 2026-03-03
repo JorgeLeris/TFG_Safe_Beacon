@@ -44,7 +44,12 @@ Future<void> mainCommon(Environment environment) async {
           appSettingsRepository: appDeps.appSettingsRepository,
           interceptor: appDeps.languageInterceptor,
         ),
-        child: const App(),
+        child: const SafeArea(
+          left: false,
+          right: false,
+          top: false,
+          child: App(),
+        ),
       ),
     ),
   );
