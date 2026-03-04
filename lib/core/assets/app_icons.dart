@@ -9,4 +9,7 @@ abstract final class AppIcons {
 
   /// The path to mock icon.
   static const mockIcon = '$_basePath/mock-icon.svg';
+
+  /// The path to google icon.
+  static const googleIcon = '$_basePath/google-icon.svg';
 }

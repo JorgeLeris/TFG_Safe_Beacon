@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:safe_beacon/core/assets/assets.dart';
 import 'package:safe_beacon/core/extensions/context_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/presentation/features/home/routes/home_routes.dart';
@@ -38,10 +39,7 @@ class LoginScreen extends StatelessWidget {
               Positioned(
                 bottom: 15,
                 right: 15,
-                child: SvgPicture.asset(
-                  'assets/images/login-image.svg',
-                  height: 185,
-                ),
+                child: SvgPicture.asset(AppImages.loginImage, height: 185),
               ),
 
               Padding(
@@ -163,10 +161,7 @@ class LoginScreen extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SvgPicture.asset(
-                              'assets/icons/google-icon.svg',
-                              height: 24,
-                            ),
+                            SvgPicture.asset(AppIcons.googleIcon, height: 24),
                             const SizedBox(width: 8),
                             Text(l10n.loginGoogle),
                           ],
