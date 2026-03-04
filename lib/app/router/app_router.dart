@@ -100,7 +100,13 @@ GoRouter buildAppRouter() {
       : <RouteBase>[];
 
   return GoRouter(
-    routes: [...$appRoutes, $authRoute, ...mockRoutes],
+    routes: [
+      // TODO: change home route when auth is ready
+      GoRoute(path: '/', redirect: (_, _) => '/login'),
+      ...$appRoutes,
+      $authRoute,
+      ...mockRoutes,
+    ],
     initialLocation: '/login',
   );
 }
