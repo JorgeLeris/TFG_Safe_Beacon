@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:safe_beacon/core/extensions/context_extensions.dart';
 
 class InputField extends StatefulWidget {
   final String hint;
@@ -12,40 +13,81 @@ class InputField extends StatefulWidget {
 
 class _InputFieldState extends State<InputField> {
   bool _obscureText = true;
+  final FocusNode _focusNode = FocusNode();
+  bool _hasText = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  bool get _isActive => _focusNode.hasFocus || _hasText;
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = context.colorScheme;
+
     return Material(
       elevation: 4,
       borderRadius: BorderRadius.circular(14),
-      child: TextField(
-        obscureText: widget.isPassword && _obscureText,
-        style: const TextStyle(color: Colors.black),
-        decoration: InputDecoration(
-          hintText: widget.hint,
-          filled: true,
-          fillColor: Colors.white,
-          hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.4)),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
+      child: Stack(
+        children: [
+          TextField(
+            focusNode: _focusNode,
+            onChanged: (value) => setState(() => _hasText = value.isNotEmpty),
+            obscureText: widget.isPassword && _obscureText,
+            style: const TextStyle(color: Colors.black),
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Colors.white,
+              contentPadding: const EdgeInsets.fromLTRB(12, 24, 12, 8),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(color: colorScheme.tertiary),
+              ),
+              suffixIcon: widget.isPassword
+                  ? IconButton(
+                      icon: Icon(
+                        _obscureText
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: Colors.black.withValues(alpha: 0.5),
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureText = !_obscureText;
+                        });
+                      },
+                    )
+                  : null,
+            ),
           ),
-          suffixIcon: widget.isPassword
-              ? IconButton(
-                  icon: Icon(
-                    _obscureText
-                        ? Icons.visibility_off_outlined
-                        : Icons.visibility_outlined,
-                    color: Colors.black.withValues(alpha: 0.5),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      _obscureText = !_obscureText;
-                    });
-                  },
-                )
-              : null,
-        ),
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeInOut,
+            left: 15,
+            top: _isActive ? 6 : 16,
+            child: AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 180),
+              style: TextStyle(
+                fontSize: _isActive ? 11 : 16,
+                color: Colors.black.withValues(alpha: 0.4),
+              ),
+              child: Text(widget.hint),
+            ),
+          ),
+        ],
       ),
     );
   }
