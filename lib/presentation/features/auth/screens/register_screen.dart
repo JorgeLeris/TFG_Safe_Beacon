@@ -73,7 +73,9 @@ class RegisterScreen extends StatelessWidget {
                     height: 50,
                     child: CustomFilledButton(
                       text: l10n.next,
-                      onPressed: () {},
+                      onPressed: () {
+                        const RegisterAddDataRoute().push(context);
+                      },
                       backgroundColor: colorScheme.inversePrimary,
                       foregroundColor: colorScheme.onPrimary,
                       colorText: colorScheme.onPrimary,

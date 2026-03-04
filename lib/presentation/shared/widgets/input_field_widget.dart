@@ -4,8 +4,14 @@ import 'package:safe_beacon/core/extensions/context_extensions.dart';
 class InputField extends StatefulWidget {
   final String hint;
   final bool isPassword;
+  final int maxLines;
 
-  const InputField({super.key, required this.hint, this.isPassword = false});
+  const InputField({
+    super.key,
+    required this.hint,
+    this.isPassword = false,
+    this.maxLines = 1,
+  });
 
   @override
   State<InputField> createState() => _InputFieldState();
@@ -30,6 +36,8 @@ class _InputFieldState extends State<InputField> {
 
   bool get _isActive => _focusNode.hasFocus || _hasText;
 
+  double get _topContentPadding => widget.maxLines > 1 ? 28 : 24;
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
@@ -43,11 +51,18 @@ class _InputFieldState extends State<InputField> {
             focusNode: _focusNode,
             onChanged: (value) => setState(() => _hasText = value.isNotEmpty),
             obscureText: widget.isPassword && _obscureText,
+            maxLines: widget.isPassword ? 1 : widget.maxLines,
+            minLines: widget.isPassword ? 1 : widget.maxLines,
             style: const TextStyle(color: Colors.black),
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white,
-              contentPadding: const EdgeInsets.fromLTRB(12, 24, 12, 8),
+              contentPadding: EdgeInsets.fromLTRB(
+                12,
+                _topContentPadding,
+                12,
+                8,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,

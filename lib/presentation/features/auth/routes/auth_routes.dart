@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:safe_beacon/presentation/features/auth/screens/login_screen.dart';
+import 'package:safe_beacon/presentation/features/auth/screens/register_add_data_screen.dart';
 import 'package:safe_beacon/presentation/features/auth/screens/register_screen.dart';
 
 part 'auth_routes.g.dart';
@@ -12,7 +13,13 @@ part 'auth_routes.g.dart';
   path: '/auth',
   routes: [
     // /auth/register
-    TypedGoRoute<RegisterRoute>(path: 'register'),
+    TypedGoRoute<RegisterRoute>(
+      path: 'register',
+      routes: [
+        // /auth/register/register-data
+        TypedGoRoute<RegisterAddDataRoute>(path: 'register-data'),
+      ],
+    ),
   ],
 )
 class AuthRoute extends GoRouteData with $AuthRoute {
@@ -29,4 +36,12 @@ class RegisterRoute extends GoRouteData with $RegisterRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       const RegisterScreen();
+}
+
+class RegisterAddDataRoute extends GoRouteData with $RegisterAddDataRoute {
+  const RegisterAddDataRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const RegisterAddDataScreen();
 }
