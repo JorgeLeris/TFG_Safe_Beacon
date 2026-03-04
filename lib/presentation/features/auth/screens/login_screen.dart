@@ -6,6 +6,7 @@ import 'package:safe_beacon/core/extensions/context_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/presentation/features/auth/routes/auth_routes.dart';
 import 'package:safe_beacon/presentation/features/home/routes/home_routes.dart';
+import 'package:safe_beacon/presentation/shared/widgets/custom_filled_button.dart';
 import 'package:safe_beacon/presentation/shared/widgets/input_field_widget.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -78,23 +79,16 @@ class LoginScreen extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     height: 50,
-                    child: FilledButton(
-                      style: FilledButton.styleFrom(
-                        backgroundColor: colorScheme.inversePrimary,
-                        foregroundColor: colorScheme.onPrimary,
-                        shape: const StadiumBorder(),
-                      ),
+                    child: CustomFilledButton(
+                      text: l10n.login,
                       onPressed: () {
                         // TODO: change with de correct logic
                         const HomeRoute().go(context);
                       },
-                      child: Text(
-                        l10n.login,
-                        style: TextStyle(
-                          fontSize: textTheme.labelLarge!.fontSize! * 1.2,
-                          color: colorScheme.onPrimary,
-                        ),
-                      ),
+                      backgroundColor: colorScheme.inversePrimary,
+                      foregroundColor: colorScheme.onPrimary,
+                      colorText: colorScheme.onPrimary,
+                      fontSizeText: textTheme.labelLarge!.fontSize! * 1.2,
                     ),
                   ),
 
