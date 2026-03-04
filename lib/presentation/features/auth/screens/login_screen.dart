@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:safe_beacon/core/extensions/context_extensions.dart';
 import 'package:safe_beacon/presentation/features/home/routes/home_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/input_field_widget.dart';
 
@@ -8,8 +9,8 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = context.colorScheme;
+    final textTheme = context.textTheme;
 
     // TODO: traducir
 
@@ -17,7 +18,7 @@ class LoginScreen extends StatelessWidget {
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: colorScheme.primary,
+        backgroundColor: colorScheme.surfaceContainerHigh,
         body: MediaQuery(
           data: MediaQuery.of(context).copyWith(viewInsets: EdgeInsets.zero),
           child: Stack(
@@ -26,9 +27,11 @@ class LoginScreen extends StatelessWidget {
                 children: [
                   Expanded(
                     flex: 7,
-                    child: Container(color: colorScheme.primary),
+                    child: Container(color: colorScheme.surfaceContainerHigh),
                   ),
-                  Expanded(child: Container(color: colorScheme.tertiary)),
+                  Expanded(
+                    child: Container(color: colorScheme.surfaceContainer),
+                  ),
                 ],
               ),
 
@@ -53,7 +56,7 @@ class LoginScreen extends StatelessWidget {
                         'SafeBeacon',
                         style: textTheme.headlineLarge?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: colorScheme.onSecondary,
+                          color: colorScheme.onPrimary,
                           fontSize: textTheme.headlineLarge!.fontSize! * 1.2,
                         ),
                       ),
@@ -70,7 +73,7 @@ class LoginScreen extends StatelessWidget {
                     Text(
                       '¿Has olvidado tu contraseña?',
                       style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onPrimary,
+                        color: colorScheme.onSurface,
                       ),
                     ),
 
@@ -81,8 +84,8 @@ class LoginScreen extends StatelessWidget {
                       height: 50,
                       child: FilledButton(
                         style: FilledButton.styleFrom(
-                          backgroundColor: colorScheme.secondary,
-                          foregroundColor: colorScheme.onSecondary,
+                          backgroundColor: colorScheme.inversePrimary,
+                          foregroundColor: colorScheme.onPrimary,
                           shape: const StadiumBorder(),
                         ),
                         onPressed: () {
@@ -92,7 +95,7 @@ class LoginScreen extends StatelessWidget {
                           'Iniciar sesión',
                           style: TextStyle(
                             fontSize: textTheme.labelLarge!.fontSize! * 1.2,
-                            color: colorScheme.onSecondary,
+                            color: colorScheme.onPrimary,
                           ),
                         ),
                       ),
@@ -104,7 +107,7 @@ class LoginScreen extends StatelessWidget {
                       child: Text.rich(
                         TextSpan(
                           style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onPrimary,
+                            color: colorScheme.onSurface,
                           ),
                           text: '¿No tienes cuenta? ',
                           children: const [
@@ -123,7 +126,7 @@ class LoginScreen extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Divider(
-                            color: colorScheme.onPrimary.withValues(alpha: 0.4),
+                            color: colorScheme.onSurface.withValues(alpha: 0.4),
                           ),
                         ),
                         Padding(
@@ -131,13 +134,13 @@ class LoginScreen extends StatelessWidget {
                           child: Text(
                             'O continuar con',
                             style: textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onPrimary,
+                              color: colorScheme.onSurface,
                             ),
                           ),
                         ),
                         Expanded(
                           child: Divider(
-                            color: colorScheme.onPrimary.withValues(alpha: 0.4),
+                            color: colorScheme.onSurface.withValues(alpha: 0.4),
                           ),
                         ),
                       ],
@@ -150,8 +153,8 @@ class LoginScreen extends StatelessWidget {
                       height: 50,
                       child: FilledButton(
                         style: FilledButton.styleFrom(
-                          backgroundColor: colorScheme.secondary,
-                          foregroundColor: colorScheme.onSecondary,
+                          backgroundColor: colorScheme.inversePrimary,
+                          foregroundColor: colorScheme.onPrimary,
                           shape: const StadiumBorder(),
                         ),
                         onPressed: () {},

@@ -17,22 +17,19 @@ class DashboardShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    final theme = context.theme;
+    final colorScheme = context.colorScheme;
 
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
+          color: colorScheme.surface,
           border: Border(
-            top: BorderSide(
-              color: theme.colorScheme.outlineVariant,
-              width: 0.75,
-            ),
+            top: BorderSide(color: colorScheme.outlineVariant, width: 0.75),
           ),
         ),
         child: NavigationBar(
-          backgroundColor: theme.colorScheme.surface,
+          backgroundColor: colorScheme.surfaceContainer,
           selectedIndex: navigationShell.currentIndex,
           onDestinationSelected: _onTap,
           destinations: [

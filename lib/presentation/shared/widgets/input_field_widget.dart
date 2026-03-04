@@ -17,6 +17,7 @@ class _InputFieldState extends State<InputField> {
   Widget build(BuildContext context) {
     return Material(
       elevation: 4,
+      borderRadius: BorderRadius.circular(14),
       child: TextField(
         obscureText: widget.isPassword && _obscureText,
         style: const TextStyle(color: Colors.black),
