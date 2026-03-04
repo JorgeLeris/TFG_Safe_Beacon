@@ -20,161 +20,154 @@ class LoginScreen extends StatelessWidget {
       child: Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: colorScheme.surfaceContainerHigh,
-        body: MediaQuery(
-          data: MediaQuery.of(context).copyWith(viewInsets: EdgeInsets.zero),
-          child: Stack(
-            children: [
-              Column(
+        body: Stack(
+          children: [
+            Column(
+              children: [
+                Expanded(
+                  flex: 7,
+                  child: Container(color: colorScheme.surfaceContainerHigh),
+                ),
+                Expanded(child: Container(color: colorScheme.surfaceContainer)),
+              ],
+            ),
+
+            Positioned(
+              bottom: 15,
+              right: 15,
+              child: SvgPicture.asset(AppImages.loginImage, height: 185),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.only(right: 32, left: 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    flex: 7,
-                    child: Container(color: colorScheme.surfaceContainerHigh),
+                  const SizedBox(height: 75),
+
+                  Center(
+                    child: Text(
+                      l10n.appName,
+                      style: textTheme.headlineLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.onPrimary,
+                        fontSize: textTheme.headlineLarge!.fontSize! * 1.2,
+                      ),
+                    ),
                   ),
-                  Expanded(
-                    child: Container(color: colorScheme.surfaceContainer),
+
+                  const SizedBox(height: 40),
+
+                  InputField(hint: l10n.email),
+                  const SizedBox(height: 24),
+                  InputField(hint: l10n.password, isPassword: true),
+
+                  const SizedBox(height: 12),
+
+                  Text(
+                    l10n.forgotPassword,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSurface,
+                    ),
                   ),
-                ],
-              ),
 
-              Positioned(
-                bottom: 15,
-                right: 15,
-                child: SvgPicture.asset(AppImages.loginImage, height: 185),
-              ),
+                  const SizedBox(height: 24),
 
-              Padding(
-                padding: const EdgeInsets.only(right: 32, left: 32),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 75),
-
-                    Center(
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colorScheme.inversePrimary,
+                        foregroundColor: colorScheme.onPrimary,
+                        shape: const StadiumBorder(),
+                      ),
+                      onPressed: () {
+                        const HomeRoute().go(context);
+                      },
                       child: Text(
-                        l10n.appName,
-                        style: textTheme.headlineLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
+                        l10n.login,
+                        style: TextStyle(
+                          fontSize: textTheme.labelLarge!.fontSize! * 1.2,
                           color: colorScheme.onPrimary,
-                          fontSize: textTheme.headlineLarge!.fontSize! * 1.2,
                         ),
                       ),
                     ),
+                  ),
 
-                    const SizedBox(height: 40),
+                  const SizedBox(height: 16),
 
-                    InputField(hint: l10n.email),
-                    const SizedBox(height: 24),
-                    InputField(hint: l10n.password, isPassword: true),
-
-                    const SizedBox(height: 12),
-
-                    Text(
-                      l10n.forgotPassword,
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurface,
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: colorScheme.inversePrimary,
-                          foregroundColor: colorScheme.onPrimary,
-                          shape: const StadiumBorder(),
+                  Center(
+                    child: Text.rich(
+                      TextSpan(
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface,
                         ),
-                        onPressed: () {
-                          const HomeRoute().go(context);
-                        },
-                        child: Text(
-                          l10n.login,
-                          style: TextStyle(
-                            fontSize: textTheme.labelLarge!.fontSize! * 1.2,
-                            color: colorScheme.onPrimary,
+                        text: l10n.dontHaveAccount,
+                        children: [
+                          TextSpan(
+                            text: l10n.register,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
-                        ),
+                        ],
                       ),
                     ),
+                  ),
 
-                    const SizedBox(height: 16),
+                  const SizedBox(height: 32),
 
-                    Center(
-                      child: Text.rich(
-                        TextSpan(
-                          style: textTheme.bodyMedium?.copyWith(
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Divider(
+                          color: colorScheme.onSurface.withValues(alpha: 0.4),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          l10n.continueWith,
+                          style: textTheme.bodySmall?.copyWith(
                             color: colorScheme.onSurface,
                           ),
-                          text: l10n.dontHaveAccount,
-                          children: [
-                            TextSpan(
-                              text: l10n.register,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
                         ),
                       ),
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            color: colorScheme.onSurface.withValues(alpha: 0.4),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Text(
-                            l10n.continueWith,
-                            style: textTheme.bodySmall?.copyWith(
-                              color: colorScheme.onSurface,
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          child: Divider(
-                            color: colorScheme.onSurface.withValues(alpha: 0.4),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: colorScheme.inversePrimary,
-                          foregroundColor: colorScheme.onPrimary,
-                          shape: const StadiumBorder(),
-                        ),
-                        onPressed: () {},
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(AppIcons.googleIcon, height: 24),
-                            const SizedBox(width: 8),
-                            Text(l10n.loginGoogle),
-                          ],
+                      Expanded(
+                        child: Divider(
+                          color: colorScheme.onSurface.withValues(alpha: 0.4),
                         ),
                       ),
-                    ),
+                    ],
+                  ),
 
-                    const SizedBox(height: 25),
-                  ],
-                ),
+                  const SizedBox(height: 20),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: colorScheme.inversePrimary,
+                        foregroundColor: colorScheme.onPrimary,
+                        shape: const StadiumBorder(),
+                      ),
+                      onPressed: () {},
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SvgPicture.asset(AppIcons.googleIcon, height: 24),
+                          const SizedBox(width: 8),
+                          Text(l10n.loginGoogle),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 25),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
