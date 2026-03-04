@@ -36,8 +36,6 @@ class _InputFieldState extends State<InputField> {
 
   bool get _isActive => _focusNode.hasFocus || _hasText;
 
-  double get _topContentPadding => widget.maxLines > 1 ? 28 : 24;
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
@@ -57,12 +55,7 @@ class _InputFieldState extends State<InputField> {
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white,
-              contentPadding: EdgeInsets.fromLTRB(
-                12,
-                _topContentPadding,
-                12,
-                8,
-              ),
+              contentPadding: const EdgeInsets.fromLTRB(12, 35, 12, 2),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,
