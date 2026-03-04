@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:safe_beacon/core/extensions/context_extensions.dart';
+import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/presentation/features/home/routes/home_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/input_field_widget.dart';
 
@@ -11,8 +12,7 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
     final textTheme = context.textTheme;
-
-    // TODO: traducir
+    final l10n = context.l10n;
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -53,7 +53,7 @@ class LoginScreen extends StatelessWidget {
 
                     Center(
                       child: Text(
-                        'SafeBeacon',
+                        l10n.appName,
                         style: textTheme.headlineLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: colorScheme.onPrimary,
@@ -64,14 +64,14 @@ class LoginScreen extends StatelessWidget {
 
                     const SizedBox(height: 40),
 
-                    const InputField(hint: 'Correo electrónico'),
+                    InputField(hint: l10n.email),
                     const SizedBox(height: 24),
-                    const InputField(hint: 'Contraseña', isPassword: true),
+                    InputField(hint: l10n.password, isPassword: true),
 
                     const SizedBox(height: 12),
 
                     Text(
-                      '¿Has olvidado tu contraseña?',
+                      l10n.forgotPassword,
                       style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurface,
                       ),
@@ -92,7 +92,7 @@ class LoginScreen extends StatelessWidget {
                           const HomeRoute().go(context);
                         },
                         child: Text(
-                          'Iniciar sesión',
+                          l10n.login,
                           style: TextStyle(
                             fontSize: textTheme.labelLarge!.fontSize! * 1.2,
                             color: colorScheme.onPrimary,
@@ -109,11 +109,13 @@ class LoginScreen extends StatelessWidget {
                           style: textTheme.bodyMedium?.copyWith(
                             color: colorScheme.onSurface,
                           ),
-                          text: '¿No tienes cuenta? ',
-                          children: const [
+                          text: l10n.dontHaveAccount,
+                          children: [
                             TextSpan(
-                              text: 'Regístrate aquí',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              text: l10n.register,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ],
                         ),
@@ -132,7 +134,7 @@ class LoginScreen extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           child: Text(
-                            'O continuar con',
+                            l10n.continueWith,
                             style: textTheme.bodySmall?.copyWith(
                               color: colorScheme.onSurface,
                             ),
@@ -166,7 +168,7 @@ class LoginScreen extends StatelessWidget {
                               height: 24,
                             ),
                             const SizedBox(width: 8),
-                            const Text('Continuar con Google'),
+                            Text(l10n.loginGoogle),
                           ],
                         ),
                       ),

@@ -5,5 +5,14 @@
   "tabControl": "Panel",
   "tabChat": "Chat",
   "tabSettings": "Ajustes",
-  "tabProfile": "Perfil"
+  "tabProfile": "Perfil",
+  "appName": "SafeBeacon",
+  "email": "Correo electrónico",
+  "password": "Contraseña",
+  "forgotPassword": "¿Has olvidado tu contraseña?",
+  "login": "Iniciar sesión",
+  "dontHaveAccount": "¿No tienes cuenta? ",
+  "register": "Regístrate aquí",
+  "continueWith": "O continuar con",
+  "loginGoogle": "Continuar con Google"
 }
