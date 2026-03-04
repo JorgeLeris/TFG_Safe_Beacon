@@ -14,5 +14,9 @@
   "dontHaveAccount": "Vous n'avez pas de compte ? ",
   "register": "Inscrivez-vous ici",
   "continueWith": "Ou continuer avec",
-  "loginGoogle": "Continuer avec Google"
+  "loginGoogle": "Continuer avec Google",
+  "confirmPassword": "Confirmer le mot de passe",
+  "next": "Suivant",
+  "haveAccount": "Vous avez déjà un compte ? ",
+  "loginHere": "Connectez-vous ici"
 }

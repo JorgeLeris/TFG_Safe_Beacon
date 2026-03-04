@@ -14,5 +14,9 @@
   "dontHaveAccount": "Don't have an account? ",
   "register": "Sign up here",
   "continueWith": "Or continue with",
-  "loginGoogle": "Continue with Google"
+  "loginGoogle": "Continue with Google",
+  "confirmPassword": "Confirm password",
+  "next": "Next",
+  "haveAccount": "Already have an account? ",
+  "loginHere": "Log in here"
 }

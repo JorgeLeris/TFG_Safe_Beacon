@@ -102,11 +102,11 @@ GoRouter buildAppRouter() {
   return GoRouter(
     routes: [
       // TODO: change home route when auth is ready
-      GoRoute(path: '/', redirect: (_, _) => '/login'),
+      GoRoute(path: '/', redirect: (_, _) => '/auth'),
       ...$appRoutes,
       $authRoute,
       ...mockRoutes,
     ],
-    initialLocation: '/login',
+    initialLocation: '/auth',
   );
 }

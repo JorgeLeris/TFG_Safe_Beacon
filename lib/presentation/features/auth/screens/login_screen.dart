@@ -1,8 +1,10 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:safe_beacon/core/assets/assets.dart';
 import 'package:safe_beacon/core/extensions/context_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/presentation/features/auth/routes/auth_routes.dart';
 import 'package:safe_beacon/presentation/features/home/routes/home_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/input_field_widget.dart';
 
@@ -83,6 +85,7 @@ class LoginScreen extends StatelessWidget {
                         shape: const StadiumBorder(),
                       ),
                       onPressed: () {
+                        // TODO: change with de correct logic
                         const HomeRoute().go(context);
                       },
                       child: Text(
@@ -108,6 +111,11 @@ class LoginScreen extends StatelessWidget {
                           TextSpan(
                             text: l10n.register,
                             style: const TextStyle(fontWeight: FontWeight.bold),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                const RegisterRoute().go(context);
+                                FocusScope.of(context).unfocus();
+                              },
                           ),
                         ],
                       ),
