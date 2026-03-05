@@ -18,5 +18,15 @@
   "confirmPassword": "Confirm password",
   "next": "Next",
   "haveAccount": "Already have an account? ",
-  "loginHere": "Log in here"
+  "loginHere": "Log in here",
+  "name": "Name",
+  "surname": "Surname",
+  "birthDate": "Birth Date",
+  "gender": "Gender",
+  "male": "Male",
+  "female": "Female",
+  "other": "Other",
+  "descriptionObservation": "Description / Observations",
+  "back": "Back",
+  "createAccount": "Create Account"
 }

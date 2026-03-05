@@ -51,32 +51,32 @@ class RegisterAddDataScreen extends StatelessWidget {
                     children: [
                       const SizedBox(height: 20),
 
-                      InputField(hint: 'Nombre'),
+                      InputField(hint: l10n.name),
                       const SizedBox(height: 24),
-                      InputField(hint: 'Apellidos'),
+                      InputField(hint: l10n.surname),
                       const SizedBox(height: 24),
-                      DateInputField(hint: 'Fecha de nacimiento'),
+                      DateInputField(hint: l10n.birthDate),
                       const SizedBox(height: 24),
                       DropdownInputField(
-                        hint: 'Género',
+                        hint: l10n.gender,
                         items: [
                           DropdownMenuItem(
                             value: Constants.maleFieldKey,
-                            child: Text('Masculino'),
+                            child: Text(l10n.male),
                           ),
                           DropdownMenuItem(
                             value: Constants.femaleFieldKey,
-                            child: Text('Femenino'),
+                            child: Text(l10n.female),
                           ),
                           DropdownMenuItem(
                             value: Constants.otherFieldKey,
-                            child: Text('Otro'),
+                            child: Text(l10n.other),
                           ),
                         ],
                       ),
                       const SizedBox(height: 24),
                       InputField(
-                        hint: 'Descripción / observaciones',
+                        hint: l10n.descriptionObservation,
                         maxLines: 5,
                       ),
 
@@ -88,7 +88,7 @@ class RegisterAddDataScreen extends StatelessWidget {
                             child: SizedBox(
                               height: 50,
                               child: CustomFilledButton(
-                                text: 'Atrás',
+                                text: l10n.back,
                                 onPressed: () {
                                   context.pop();
                                 },
@@ -107,7 +107,7 @@ class RegisterAddDataScreen extends StatelessWidget {
                             child: SizedBox(
                               height: 50,
                               child: CustomFilledButton(
-                                text: 'Crear cuenta',
+                                text: l10n.createAccount,
                                 onPressed: () {},
                                 backgroundColor: colorScheme.inversePrimary,
                                 foregroundColor: colorScheme.onPrimary,
