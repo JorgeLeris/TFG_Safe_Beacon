@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:safe_beacon/core/assets/assets.dart';
 import 'package:safe_beacon/core/extensions/context_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
-import 'package:safe_beacon/presentation/shared/widgets/custom_filled_button.dart';
+import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -15,34 +15,10 @@ class ProfileScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
-      appBar: AppBar(
-        backgroundColor: colorScheme.surfaceContainer,
-        scrolledUnderElevation: 0,
-        title: Text(
-          l10n.appName,
-          style: textTheme.titleLarge?.copyWith(
-            color: colorScheme.onSurfaceVariant,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        centerTitle: true,
-        elevation: 0,
-      ),
+      appBar: const CustomAppBar(),
       body: Column(
         children: [
-          Container(
-            width: double.infinity,
-            color: colorScheme.primary,
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Text(
-              l10n.tabProfile,
-              textAlign: TextAlign.center,
-              style: textTheme.titleMedium?.copyWith(
-                color: colorScheme.onPrimary,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-          ),
+          SectionHeader(text: l10n.tabProfile),
 
           Expanded(
             child: SingleChildScrollView(

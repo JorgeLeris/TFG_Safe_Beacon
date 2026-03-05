@@ -6,8 +6,7 @@ import 'package:safe_beacon/core/extensions/context_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/presentation/features/auth/routes/auth_routes.dart';
 import 'package:safe_beacon/presentation/features/home/routes/home_routes.dart';
-import 'package:safe_beacon/presentation/shared/widgets/custom_filled_button.dart';
-import 'package:safe_beacon/presentation/shared/widgets/input_field_widget.dart';
+import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
