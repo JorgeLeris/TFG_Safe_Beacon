@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/extensions/context_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/presentation/shared/widgets/custom_filled_button.dart';
 import 'package:safe_beacon/presentation/shared/widgets/date_input_field_widget.dart';
+import 'package:safe_beacon/presentation/shared/widgets/dropdown_input_field.dart';
 import 'package:safe_beacon/presentation/shared/widgets/input_field_widget.dart';
 
 class RegisterAddDataScreen extends StatelessWidget {
@@ -55,7 +57,23 @@ class RegisterAddDataScreen extends StatelessWidget {
                       const SizedBox(height: 24),
                       DateInputField(hint: 'Fecha de nacimiento'),
                       const SizedBox(height: 24),
-                      InputField(hint: 'Género'),
+                      DropdownInputField(
+                        hint: 'Género',
+                        items: [
+                          DropdownMenuItem(
+                            value: Constants.maleFieldKey,
+                            child: Text('Masculino'),
+                          ),
+                          DropdownMenuItem(
+                            value: Constants.femaleFieldKey,
+                            child: Text('Femenino'),
+                          ),
+                          DropdownMenuItem(
+                            value: Constants.otherFieldKey,
+                            child: Text('Otro'),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 24),
                       InputField(
                         hint: 'Descripción / observaciones',

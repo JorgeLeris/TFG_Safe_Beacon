@@ -55,7 +55,7 @@ class _InputFieldState extends State<InputField> {
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white,
-              contentPadding: const EdgeInsets.fromLTRB(12, 35, 12, 2),
+              contentPadding: const EdgeInsets.fromLTRB(12, 24, 12, 8),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,
