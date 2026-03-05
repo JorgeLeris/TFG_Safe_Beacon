@@ -32,5 +32,6 @@
   "edit": "Edit",
   "editProfile": "Edit Profile",
   "logout": "Logout",
-  "save": "Save"
+  "save": "Save",
+  "finishRegistration": "Finish Registration"
 }

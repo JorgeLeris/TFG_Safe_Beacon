@@ -32,5 +32,6 @@
   "edit": "Editar",
   "editProfile": "Editar perfil",
   "logout": "Cerrar sesión",
-  "save": "Guardar"
+  "save": "Guardar",
+  "finishRegistration": "Finalizar registro"
 }

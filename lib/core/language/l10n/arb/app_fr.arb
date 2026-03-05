@@ -32,5 +32,6 @@
   "edit": "Modifier",
   "editProfile": "Modifier le profil",
   "logout": "Déconnexion",
-  "save": "Sauvegarder"
+  "save": "Sauvegarder",
+  "finishRegistration": "Finaliser l'inscription"
 }

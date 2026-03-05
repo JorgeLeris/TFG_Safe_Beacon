@@ -6,7 +6,9 @@ import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class RegisterAddDataScreen extends StatelessWidget {
-  const RegisterAddDataScreen({super.key});
+  const RegisterAddDataScreen({super.key, this.isGoogleRegister = false});
+
+  final bool isGoogleRegister;
 
   // TODO: safe data with cubit for the case if goes back
 
@@ -79,49 +81,66 @@ class RegisterAddDataScreen extends StatelessWidget {
 
                       const SizedBox(height: 36),
 
-                      Row(
-                        children: [
-                          Expanded(
-                            child: SizedBox(
-                              child: CustomFilledButton(
-                                text: l10n.back,
-                                onPressed: () {
-                                  context.pop();
-                                },
-                                backgroundColor: colorScheme.primary,
-                                foregroundColor: colorScheme.onPrimary,
-                                colorText: colorScheme.onPrimary,
-                                fontSizeText:
-                                    textTheme.labelLarge!.fontSize! * 1.2,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                  horizontal: 14,
+                      if (isGoogleRegister)
+                        SizedBox(
+                          width: double.infinity,
+                          child: CustomFilledButton(
+                            text: l10n.finishRegistration,
+                            onPressed: () {},
+                            backgroundColor: colorScheme.inversePrimary,
+                            foregroundColor: colorScheme.onPrimary,
+                            colorText: colorScheme.onPrimary,
+                            fontSizeText: textTheme.labelLarge!.fontSize! * 1.2,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 14,
+                              horizontal: 14,
+                            ),
+                          ),
+                        )
+                      else
+                        Row(
+                          children: [
+                            Expanded(
+                              child: SizedBox(
+                                child: CustomFilledButton(
+                                  text: l10n.back,
+                                  onPressed: () {
+                                    context.pop();
+                                  },
+                                  backgroundColor: colorScheme.primary,
+                                  foregroundColor: colorScheme.onPrimary,
+                                  colorText: colorScheme.onPrimary,
+                                  fontSizeText:
+                                      textTheme.labelLarge!.fontSize! * 1.2,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                    horizontal: 14,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
 
-                          const SizedBox(width: 35),
+                            const SizedBox(width: 35),
 
-                          Expanded(
-                            child: SizedBox(
-                              child: CustomFilledButton(
-                                text: l10n.createAccount,
-                                onPressed: () {},
-                                backgroundColor: colorScheme.inversePrimary,
-                                foregroundColor: colorScheme.onPrimary,
-                                colorText: colorScheme.onPrimary,
-                                fontSizeText:
-                                    textTheme.labelLarge!.fontSize! * 1.2,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                  horizontal: 14,
+                            Expanded(
+                              child: SizedBox(
+                                child: CustomFilledButton(
+                                  text: l10n.createAccount,
+                                  onPressed: () {},
+                                  backgroundColor: colorScheme.inversePrimary,
+                                  foregroundColor: colorScheme.onPrimary,
+                                  colorText: colorScheme.onPrimary,
+                                  fontSizeText:
+                                      textTheme.labelLarge!.fontSize! * 1.2,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                    horizontal: 14,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
 
                       const SizedBox(height: 25),
                     ],

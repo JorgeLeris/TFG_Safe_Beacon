@@ -39,9 +39,11 @@ class RegisterRoute extends GoRouteData with $RegisterRoute {
 }
 
 class RegisterAddDataRoute extends GoRouteData with $RegisterAddDataRoute {
-  const RegisterAddDataRoute();
+  const RegisterAddDataRoute({this.isGoogleRegister = false});
+
+  final bool isGoogleRegister;
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
-      const RegisterAddDataScreen();
+      RegisterAddDataScreen(isGoogleRegister: isGoogleRegister);
 }
