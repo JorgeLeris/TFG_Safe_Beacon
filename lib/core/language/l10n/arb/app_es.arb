@@ -28,5 +28,8 @@
   "other": "Otro",
   "descriptionObservation": "Descripción / Observaciones",
   "back": "Atrás",
-  "createAccount": "Crear cuenta"
+  "createAccount": "Crear cuenta",
+  "edit": "Editar",
+  "logout": "Cerrar sesión",
+  "save": "Guardar"
 }

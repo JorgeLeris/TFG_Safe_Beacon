@@ -19,7 +19,7 @@ class ProfileScreen extends StatelessWidget {
         backgroundColor: colorScheme.surfaceContainer,
         scrolledUnderElevation: 0,
         title: Text(
-          'SafeBeacon',
+          l10n.appName,
           style: textTheme.titleLarge?.copyWith(
             color: colorScheme.onSurfaceVariant,
             fontWeight: FontWeight.bold,
@@ -35,7 +35,7 @@ class ProfileScreen extends StatelessWidget {
             color: colorScheme.primary,
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Text(
-              'Perfil',
+              l10n.tabProfile,
               textAlign: TextAlign.center,
               style: textTheme.titleMedium?.copyWith(
                 color: colorScheme.onPrimary,
@@ -74,7 +74,7 @@ class ProfileScreen extends StatelessWidget {
 
                     // Profile fields
                     _ProfileField(
-                      label: 'Nombre',
+                      label: l10n.name,
                       value: 'Lorem Impsum',
                       textTheme: textTheme,
                       colorScheme: colorScheme,
@@ -82,7 +82,7 @@ class ProfileScreen extends StatelessWidget {
                     const SizedBox(height: 12),
 
                     _ProfileField(
-                      label: 'Apellidos',
+                      label: l10n.surname,
                       value: 'Lorem Impsum',
                       textTheme: textTheme,
                       colorScheme: colorScheme,
@@ -90,7 +90,7 @@ class ProfileScreen extends StatelessWidget {
                     const SizedBox(height: 12),
 
                     _ProfileField(
-                      label: 'Fecha de nacimiento',
+                      label: l10n.birthDate,
                       value: 'Lorem Impsum',
                       textTheme: textTheme,
                       colorScheme: colorScheme,
@@ -98,7 +98,7 @@ class ProfileScreen extends StatelessWidget {
                     const SizedBox(height: 12),
 
                     _ProfileField(
-                      label: 'Género',
+                      label: l10n.gender,
                       value: 'Lorem Impsum',
                       textTheme: textTheme,
                       colorScheme: colorScheme,
@@ -106,7 +106,7 @@ class ProfileScreen extends StatelessWidget {
                     const SizedBox(height: 12),
 
                     _ProfileField(
-                      label: 'Descripción / observaciones',
+                      label: l10n.descriptionObservation,
                       value:
                           'Is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s.',
                       textTheme: textTheme,
@@ -123,7 +123,7 @@ class ProfileScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             CustomFilledButton(
-                              text: 'Editar',
+                              text: l10n.edit,
                               onPressed: () {},
                               backgroundColor: colorScheme.secondary,
                               foregroundColor: colorScheme.onSecondary,
@@ -141,7 +141,7 @@ class ProfileScreen extends StatelessWidget {
                             const SizedBox(height: 12),
 
                             CustomFilledButton(
-                              text: 'Cerrar sesión',
+                              text: l10n.logout,
                               onPressed: () {},
                               backgroundColor: colorScheme.primary,
                               foregroundColor: colorScheme.onPrimary,
