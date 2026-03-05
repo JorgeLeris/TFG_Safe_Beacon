@@ -9,6 +9,7 @@ import 'package:safe_beacon/app/app.dart';
 import 'package:safe_beacon/app/config/app_dependencies.dart';
 import 'package:safe_beacon/app/config/environment.dart';
 import 'package:safe_beacon/app/monitoring/logging.dart';
+import 'package:safe_beacon/app/router/app_router.dart';
 import 'package:safe_beacon/core/language/language.dart';
 import 'package:safe_beacon/data/repositories/app_settings_repository.dart';
 import 'package:safe_beacon/firebase_options.dart';
@@ -21,6 +22,9 @@ Future<void> mainCommon(Environment environment) async {
 
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Build the app router with dependencies
+  final router = buildAppRouter();
 
   // Initialize global dependencies
   final appDeps = await AppDependencies.initialize(environment);
@@ -48,11 +52,11 @@ Future<void> mainCommon(Environment environment) async {
           appSettingsRepository: appDeps.appSettingsRepository,
           interceptor: appDeps.languageInterceptor,
         ),
-        child: const SafeArea(
+        child: SafeArea(
           left: false,
           right: false,
           top: false,
-          child: App(),
+          child: App(router: router),
         ),
       ),
     ),
