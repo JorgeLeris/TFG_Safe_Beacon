@@ -33,5 +33,6 @@
   "editProfile": "Edit Profile",
   "logout": "Logout",
   "save": "Save",
-  "finishRegistration": "Finish Registration"
+  "finishRegistration": "Finish Registration",
+  "initChatWith": "Initiate chat with "
 }

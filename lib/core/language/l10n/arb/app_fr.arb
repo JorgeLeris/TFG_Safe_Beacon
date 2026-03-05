@@ -33,5 +33,6 @@
   "editProfile": "Modifier le profil",
   "logout": "Déconnexion",
   "save": "Sauvegarder",
-  "finishRegistration": "Finaliser l'inscription"
+  "finishRegistration": "Finaliser l'inscription",
+  "initChatWith": "Commencer une conversation avec "
 }
