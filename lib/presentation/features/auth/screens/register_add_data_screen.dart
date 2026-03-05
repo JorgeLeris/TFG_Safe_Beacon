@@ -86,7 +86,6 @@ class RegisterAddDataScreen extends StatelessWidget {
                         children: [
                           Expanded(
                             child: SizedBox(
-                              height: 50,
                               child: CustomFilledButton(
                                 text: l10n.back,
                                 onPressed: () {
@@ -97,6 +96,10 @@ class RegisterAddDataScreen extends StatelessWidget {
                                 colorText: colorScheme.onPrimary,
                                 fontSizeText:
                                     textTheme.labelLarge!.fontSize! * 1.2,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                  horizontal: 14,
+                                ),
                               ),
                             ),
                           ),
@@ -105,7 +108,6 @@ class RegisterAddDataScreen extends StatelessWidget {
 
                           Expanded(
                             child: SizedBox(
-                              height: 50,
                               child: CustomFilledButton(
                                 text: l10n.createAccount,
                                 onPressed: () {},
@@ -114,6 +116,10 @@ class RegisterAddDataScreen extends StatelessWidget {
                                 colorText: colorScheme.onPrimary,
                                 fontSizeText:
                                     textTheme.labelLarge!.fontSize! * 1.2,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                  horizontal: 14,
+                                ),
                               ),
                             ),
                           ),

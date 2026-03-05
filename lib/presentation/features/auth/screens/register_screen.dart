@@ -70,7 +70,6 @@ class RegisterScreen extends StatelessWidget {
 
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
                     child: CustomFilledButton(
                       text: l10n.next,
                       onPressed: () {
@@ -80,6 +79,10 @@ class RegisterScreen extends StatelessWidget {
                       foregroundColor: colorScheme.onPrimary,
                       colorText: colorScheme.onPrimary,
                       fontSizeText: textTheme.labelLarge!.fontSize! * 1.2,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                        horizontal: 14,
+                      ),
                     ),
                   ),
 

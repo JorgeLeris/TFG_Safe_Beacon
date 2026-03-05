@@ -78,7 +78,6 @@ class LoginScreen extends StatelessWidget {
 
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
                     child: CustomFilledButton(
                       text: l10n.login,
                       onPressed: () {
@@ -89,6 +88,10 @@ class LoginScreen extends StatelessWidget {
                       foregroundColor: colorScheme.onPrimary,
                       colorText: colorScheme.onPrimary,
                       fontSizeText: textTheme.labelLarge!.fontSize! * 1.2,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 14,
+                        horizontal: 14,
+                      ),
                     ),
                   ),
 
@@ -146,12 +149,15 @@ class LoginScreen extends StatelessWidget {
 
                   SizedBox(
                     width: double.infinity,
-                    height: 50,
                     child: FilledButton(
                       style: FilledButton.styleFrom(
                         backgroundColor: colorScheme.inversePrimary,
                         foregroundColor: colorScheme.onPrimary,
                         shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                          horizontal: 14,
+                        ),
                       ),
                       onPressed: () {},
                       child: Row(
