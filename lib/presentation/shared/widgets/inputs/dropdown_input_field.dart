@@ -100,7 +100,9 @@ class _DropdownInputFieldState<T> extends State<DropdownInputField<T>> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: colorScheme.tertiary),
+                  borderSide: BorderSide(
+                    color: colorScheme.tertiary.withValues(alpha: 0.4),
+                  ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),

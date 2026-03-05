@@ -35,7 +35,7 @@ ThemeData buildTheme({Brightness brightness = Brightness.light}) {
 
       // Components color (mid intensity)
       tertiary: isDark ? const Color(0xFFE1E7F3) : const Color(0xFF0080B1),
-      onTertiary: Colors.white,
+      onTertiary: isDark ? Colors.black : Colors.white,
 
       // Components color (always dark)
       inversePrimary: isDark

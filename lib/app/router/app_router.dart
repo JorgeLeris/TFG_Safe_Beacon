@@ -105,6 +105,7 @@ GoRouter buildAppRouter() {
       GoRoute(path: '/', redirect: (_, _) => '/auth'),
       ...$appRoutes,
       $authRoute,
+      $profileRoute,
       ...mockRoutes,
     ],
     initialLocation: '/auth',

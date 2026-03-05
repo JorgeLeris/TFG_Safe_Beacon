@@ -30,6 +30,7 @@
   "back": "Retour",
   "createAccount": "Créer un compte",
   "edit": "Modifier",
+  "editProfile": "Modifier le profil",
   "logout": "Déconnexion",
   "save": "Sauvegarder"
 }

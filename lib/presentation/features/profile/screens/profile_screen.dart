@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:safe_beacon/core/assets/assets.dart';
 import 'package:safe_beacon/core/extensions/context_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/presentation/features/profile/routes/profile_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -87,7 +88,6 @@ class ProfileScreen extends StatelessWidget {
                           'Is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s.',
                       textTheme: textTheme,
                       colorScheme: colorScheme,
-                      isMultiLine: true,
                     ),
 
                     const SizedBox(height: 25),
@@ -100,7 +100,9 @@ class ProfileScreen extends StatelessWidget {
                           children: [
                             CustomFilledButton(
                               text: l10n.edit,
-                              onPressed: () {},
+                              onPressed: () {
+                                const ProfileEditRoute().push(context);
+                              },
                               backgroundColor: colorScheme.secondary,
                               foregroundColor: colorScheme.onSecondary,
                               colorText: colorScheme.onSecondary,
@@ -153,14 +155,12 @@ class _ProfileField extends StatelessWidget {
     required this.value,
     required this.textTheme,
     required this.colorScheme,
-    this.isMultiLine = false,
   });
 
   final String label;
   final String value;
   final TextTheme textTheme;
   final ColorScheme colorScheme;
-  final bool isMultiLine;
 
   @override
   Widget build(BuildContext context) {

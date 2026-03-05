@@ -62,7 +62,9 @@ class _InputFieldState extends State<InputField> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
-                borderSide: BorderSide(color: colorScheme.tertiary),
+                borderSide: BorderSide(
+                  color: colorScheme.tertiary.withValues(alpha: 0.4),
+                ),
               ),
               suffixIcon: widget.isPassword
                   ? IconButton(
