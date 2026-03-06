@@ -34,5 +34,9 @@
   "logout": "Déconnexion",
   "save": "Sauvegarder",
   "finishRegistration": "Finaliser l'inscription",
-  "initChatWith": "Commencer une conversation avec "
+  "initChatWith": "Commencer une conversation avec ",
+  "emailRequired": "L'adresse e-mail est requise",
+  "emailInvalid": "Veuillez entrer une adresse e-mail valide",
+  "passwordRequired": "Le mot de passe est requis",
+  "passwordInvalid": "Minimum 6 caractères"
 }

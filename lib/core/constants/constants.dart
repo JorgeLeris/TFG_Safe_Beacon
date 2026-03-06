@@ -8,4 +8,7 @@ abstract final class Constants {
 
   /// Other value for dropdown fields.
   static const otherFieldKey = 'other';
+
+  /// Regular expression for validating email addresses.
+  static final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 }
