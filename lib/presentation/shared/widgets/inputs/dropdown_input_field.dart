@@ -6,6 +6,7 @@ class DropdownInputField<T> extends StatefulWidget {
   final List<DropdownMenuItem<T>> items;
   final ValueChanged<T?>? onChanged;
   final T? value;
+  final String? errorText;
 
   const DropdownInputField({
     super.key,
@@ -13,6 +14,7 @@ class DropdownInputField<T> extends StatefulWidget {
     required this.items,
     this.onChanged,
     this.value,
+    this.errorText,
   });
 
   @override
@@ -63,71 +65,99 @@ class _DropdownInputFieldState<T> extends State<DropdownInputField<T>> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
+    final hasError = widget.errorText != null && widget.errorText!.isNotEmpty;
 
-    return Material(
-      elevation: 4,
-      borderRadius: BorderRadius.circular(14),
-      child: Stack(
-        children: [
-          Theme(
-            data: Theme.of(context).copyWith(
-              highlightColor: colorScheme.tertiary.withValues(alpha: 0.12),
-              focusColor: colorScheme.tertiary.withValues(alpha: 0.12),
-              hoverColor: colorScheme.tertiary.withValues(alpha: 0.12),
-            ),
-            child: DropdownButtonFormField<T>(
-              initialValue: _selected,
-              items: _buildStyledItems(colorScheme),
-              selectedItemBuilder: (_) => _buildSelectedItemWidgets(),
-              onChanged: (value) {
-                setState(() => _selected = value);
-                widget.onChanged?.call(value);
-              },
-              style: const TextStyle(color: Colors.black),
-              icon: Icon(
-                Icons.keyboard_arrow_down_rounded,
-                color: Colors.black.withValues(alpha: 0.5),
-              ),
-              borderRadius: BorderRadius.circular(16),
-              dropdownColor: colorScheme.surfaceContainer,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: const EdgeInsets.fromLTRB(12, 24, 12, 8),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Material(
+          elevation: 4,
+          borderRadius: BorderRadius.circular(14),
+          child: Stack(
+            children: [
+              Theme(
+                data: Theme.of(context).copyWith(
+                  highlightColor: colorScheme.tertiary.withValues(alpha: 0.12),
+                  focusColor: colorScheme.tertiary.withValues(alpha: 0.12),
+                  hoverColor: colorScheme.tertiary.withValues(alpha: 0.12),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(
-                    color: colorScheme.tertiary.withValues(alpha: 0.4),
+                child: DropdownButtonFormField<T>(
+                  initialValue: _selected,
+                  items: _buildStyledItems(colorScheme),
+                  selectedItemBuilder: (_) => _buildSelectedItemWidgets(),
+                  onChanged: (value) {
+                    setState(() => _selected = value);
+                    widget.onChanged?.call(value);
+                  },
+                  style: const TextStyle(color: Colors.black),
+                  icon: Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    color: Colors.black.withValues(alpha: 0.5),
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  dropdownColor: colorScheme.surfaceContainer,
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.fromLTRB(12, 24, 12, 8),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: hasError
+                          ? BorderSide(color: Colors.red.shade700, width: 1.25)
+                          : BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: hasError
+                          ? BorderSide(color: Colors.red.shade700, width: 1.25)
+                          : BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: hasError
+                          ? BorderSide(color: Colors.red.shade700, width: 1.25)
+                          : BorderSide(
+                              color: colorScheme.tertiary.withValues(
+                                alpha: 0.4,
+                              ),
+                            ),
+                    ),
                   ),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
+              ),
+
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.easeInOut,
+                left: 15,
+                top: _hasValue ? 6 : 16,
+                child: AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 180),
+                  style: TextStyle(
+                    fontSize: _hasValue ? 11 : 16,
+                    color: Colors.black.withValues(alpha: 0.4),
+                  ),
+                  child: Text(widget.hint),
                 ),
               ),
-            ),
+            ],
           ),
+        ),
 
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 180),
-            curve: Curves.easeInOut,
-            left: 15,
-            top: _hasValue ? 6 : 16,
-            child: AnimatedDefaultTextStyle(
-              duration: const Duration(milliseconds: 180),
-              style: TextStyle(
-                fontSize: _hasValue ? 11 : 16,
-                color: Colors.black.withValues(alpha: 0.4),
-              ),
-              child: Text(widget.hint),
-            ),
-          ),
-        ],
-      ),
+        hasError
+            ? Padding(
+                padding: const EdgeInsets.only(top: 4, left: 10),
+                child: Text(
+                  widget.errorText!,
+                  style: TextStyle(
+                    color: Colors.red.shade700,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              )
+            : const SizedBox.shrink(),
+      ],
     );
   }
 }

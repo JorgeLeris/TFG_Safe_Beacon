@@ -4,11 +4,13 @@ import 'package:safe_beacon/core/extensions/context_extensions.dart';
 class DateInputField extends StatefulWidget {
   final String hint;
   final bool futureDates;
+  final String? errorText;
 
   const DateInputField({
     super.key,
     required this.hint,
     this.futureDates = false,
+    this.errorText,
   });
 
   @override
@@ -71,56 +73,81 @@ class _DateInputFieldState extends State<DateInputField> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: _pickDate,
-      child: Material(
-        elevation: 4,
-        borderRadius: BorderRadius.circular(14),
-        child: Stack(
-          children: [
-            TextField(
-              enabled: false,
-              controller: TextEditingController(text: _formattedDate),
-              style: const TextStyle(color: Colors.black),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: const EdgeInsets.fromLTRB(12, 24, 12, 8),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
-                disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
-                suffixIcon: IconButton(
-                  onPressed: _pickDate,
-                  icon: Icon(
-                    Icons.calendar_month_outlined,
-                    color: Colors.black.withValues(alpha: 0.5),
+    final hasError = widget.errorText != null && widget.errorText!.isNotEmpty;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        GestureDetector(
+          onTap: _pickDate,
+          child: Material(
+            elevation: 4,
+            borderRadius: BorderRadius.circular(14),
+            child: Stack(
+              children: [
+                TextField(
+                  enabled: false,
+                  controller: TextEditingController(text: _formattedDate),
+                  style: const TextStyle(color: Colors.black),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.fromLTRB(12, 24, 12, 8),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: hasError
+                          ? BorderSide(color: Colors.red.shade700, width: 1.25)
+                          : BorderSide.none,
+                    ),
+                    disabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: hasError
+                          ? BorderSide(color: Colors.red.shade700, width: 1.25)
+                          : BorderSide.none,
+                    ),
+                    suffixIcon: IconButton(
+                      onPressed: _pickDate,
+                      icon: Icon(
+                        Icons.calendar_month_outlined,
+                        color: Colors.black.withValues(alpha: 0.5),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
 
-            AnimatedPositioned(
-              duration: const Duration(milliseconds: 180),
-              curve: Curves.easeInOut,
-              left: 15,
-              top: _hasDate ? 6 : 16,
-              child: AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 180),
-                style: TextStyle(
-                  fontSize: _hasDate ? 11 : 16,
-                  color: Colors.black.withValues(alpha: 0.4),
+                AnimatedPositioned(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeInOut,
+                  left: 15,
+                  top: _hasDate ? 6 : 16,
+                  child: AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 180),
+                    style: TextStyle(
+                      fontSize: _hasDate ? 11 : 16,
+                      color: Colors.black.withValues(alpha: 0.4),
+                    ),
+                    child: Text(widget.hint),
+                  ),
                 ),
-                child: Text(widget.hint),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
+
+        hasError
+            ? Padding(
+                padding: const EdgeInsets.only(top: 4, left: 10),
+                child: Text(
+                  widget.errorText!,
+                  style: TextStyle(
+                    color: Colors.red.shade700,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              )
+            : const SizedBox.shrink(),
+      ],
     );
   }
 }
