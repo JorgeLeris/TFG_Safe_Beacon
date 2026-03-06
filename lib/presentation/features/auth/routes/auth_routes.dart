@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safe_beacon/presentation/features/auth/providers/login_provider.dart';
 import 'package:safe_beacon/presentation/features/auth/screens/login_screen.dart';
 import 'package:safe_beacon/presentation/features/auth/screens/register_add_data_screen.dart';
 import 'package:safe_beacon/presentation/features/auth/screens/register_screen.dart';
@@ -27,7 +28,7 @@ class AuthRoute extends GoRouteData with $AuthRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
-      const LoginScreen();
+      const LoginProvider(child: LoginScreen());
 }
 
 class RegisterRoute extends GoRouteData with $RegisterRoute {
