@@ -5,12 +5,14 @@ class DateInputField extends StatefulWidget {
   final String hint;
   final bool futureDates;
   final String? errorText;
+  final ValueChanged<DateTime?>? onChanged;
 
   const DateInputField({
     super.key,
     required this.hint,
     this.futureDates = false,
     this.errorText,
+    this.onChanged,
   });
 
   @override
@@ -68,6 +70,7 @@ class _DateInputFieldState extends State<DateInputField> {
 
     if (picked != null) {
       setState(() => _selectedDate = picked);
+      widget.onChanged?.call(picked);
     }
   }
 

@@ -6,6 +6,7 @@ class InputField extends StatefulWidget {
   final bool isPassword;
   final int maxLines;
   final String? errorText;
+  final ValueChanged<String>? onChanged;
 
   const InputField({
     super.key,
@@ -13,6 +14,7 @@ class InputField extends StatefulWidget {
     this.isPassword = false,
     this.maxLines = 1,
     this.errorText,
+    this.onChanged,
   });
 
   @override
@@ -53,8 +55,10 @@ class _InputFieldState extends State<InputField> {
             children: [
               TextField(
                 focusNode: _focusNode,
-                onChanged: (value) =>
-                    setState(() => _hasText = value.isNotEmpty),
+                onChanged: (value) {
+                  setState(() => _hasText = value.isNotEmpty);
+                  widget.onChanged?.call(value);
+                },
                 obscureText: widget.isPassword && _obscureText,
                 maxLines: widget.isPassword ? 1 : widget.maxLines,
                 minLines: widget.isPassword ? 1 : widget.maxLines,
