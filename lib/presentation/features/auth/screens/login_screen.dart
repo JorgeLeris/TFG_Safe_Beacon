@@ -159,9 +159,7 @@ class LoginScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () {
-                        const RegisterAddDataRoute(
-                          isGoogleRegister: true,
-                        ).push(context);
+                        const GoogleRegisterRoute().push(context);
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,

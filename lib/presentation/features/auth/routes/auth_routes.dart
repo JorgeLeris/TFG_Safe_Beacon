@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:safe_beacon/presentation/features/auth/providers/login_provider.dart';
+import 'package:safe_beacon/presentation/features/auth/providers/register_provider.dart';
 import 'package:safe_beacon/presentation/features/auth/screens/login_screen.dart';
 import 'package:safe_beacon/presentation/features/auth/screens/register_add_data_screen.dart';
 import 'package:safe_beacon/presentation/features/auth/screens/register_screen.dart';
@@ -13,14 +14,15 @@ part 'auth_routes.g.dart';
 @TypedGoRoute<AuthRoute>(
   path: '/auth',
   routes: [
-    // /auth/register
-    TypedGoRoute<RegisterRoute>(
-      path: 'register',
+    TypedShellRoute<RegisterShellRoute>(
       routes: [
-        // /auth/register/register-data
-        TypedGoRoute<RegisterAddDataRoute>(path: 'register-data'),
+        TypedGoRoute<RegisterRoute>(
+          path: 'register',
+          routes: [TypedGoRoute<RegisterAddDataRoute>(path: 'register-data')],
+        ),
       ],
     ),
+    TypedGoRoute<GoogleRegisterRoute>(path: 'google-register'),
   ],
 )
 class AuthRoute extends GoRouteData with $AuthRoute {
@@ -29,6 +31,15 @@ class AuthRoute extends GoRouteData with $AuthRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       const LoginProvider(child: LoginScreen());
+}
+
+/// Shell route for register flow, to provide the same RegisterCubit to all its routes
+class RegisterShellRoute extends ShellRouteData {
+  const RegisterShellRoute();
+
+  @override
+  Widget builder(BuildContext context, GoRouterState state, Widget navigator) =>
+      RegisterProvider(child: navigator);
 }
 
 class RegisterRoute extends GoRouteData with $RegisterRoute {
@@ -40,11 +51,21 @@ class RegisterRoute extends GoRouteData with $RegisterRoute {
 }
 
 class RegisterAddDataRoute extends GoRouteData with $RegisterAddDataRoute {
-  const RegisterAddDataRoute({this.isGoogleRegister = false});
-
-  final bool isGoogleRegister;
+  const RegisterAddDataRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
-      RegisterAddDataScreen(isGoogleRegister: isGoogleRegister);
+      const RegisterAddDataScreen();
+}
+
+/// Independent route for Google register
+class GoogleRegisterRoute extends GoRouteData with $GoogleRegisterRoute {
+  const GoogleRegisterRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      const RegisterProvider(
+        isGoogleRegister: true,
+        child: RegisterAddDataScreen(isGoogleRegister: true),
+      );
 }
