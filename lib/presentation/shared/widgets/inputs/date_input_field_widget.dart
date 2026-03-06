@@ -139,14 +139,24 @@ class _DateInputFieldState extends State<DateInputField> {
 
         hasError
             ? Padding(
-                padding: const EdgeInsets.only(top: 4, left: 10),
-                child: Text(
-                  widget.errorText!,
-                  style: TextStyle(
-                    color: Colors.red.shade700,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
+                padding: const EdgeInsets.only(top: 6, left: 10),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.warning_amber_outlined,
+                      size: 14,
+                      color: Colors.red.shade700,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      widget.errorText!,
+                      style: TextStyle(
+                        color: Colors.red.shade700,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               )
             : const SizedBox.shrink(),
