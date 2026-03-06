@@ -11,6 +11,7 @@ class CustomFilledButton extends StatelessWidget {
     this.fontSizeText,
     this.icon,
     this.padding,
+    this.isLoading = false,
   });
 
   final String text;
@@ -21,6 +22,7 @@ class CustomFilledButton extends StatelessWidget {
   final double? fontSizeText;
   final IconData? icon;
   final EdgeInsetsGeometry? padding;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -46,8 +48,17 @@ class CustomFilledButton extends StatelessWidget {
         padding: padding,
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       ),
-      onPressed: onPressed,
-      child: icon != null
+      onPressed: isLoading ? null : onPressed,
+      child: isLoading
+          ? SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: colorText ?? colorScheme.onPrimary,
+              ),
+            )
+          : icon != null
           ? Row(
               mainAxisSize: MainAxisSize.min,
               children: [
