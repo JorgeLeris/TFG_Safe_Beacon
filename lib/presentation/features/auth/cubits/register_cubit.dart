@@ -2,13 +2,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/domain/auth/auth_repository.dart';
 
 part 'register_state.dart';
 part 'register_cubit.freezed.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {
-  RegisterCubit({bool isGoogleRegister = false})
-    : super(RegisterState(isGoogleRegister: isGoogleRegister));
+  RegisterCubit({
+    required AuthRepository authRepository,
+    bool isGoogleRegister = false,
+  }) : _authRepository = authRepository,
+       super(RegisterState(isGoogleRegister: isGoogleRegister));
+
+  final AuthRepository _authRepository;
 
   // MARK: Step 1 - RegisterScreen
 
@@ -19,7 +25,7 @@ class RegisterCubit extends Cubit<RegisterState> {
   void onConfirmPasswordChanged(String value) =>
       emit(state.copyWith(confirmPassword: value));
 
-  /// Validate step 1. If valid, emits [step1Completed] = true
+  /// Validate step 1.
   void onNextStep(AppLocalizations l10n) {
     clearErrors();
 
@@ -61,7 +67,7 @@ class RegisterCubit extends Cubit<RegisterState> {
   void onDescriptionChanged(String value) =>
       emit(state.copyWith(description: value));
 
-  /// Validate step 2, activates [isLoading].
+  /// Validate step 2 and submit registration.
   Future<void> onSubmit(AppLocalizations l10n) async {
     clearErrors();
 
@@ -90,8 +96,20 @@ class RegisterCubit extends Cubit<RegisterState> {
     emit(state.copyWith(isLoading: true, errorMessage: null));
 
     try {
-      // TODO: reemplazar con el caso de uso real
-      await Future.delayed(const Duration(seconds: 2));
+      final user = await _authRepository.createUserWithCredential(
+        state.email,
+        state.password,
+      );
+
+      if (user == null) {
+        emit(
+          state.copyWith(
+            isLoading: false,
+            errorMessage: l10n.registrationFailed,
+          ),
+        );
+        return;
+      }
 
       emit(state.copyWith(isLoading: false));
     } catch (e) {

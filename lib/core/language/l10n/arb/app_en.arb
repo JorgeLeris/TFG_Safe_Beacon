@@ -44,5 +44,6 @@
   "nameRequired": "Name is required",
   "surnameRequired": "Surname is required",
   "birthDateRequired": "Birth date is required",
-  "genderRequired": "Gender is required"
+  "genderRequired": "Gender is required",
+  "registrationFailed": "Error occurred while registering. Please try again."
 }
