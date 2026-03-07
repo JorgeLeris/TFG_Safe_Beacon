@@ -6,6 +6,7 @@ class DateInputField extends StatefulWidget {
   final bool futureDates;
   final String? errorText;
   final ValueChanged<DateTime?>? onChanged;
+  final DateTime? initialValue;
 
   const DateInputField({
     super.key,
@@ -13,6 +14,7 @@ class DateInputField extends StatefulWidget {
     this.futureDates = false,
     this.errorText,
     this.onChanged,
+    this.initialValue,
   });
 
   @override
@@ -31,6 +33,12 @@ class _DateInputFieldState extends State<DateInputField> {
     final month = d.month.toString().padLeft(2, '0');
     final year = d.year.toString();
     return '$day/$month/$year';
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDate = widget.initialValue;
   }
 
   Future<void> _pickDate() async {

@@ -7,6 +7,7 @@ class InputField extends StatefulWidget {
   final int maxLines;
   final String? errorText;
   final ValueChanged<String>? onChanged;
+  final String? initialValue;
 
   const InputField({
     super.key,
@@ -15,6 +16,7 @@ class InputField extends StatefulWidget {
     this.maxLines = 1,
     this.errorText,
     this.onChanged,
+    this.initialValue,
   });
 
   @override
@@ -25,15 +27,19 @@ class _InputFieldState extends State<InputField> {
   bool _obscureText = true;
   final FocusNode _focusNode = FocusNode();
   bool _hasText = false;
+  late final TextEditingController _controller;
 
   @override
   void initState() {
     super.initState();
+    _hasText = (widget.initialValue ?? '').isNotEmpty;
+    _controller = TextEditingController(text: widget.initialValue);
     _focusNode.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
+    _controller.dispose();
     _focusNode.dispose();
     super.dispose();
   }
@@ -54,6 +60,7 @@ class _InputFieldState extends State<InputField> {
           child: Stack(
             children: [
               TextField(
+                controller: _controller,
                 focusNode: _focusNode,
                 onChanged: (value) {
                   setState(() => _hasText = value.isNotEmpty);
