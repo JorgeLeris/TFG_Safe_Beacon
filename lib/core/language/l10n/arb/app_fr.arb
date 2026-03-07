@@ -38,5 +38,11 @@
   "emailRequired": "L'adresse e-mail est requise",
   "emailInvalid": "Veuillez entrer une adresse e-mail valide",
   "passwordRequired": "Le mot de passe est requis",
-  "passwordInvalid": "Minimum 6 caractères"
+  "passwordInvalid": "Minimum 6 caractères",
+  "confirmPasswordRequired": "La confirmation du mot de passe est requise",
+  "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+  "nameRequired": "Le nom est requis",
+  "surnameRequired": "Les prénoms sont requis",
+  "birthDateRequired": "La date de naissance est requise",
+  "genderRequired": "Le genre est requis"
 }

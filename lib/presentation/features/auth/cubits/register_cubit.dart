@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:safe_beacon/core/constants/constants.dart';
+import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 
 part 'register_state.dart';
 part 'register_cubit.freezed.dart';
@@ -8,40 +10,137 @@ class RegisterCubit extends Cubit<RegisterState> {
   RegisterCubit({bool isGoogleRegister = false})
     : super(RegisterState(isGoogleRegister: isGoogleRegister));
 
-  // Step 1
-  void onEmailChanged(String value) =>
-      emit(state.copyWith(email: value, errorMessage: null));
+  // MARK: Step 1 - RegisterScreen
 
-  void onPasswordChanged(String value) =>
-      emit(state.copyWith(password: value, errorMessage: null));
+  void onEmailChanged(String value) => emit(state.copyWith(email: value));
+
+  void onPasswordChanged(String value) => emit(state.copyWith(password: value));
 
   void onConfirmPasswordChanged(String value) =>
-      emit(state.copyWith(confirmPassword: value, errorMessage: null));
+      emit(state.copyWith(confirmPassword: value));
 
-  // Step 2
-  void onNameChanged(String value) =>
-      emit(state.copyWith(name: value, errorMessage: null));
+  /// Validate step 1. If valid, emits [step1Completed] = true
+  void onNextStep(AppLocalizations l10n) {
+    clearErrors();
 
-  void onSurnameChanged(String value) =>
-      emit(state.copyWith(surname: value, errorMessage: null));
+    final emailError = _validateEmail(state.email, l10n);
+    final passwordError = _validatePassword(state.password, l10n);
+    final confirmPasswordError = _validateConfirmPassword(
+      state.password,
+      state.confirmPassword,
+      l10n,
+    );
 
-  void onBirthDateChanged(DateTime? value) =>
-      emit(state.copyWith(birthDate: value, errorMessage: null));
+    if (emailError != null ||
+        passwordError != null ||
+        confirmPasswordError != null) {
+      emit(
+        state.copyWith(
+          emailError: emailError,
+          passwordError: passwordError,
+          confirmPasswordError: confirmPasswordError,
+        ),
+      );
+      return;
+    }
 
-  void onGenderChanged(String? value) =>
-      emit(state.copyWith(gender: value, errorMessage: null));
-
-  void onDescriptionChanged(String value) =>
-      emit(state.copyWith(description: value, errorMessage: null));
-
-  // Common
-  void onSubmit() {
-    emit(state.copyWith(isLoading: true, errorMessage: null));
-
-    Future.delayed(const Duration(seconds: 2), () {
-      emit(state.copyWith(isLoading: false));
-    });
+    emit(state.copyWith(step1Completed: true));
   }
 
-  void clearError() => emit(state.copyWith(errorMessage: null));
+  // MARK: Step 2 - RegisterAddDataScreen
+
+  void onNameChanged(String value) => emit(state.copyWith(name: value));
+
+  void onSurnameChanged(String value) => emit(state.copyWith(surname: value));
+
+  void onBirthDateChanged(DateTime? value) =>
+      emit(state.copyWith(birthDate: value));
+
+  void onGenderChanged(String? value) => emit(state.copyWith(gender: value));
+
+  void onDescriptionChanged(String value) =>
+      emit(state.copyWith(description: value));
+
+  /// Validate step 2, activates [isLoading].
+  Future<void> onSubmit(AppLocalizations l10n) async {
+    clearErrors();
+
+    final nameError = _validateRequired(state.name, l10n.nameRequired);
+    final surnameError = _validateRequired(state.surname, l10n.surnameRequired);
+    final birthDateError = state.birthDate == null
+        ? l10n.birthDateRequired
+        : null;
+    final genderError = state.gender == null ? l10n.genderRequired : null;
+
+    if (nameError != null ||
+        surnameError != null ||
+        birthDateError != null ||
+        genderError != null) {
+      emit(
+        state.copyWith(
+          nameError: nameError,
+          surnameError: surnameError,
+          birthDateError: birthDateError,
+          genderError: genderError,
+        ),
+      );
+      return;
+    }
+
+    emit(state.copyWith(isLoading: true, errorMessage: null));
+
+    try {
+      // TODO: reemplazar con el caso de uso real
+      await Future.delayed(const Duration(seconds: 2));
+
+      emit(state.copyWith(isLoading: false));
+    } catch (e) {
+      emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
+    }
+  }
+
+  void clearErrors() {
+    emit(
+      state.copyWith(
+        errorMessage: null,
+        emailError: null,
+        passwordError: null,
+        confirmPasswordError: null,
+        nameError: null,
+        surnameError: null,
+        birthDateError: null,
+        genderError: null,
+        step1Completed: false,
+      ),
+    );
+  }
+
+  // MARK: Validation fields
+
+  String? _validateEmail(String value, AppLocalizations l10n) {
+    if (value.trim().isEmpty) return l10n.emailRequired;
+    if (!Constants.emailRegex.hasMatch(value.trim())) return l10n.emailInvalid;
+    return null;
+  }
+
+  String? _validatePassword(String value, AppLocalizations l10n) {
+    if (value.isEmpty) return l10n.passwordRequired;
+    if (value.length < 6) return l10n.passwordInvalid;
+    return null;
+  }
+
+  String? _validateConfirmPassword(
+    String password,
+    String confirm,
+    AppLocalizations l10n,
+  ) {
+    if (confirm.isEmpty) return l10n.confirmPasswordRequired;
+    if (confirm != password) return l10n.passwordsDoNotMatch;
+    return null;
+  }
+
+  String? _validateRequired(String value, String errorMessage) {
+    if (value.trim().isEmpty) return errorMessage;
+    return null;
+  }
 }

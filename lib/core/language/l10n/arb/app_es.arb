@@ -38,5 +38,11 @@
   "emailRequired": "El correo es obligatorio",
   "emailInvalid": "Introduce un correo válido",
   "passwordRequired": "La contraseña es obligatoria",
-  "passwordInvalid": "Mínimo 6 caracteres"
+  "passwordInvalid": "Mínimo 6 caracteres",
+  "confirmPasswordRequired": "La confirmación de contraseña es obligatoria",
+  "passwordsDoNotMatch": "Las contraseñas no coinciden",
+  "nameRequired": "El nombre es obligatorio",
+  "surnameRequired": "Los apellidos son obligatorios",
+  "birthDateRequired": "La fecha de nacimiento es obligatoria",
+  "genderRequired": "El género es obligatorio"
 }

@@ -38,5 +38,11 @@
   "emailRequired": "Email is required",
   "emailInvalid": "Please enter a valid email",
   "passwordRequired": "Password is required",
-  "passwordInvalid": "Minimum 6 characters"
+  "passwordInvalid": "Minimum 6 characters",
+  "confirmPasswordRequired": "Confirm password is required",
+  "passwordsDoNotMatch": "Passwords do not match",
+  "nameRequired": "Name is required",
+  "surnameRequired": "Surname is required",
+  "birthDateRequired": "Birth date is required",
+  "genderRequired": "Gender is required"
 }
