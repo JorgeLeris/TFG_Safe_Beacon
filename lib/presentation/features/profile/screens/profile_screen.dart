@@ -18,12 +18,17 @@ class ProfileScreen extends StatelessWidget {
     final l10n = context.l10n;
 
     return BlocListener<LogoutCubit, LogoutState>(
+      listenWhen: (prev, curr) => prev.isLoading && !curr.isLoading,
       listener: (context, state) {
-        if (state.isSuccess) {
-          const AuthRoute().go(context);
-        }
         if (state.errorMessage != null) {
-          // TODO: Show error message
+          CustomDialog.show(
+            context: context,
+            title: l10n.logoutErrorTitle,
+            content: Text(state.errorMessage!),
+            buttonText: l10n.accept,
+          );
+        } else if (state.isSuccess) {
+          const AuthRoute().go(context);
         }
       },
       child: Scaffold(
@@ -138,7 +143,7 @@ class ProfileScreen extends StatelessWidget {
                                         ? () {}
                                         : () => context
                                               .read<LogoutCubit>()
-                                              .onLogout(),
+                                              .onLogout(l10n),
                                     backgroundColor: colorScheme.primary,
                                     foregroundColor: colorScheme.onPrimary,
                                     colorText: colorScheme.onPrimary,

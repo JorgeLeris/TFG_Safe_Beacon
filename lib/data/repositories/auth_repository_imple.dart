@@ -16,7 +16,7 @@ class AuthRepositoryImpl implements AuthRepository {
       return user;
     } catch (e, st) {
       appLogger.severe('Error creating user:', e, st);
-      return null;
+      rethrow;
     }
   }
 
@@ -28,7 +28,7 @@ class AuthRepositoryImpl implements AuthRepository {
       return user;
     } catch (e, st) {
       appLogger.severe('Error logging in user:', e, st);
-      return null;
+      rethrow;
     }
   }
 

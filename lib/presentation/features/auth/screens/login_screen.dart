@@ -28,9 +28,19 @@ class _LoginView extends StatelessWidget {
     final cubit = context.read<LoginCubit>();
 
     return BlocListener<LoginCubit, LoginState>(
-      listenWhen: (prev, curr) =>
-          prev.isLoading && !curr.isLoading && curr.errorMessage == null,
-      listener: (context, state) => const HomeRoute().go(context),
+      listenWhen: (prev, curr) => prev.isLoading && !curr.isLoading,
+      listener: (context, state) {
+        if (state.errorMessage != null) {
+          CustomDialog.show(
+            context: context,
+            title: l10n.loginErrorTitle,
+            content: Text(state.errorMessage!),
+            buttonText: l10n.accept,
+          );
+        } else {
+          const HomeRoute().go(context);
+        }
+      },
       child: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Scaffold(
@@ -120,7 +130,10 @@ class _LoginView extends StatelessWidget {
                           isLoading: state.isLoading,
                           onPressed: state.isLoading
                               ? () {}
-                              : () => cubit.onSubmit(context.l10n),
+                              : () {
+                                  FocusScope.of(context).unfocus();
+                                  cubit.onSubmit(context.l10n);
+                                },
                           backgroundColor: colorScheme.inversePrimary,
                           foregroundColor: colorScheme.onPrimary,
                           colorText: colorScheme.onPrimary,

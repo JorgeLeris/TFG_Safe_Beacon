@@ -21,15 +21,19 @@ class RegisterAddDataScreen extends StatelessWidget {
     final cubit = context.read<RegisterCubit>();
 
     return BlocListener<RegisterCubit, RegisterState>(
-      listenWhen: (prev, curr) =>
-          prev.isLoading &&
-          !curr.isLoading &&
-          curr.errorMessage == null &&
-          curr.nameError == null &&
-          curr.surnameError == null &&
-          curr.birthDateError == null &&
-          curr.genderError == null,
-      listener: (context, state) => const HomeRoute().go(context),
+      listenWhen: (prev, curr) => prev.isLoading && !curr.isLoading,
+      listener: (context, state) {
+        if (state.errorMessage != null) {
+          CustomDialog.show(
+            context: context,
+            title: l10n.registerErrorTitle,
+            content: Text(state.errorMessage!),
+            buttonText: l10n.accept,
+          );
+        } else {
+          const HomeRoute().go(context);
+        }
+      },
       child: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Scaffold(
@@ -175,7 +179,10 @@ class RegisterAddDataScreen extends StatelessWidget {
                                     text: l10n.back,
                                     onPressed: state.isLoading
                                         ? () {}
-                                        : () => context.pop(),
+                                        : () {
+                                            FocusScope.of(context).unfocus();
+                                            context.pop();
+                                          },
                                     backgroundColor: colorScheme.primary,
                                     foregroundColor: colorScheme.onPrimary,
                                     colorText: colorScheme.onPrimary,

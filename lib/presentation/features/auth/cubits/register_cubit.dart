@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:safe_beacon/core/constants/constants.dart';
@@ -112,8 +113,13 @@ class RegisterCubit extends Cubit<RegisterState> {
       }
 
       emit(state.copyWith(isLoading: false));
+    } on FirebaseAuthException catch (e) {
+      final message = _mapFirebaseError(e.code, l10n);
+      emit(state.copyWith(isLoading: false, errorMessage: message));
     } catch (e) {
-      emit(state.copyWith(isLoading: false, errorMessage: e.toString()));
+      emit(
+        state.copyWith(isLoading: false, errorMessage: l10n.registrationFailed),
+      );
     }
   }
 
@@ -160,5 +166,21 @@ class RegisterCubit extends Cubit<RegisterState> {
   String? _validateRequired(String value, String errorMessage) {
     if (value.trim().isEmpty) return errorMessage;
     return null;
+  }
+
+  // MARK: Map Firebase errors
+  String _mapFirebaseError(String code, AppLocalizations l10n) {
+    switch (code) {
+      case 'email-already-in-use':
+        return l10n.registerEmailAlreadyInUse;
+      case 'invalid-email':
+        return l10n.emailInvalid;
+      case 'weak-password':
+        return l10n.registerWeakPassword;
+      case 'too-many-requests':
+        return l10n.loginTooManyRequests;
+      default:
+        return l10n.registrationFailed;
+    }
   }
 }
