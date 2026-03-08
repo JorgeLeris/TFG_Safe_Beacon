@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:safe_beacon/presentation/features/auth/routes/auth_routes.dart';
@@ -100,14 +101,30 @@ GoRouter buildAppRouter() {
       : <RouteBase>[];
 
   return GoRouter(
+    initialLocation: '/auth',
+    redirect: (context, state) {
+      final user = FirebaseAuth.instance.currentUser;
+      final isOnAuth = state.matchedLocation.startsWith('/auth');
+
+      if (user != null && isOnAuth) return '/home';
+      if (user == null && !isOnAuth) return '/auth';
+
+      return null;
+    },
+    refreshListenable: _AuthStateListenable(),
     routes: [
-      // TODO: change home route when auth is ready
       GoRoute(path: '/', redirect: (_, _) => '/auth'),
       ...$appRoutes,
       $authRoute,
       $profileRoute,
       ...mockRoutes,
     ],
-    initialLocation: '/auth',
   );
+}
+
+/// Listenable that notifies when the authentication state changes
+class _AuthStateListenable extends ChangeNotifier {
+  _AuthStateListenable() {
+    FirebaseAuth.instance.authStateChanges().listen((_) => notifyListeners());
+  }
 }

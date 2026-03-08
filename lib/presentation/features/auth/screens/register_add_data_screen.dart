@@ -5,7 +5,6 @@ import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/extensions/context_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/presentation/features/auth/cubits/register_cubit.dart';
-import 'package:safe_beacon/presentation/features/home/routes/home_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class RegisterAddDataScreen extends StatelessWidget {
@@ -30,8 +29,6 @@ class RegisterAddDataScreen extends StatelessWidget {
             content: Text(state.errorMessage!),
             buttonText: l10n.accept,
           );
-        } else {
-          const HomeRoute().go(context);
         }
       },
       child: GestureDetector(

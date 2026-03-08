@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safe_beacon/core/assets/assets.dart';
 import 'package:safe_beacon/core/extensions/context_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
-import 'package:safe_beacon/presentation/features/auth/routes/auth_routes.dart';
 import 'package:safe_beacon/presentation/features/profile/cubits/logout_cubit.dart';
 import 'package:safe_beacon/presentation/features/profile/routes/profile_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
@@ -27,8 +26,6 @@ class ProfileScreen extends StatelessWidget {
             content: Text(state.errorMessage!),
             buttonText: l10n.accept,
           );
-        } else if (state.isSuccess) {
-          const AuthRoute().go(context);
         }
       },
       child: Scaffold(
