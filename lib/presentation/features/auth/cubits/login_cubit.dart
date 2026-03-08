@@ -2,12 +2,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/domain/auth/auth_repository.dart';
 
 part 'login_state.dart';
 part 'login_cubit.freezed.dart';
 
 class LoginCubit extends Cubit<LoginState> {
-  LoginCubit() : super(const LoginState());
+  LoginCubit({required AuthRepository authRepository})
+    : _authRepository = authRepository,
+      super(const LoginState());
+
+  final AuthRepository _authRepository;
 
   void onEmailChanged(String value) {
     emit(state.copyWith(email: value));
@@ -33,8 +38,15 @@ class LoginCubit extends Cubit<LoginState> {
     emit(state.copyWith(isLoading: true, errorMessage: null));
 
     try {
-      // TODO: reemplazar con el caso de uso real
-      await Future.delayed(const Duration(seconds: 2));
+      final user = await _authRepository.loginWithCredential(
+        state.email,
+        state.password,
+      );
+
+      if (user == null) {
+        emit(state.copyWith(isLoading: false, errorMessage: l10n.loginFailed));
+        return;
+      }
 
       emit(state.copyWith(isLoading: false));
     } catch (e) {

@@ -45,5 +45,6 @@
   "surnameRequired": "Los apellidos son obligatorios",
   "birthDateRequired": "La fecha de nacimiento es obligatoria",
   "genderRequired": "El género es obligatorio",
-  "registrationFailed": "Error al registrarse. Inténtalo de nuevo."
+  "registrationFailed": "Error al registrarse. Inténtalo de nuevo.",
+  "loginFailed": "Error al iniciar sesión. Verifica tus credenciales."
 }

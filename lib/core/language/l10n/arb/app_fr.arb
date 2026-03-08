@@ -45,5 +45,6 @@
   "surnameRequired": "Les prénoms sont requis",
   "birthDateRequired": "La date de naissance est requise",
   "genderRequired": "Le genre est requis",
-  "registrationFailed": "Une erreur s'est produite lors de l'inscription. Veuillez réessayer."
+  "registrationFailed": "Une erreur s'est produite lors de l'inscription. Veuillez réessayer.",
+  "loginFailed": "Une erreur s'est produite lors de la connexion. Veuillez vérifier vos identifiants."
 }
