@@ -97,6 +97,8 @@ class RegisterCubit extends Cubit<RegisterState> {
     emit(state.copyWith(isLoading: true, errorMessage: null));
 
     try {
+      // TODO: Save additional user data
+
       final user = await _authRepository.createUserWithCredential(
         state.email,
         state.password,

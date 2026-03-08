@@ -197,28 +197,32 @@ class _LoginView extends StatelessWidget {
 
                     const SizedBox(height: 20),
 
-                    SizedBox(
-                      width: double.infinity,
-                      child: FilledButton(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: colorScheme.inversePrimary,
-                          foregroundColor: colorScheme.onPrimary,
-                          shape: const StadiumBorder(),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 14,
-                            horizontal: 14,
+                    BlocBuilder<LoginCubit, LoginState>(
+                      buildWhen: (prev, curr) =>
+                          prev.isLoading != curr.isLoading,
+                      builder: (context, state) => SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          style: FilledButton.styleFrom(
+                            backgroundColor: colorScheme.inversePrimary,
+                            foregroundColor: colorScheme.onPrimary,
+                            shape: const StadiumBorder(),
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 14,
+                              horizontal: 14,
+                            ),
                           ),
-                        ),
-                        onPressed: () {
-                          const GoogleRegisterRoute().push(context);
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(AppIcons.googleIcon, height: 24),
-                            const SizedBox(width: 8),
-                            Text(l10n.loginGoogle),
-                          ],
+                          onPressed: state.isLoading
+                              ? null
+                              : () => cubit.onGoogleLogin(l10n),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SvgPicture.asset(AppIcons.googleIcon, height: 24),
+                              const SizedBox(width: 8),
+                              Text(l10n.loginGoogle),
+                            ],
+                          ),
                         ),
                       ),
                     ),

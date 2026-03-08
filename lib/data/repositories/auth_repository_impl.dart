@@ -33,6 +33,18 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<User?> loginWithGoogle() async {
+    try {
+      final user = await _authApi.loginWithGoogle();
+      appLogger.info('User logged in with Google successfully: ${user?.uid}');
+      return user;
+    } catch (e, st) {
+      appLogger.severe('Error logging in with Google:', e, st);
+      rethrow;
+    }
+  }
+
+  @override
   Future<void> logout() async {
     try {
       await _authApi.logout();

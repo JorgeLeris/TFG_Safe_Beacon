@@ -58,6 +58,28 @@ class LoginCubit extends Cubit<LoginState> {
     }
   }
 
+  Future<void> onGoogleLogin(AppLocalizations l10n) async {
+    emit(state.copyWith(isLoading: true, errorMessage: null));
+
+    try {
+      final user = await _authRepository.loginWithGoogle();
+
+      // TODO: Save all posible data from google user, the data other null
+
+      if (user == null) {
+        emit(state.copyWith(isLoading: false, errorMessage: l10n.loginFailed));
+        return;
+      }
+
+      emit(state.copyWith(isLoading: false));
+    } on FirebaseAuthException catch (e) {
+      final message = _mapFirebaseError(e.code, l10n);
+      emit(state.copyWith(isLoading: false, errorMessage: message));
+    } catch (e) {
+      emit(state.copyWith(isLoading: false, errorMessage: l10n.loginFailed));
+    }
+  }
+
   void clearErrors() {
     emit(
       state.copyWith(errorMessage: null, emailError: null, passwordError: null),
