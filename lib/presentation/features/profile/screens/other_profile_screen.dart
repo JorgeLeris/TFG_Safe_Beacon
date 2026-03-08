@@ -112,10 +112,8 @@ class OtherProfileScreen extends StatelessWidget {
                               fontSizeText:
                                   textTheme.labelLarge!.fontSize! * 1.1,
                               icon: Icons.chat_outlined,
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 32,
-                                vertical: 12,
-                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              width: 225,
                             ),
                           ],
                         ),

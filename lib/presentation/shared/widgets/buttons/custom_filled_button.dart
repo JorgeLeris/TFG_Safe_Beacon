@@ -11,6 +11,7 @@ class CustomFilledButton extends StatelessWidget {
     this.fontSizeText,
     this.icon,
     this.padding,
+    this.width,
     this.isLoading = false,
   });
 
@@ -22,6 +23,7 @@ class CustomFilledButton extends StatelessWidget {
   final double? fontSizeText;
   final IconData? icon;
   final EdgeInsetsGeometry? padding;
+  final double? width;
   final bool isLoading;
 
   @override
@@ -40,7 +42,7 @@ class CustomFilledButton extends StatelessWidget {
       ),
     );
 
-    return FilledButton(
+    final button = FilledButton(
       style: FilledButton.styleFrom(
         backgroundColor: backgroundColor ?? colorScheme.inversePrimary,
         foregroundColor: foregroundColor ?? colorScheme.onPrimary,
@@ -69,5 +71,7 @@ class CustomFilledButton extends StatelessWidget {
             )
           : textWidget,
     );
+
+    return width != null ? SizedBox(width: width, child: button) : button;
   }
 }

@@ -121,9 +121,9 @@ class ProfileScreen extends StatelessWidget {
                                 fontSizeText:
                                     textTheme.labelLarge!.fontSize! * 1.1,
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 50,
                                   vertical: 10,
                                 ),
+                                width: 225,
                               ),
 
                               const SizedBox(height: 12),
@@ -147,9 +147,9 @@ class ProfileScreen extends StatelessWidget {
                                     icon: state.isLoading ? null : Icons.logout,
                                     isLoading: state.isLoading,
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 50,
                                       vertical: 10,
                                     ),
+                                    width: 225,
                                   );
                                 },
                               ),

@@ -124,10 +124,8 @@ class EditProfileScreen extends StatelessWidget {
                           foregroundColor: colorScheme.onSecondary,
                           colorText: colorScheme.onSecondary,
                           fontSizeText: textTheme.labelLarge!.fontSize! * 1.1,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 75,
-                            vertical: 10,
-                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          width: 225,
                         ),
                       ),
 
