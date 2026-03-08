@@ -6,24 +6,17 @@ import 'package:safe_beacon/domain/auth/auth_repository.dart';
 import 'package:safe_beacon/presentation/features/auth/cubits/register_cubit.dart';
 
 class RegisterProvider extends StatelessWidget {
-  const RegisterProvider({
-    required this.child,
-    this.isGoogleRegister = false,
-    super.key,
-  });
+  const RegisterProvider({required this.child, super.key});
 
   final Widget child;
-  final bool isGoogleRegister;
 
   @override
   Widget build(BuildContext context) {
     return RepositoryProvider<AuthRepository>(
       create: (_) => AuthRepositoryImpl(authApi: AuthApi()),
       child: BlocProvider(
-        create: (context) => RegisterCubit(
-          authRepository: context.read<AuthRepository>(),
-          isGoogleRegister: isGoogleRegister,
-        ),
+        create: (context) =>
+            RegisterCubit(authRepository: context.read<AuthRepository>()),
         child: child,
       ),
     );

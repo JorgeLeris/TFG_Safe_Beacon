@@ -16,7 +16,6 @@ abstract class RegisterState with _$RegisterState {
     @Default('') String description,
 
     // Common
-    @Default(false) bool isGoogleRegister,
     @Default(false) bool isLoading,
     String? errorMessage,
 

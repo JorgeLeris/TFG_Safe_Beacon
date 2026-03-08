@@ -8,9 +8,7 @@ import 'package:safe_beacon/presentation/features/auth/cubits/register_cubit.dar
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class RegisterAddDataScreen extends StatelessWidget {
-  const RegisterAddDataScreen({super.key, this.isGoogleRegister = false});
-
-  final bool isGoogleRegister;
+  const RegisterAddDataScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -149,26 +147,6 @@ class RegisterAddDataScreen extends StatelessWidget {
                           buildWhen: (prev, curr) =>
                               prev.isLoading != curr.isLoading,
                           builder: (context, state) {
-                            if (isGoogleRegister) {
-                              return SizedBox(
-                                width: double.infinity,
-                                child: CustomFilledButton(
-                                  text: l10n.finishRegistration,
-                                  isLoading: state.isLoading,
-                                  onPressed: () => cubit.onSubmit(l10n),
-                                  backgroundColor: colorScheme.inversePrimary,
-                                  foregroundColor: colorScheme.onPrimary,
-                                  colorText: colorScheme.onPrimary,
-                                  fontSizeText:
-                                      textTheme.labelLarge!.fontSize! * 1.2,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 14,
-                                    horizontal: 14,
-                                  ),
-                                ),
-                              );
-                            }
-
                             return Row(
                               children: [
                                 Expanded(

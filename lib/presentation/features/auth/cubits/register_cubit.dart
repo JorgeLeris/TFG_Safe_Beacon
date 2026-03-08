@@ -9,11 +9,9 @@ part 'register_state.dart';
 part 'register_cubit.freezed.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {
-  RegisterCubit({
-    required AuthRepository authRepository,
-    bool isGoogleRegister = false,
-  }) : _authRepository = authRepository,
-       super(RegisterState(isGoogleRegister: isGoogleRegister));
+  RegisterCubit({required AuthRepository authRepository})
+    : _authRepository = authRepository,
+      super(const RegisterState());
 
   final AuthRepository _authRepository;
 

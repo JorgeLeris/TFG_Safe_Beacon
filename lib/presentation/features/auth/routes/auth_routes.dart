@@ -22,7 +22,6 @@ part 'auth_routes.g.dart';
         ),
       ],
     ),
-    TypedGoRoute<GoogleRegisterRoute>(path: 'google-register'),
   ],
 )
 class AuthRoute extends GoRouteData with $AuthRoute {
@@ -56,16 +55,4 @@ class RegisterAddDataRoute extends GoRouteData with $RegisterAddDataRoute {
   @override
   Widget build(BuildContext context, GoRouterState state) =>
       const RegisterAddDataScreen();
-}
-
-/// Independent route for Google register
-class GoogleRegisterRoute extends GoRouteData with $GoogleRegisterRoute {
-  const GoogleRegisterRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const RegisterProvider(
-        isGoogleRegister: true,
-        child: RegisterAddDataScreen(isGoogleRegister: true),
-      );
 }
