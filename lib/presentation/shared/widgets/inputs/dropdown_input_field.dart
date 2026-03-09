@@ -131,13 +131,15 @@ class _DropdownInputFieldState<T> extends State<DropdownInputField<T>> {
                 curve: Curves.easeInOut,
                 left: 15,
                 top: _hasValue ? 6 : 16,
-                child: AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 180),
-                  style: TextStyle(
-                    fontSize: _hasValue ? 11 : 16,
-                    color: Colors.black.withValues(alpha: 0.4),
+                child: IgnorePointer(
+                  child: AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 180),
+                    style: TextStyle(
+                      fontSize: _hasValue ? 11 : 16,
+                      color: Colors.black.withValues(alpha: 0.4),
+                    ),
+                    child: Text(widget.hint),
                   ),
-                  child: Text(widget.hint),
                 ),
               ),
             ],
