@@ -2,18 +2,26 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:safe_beacon/core/constants/constants.dart';
+import 'package:safe_beacon/core/extensions/date_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/auth/auth_repository.dart';
+import 'package:safe_beacon/domain/common/result.dart';
+import 'package:safe_beacon/domain/profile/entities/user_profile.dart';
+import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
 
 part 'register_state.dart';
 part 'register_cubit.freezed.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {
-  RegisterCubit({required AuthRepository authRepository})
-    : _authRepository = authRepository,
-      super(const RegisterState());
+  RegisterCubit({
+    required AuthRepository authRepository,
+    required UserProfileRepository userProfileRepository,
+  }) : _authRepository = authRepository,
+       _userProfileRepository = userProfileRepository,
+       super(const RegisterState());
 
   final AuthRepository _authRepository;
+  final UserProfileRepository _userProfileRepository;
 
   // MARK: Step 1 - RegisterScreen
 
@@ -95,14 +103,33 @@ class RegisterCubit extends Cubit<RegisterState> {
     emit(state.copyWith(isLoading: true, errorMessage: null));
 
     try {
-      // TODO: Save additional user data
-
       final user = await _authRepository.createUserWithCredential(
         state.email,
         state.password,
       );
 
       if (user == null) {
+        emit(
+          state.copyWith(
+            isLoading: false,
+            errorMessage: l10n.registrationFailed,
+          ),
+        );
+        return;
+      }
+
+      final profileResult = await _userProfileRepository.createProfile(
+        UserProfile(
+          uid: user.uid,
+          name: state.name.trim(),
+          surname: state.surname.trim(),
+          gender: state.gender,
+          birthDate: state.birthDate?.toStringDate(),
+          description: state.description.trim(),
+        ),
+      );
+
+      if (profileResult.isFailure) {
         emit(
           state.copyWith(
             isLoading: false,

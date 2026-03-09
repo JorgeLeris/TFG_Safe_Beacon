@@ -4,16 +4,23 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/auth/auth_repository.dart';
+import 'package:safe_beacon/domain/common/result.dart';
+import 'package:safe_beacon/domain/profile/entities/user_profile.dart';
+import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
 
 part 'login_state.dart';
 part 'login_cubit.freezed.dart';
 
 class LoginCubit extends Cubit<LoginState> {
-  LoginCubit({required AuthRepository authRepository})
-    : _authRepository = authRepository,
-      super(const LoginState());
+  LoginCubit({
+    required AuthRepository authRepository,
+    required UserProfileRepository userProfileRepository,
+  }) : _authRepository = authRepository,
+       _userProfileRepository = userProfileRepository,
+       super(const LoginState());
 
   final AuthRepository _authRepository;
+  final UserProfileRepository _userProfileRepository;
 
   void onEmailChanged(String value) {
     emit(state.copyWith(email: value));
@@ -62,16 +69,47 @@ class LoginCubit extends Cubit<LoginState> {
     emit(state.copyWith(isLoading: true, errorMessage: null));
 
     try {
-      final user = await _authRepository.loginWithGoogle();
+      final result = await _authRepository.loginWithGoogle();
 
-      // TODO: Save all posible data from google user, the data other null
-
-      if (user == null) {
-        emit(state.copyWith(isLoading: false, errorMessage: l10n.loginFailed));
+      final user = result?.user;
+      if (result == null || user == null) {
+        if (!isClosed) {
+          emit(
+            state.copyWith(isLoading: false, errorMessage: l10n.loginFailed),
+          );
+        }
         return;
       }
 
-      emit(state.copyWith(isLoading: false));
+      if (result.isNewUser) {
+        final nameParts = (user.displayName ?? '').trim().split(' ');
+        final name = nameParts.isNotEmpty ? nameParts.first : '';
+        final surname = nameParts.length > 1
+            ? nameParts.sublist(1).join(' ')
+            : null;
+
+        final profileResult = await _userProfileRepository.createProfile(
+          UserProfile(
+            uid: user.uid,
+            name: name,
+            surname: surname,
+            profilePhoto: user.photoURL,
+          ),
+        );
+
+        if (profileResult.isFailure) {
+          if (!isClosed) {
+            emit(
+              state.copyWith(isLoading: false, errorMessage: l10n.loginFailed),
+            );
+          }
+          return;
+        }
+      }
+
+      if (!isClosed) {
+        emit(state.copyWith(isLoading: false));
+      }
     } on FirebaseAuthException catch (e) {
       final message = _mapFirebaseError(e.code, l10n);
       emit(state.copyWith(isLoading: false, errorMessage: message));

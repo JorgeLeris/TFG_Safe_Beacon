@@ -18,7 +18,7 @@ class AuthApi {
     return credential.user;
   }
 
-  Future<User?> loginWithGoogle() async {
+  Future<({User? user, bool isNewUser})> loginWithGoogle() async {
     final googleUser = await GoogleSignIn().signIn();
     final googleAuth = await googleUser?.authentication;
 
@@ -28,7 +28,10 @@ class AuthApi {
     );
 
     final userCredential = await _auth.signInWithCredential(credential);
-    return userCredential.user;
+    return (
+      user: userCredential.user,
+      isNewUser: userCredential.additionalUserInfo?.isNewUser ?? false,
+    );
   }
 
   Future<void> logout() => _auth.signOut();

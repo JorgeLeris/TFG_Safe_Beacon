@@ -23,6 +23,7 @@ class RegisterScreen extends StatelessWidget {
       listenWhen: (prev, curr) => !prev.step1Completed && curr.step1Completed,
       listener: (context, state) => const RegisterAddDataRoute().push(context),
       child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
         onTap: () => FocusScope.of(context).unfocus(),
         child: Scaffold(
           resizeToAvoidBottomInset: false,

@@ -39,6 +39,7 @@ class _LoginView extends StatelessWidget {
         }
       },
       child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
         onTap: () => FocusScope.of(context).unfocus(),
         child: Scaffold(
           resizeToAvoidBottomInset: false,

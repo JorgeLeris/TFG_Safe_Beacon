@@ -33,11 +33,13 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<User?> loginWithGoogle() async {
+  Future<({User? user, bool isNewUser})?> loginWithGoogle() async {
     try {
-      final user = await _authApi.loginWithGoogle();
-      appLogger.info('User logged in with Google successfully: ${user?.uid}');
-      return user;
+      final result = await _authApi.loginWithGoogle();
+      appLogger.info(
+        'User logged in with Google successfully: ${result.user?.uid}',
+      );
+      return result;
     } catch (e, st) {
       appLogger.severe('Error logging in with Google:', e, st);
       rethrow;

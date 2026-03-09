@@ -30,6 +30,7 @@ class RegisterAddDataScreen extends StatelessWidget {
         }
       },
       child: GestureDetector(
+        behavior: HitTestBehavior.translucent,
         onTap: () => FocusScope.of(context).unfocus(),
         child: Scaffold(
           backgroundColor: colorScheme.surfaceContainerHigh,
