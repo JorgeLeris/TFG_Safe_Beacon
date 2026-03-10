@@ -58,5 +58,8 @@
   "registerEmailAlreadyInUse": "Email is already in use. Please use another email or log in.",
   "registerWeakPassword": "Password is too weak.",
   "logoutFailed": "Error occurred while logging out. Please try again.",
-  "logoutErrorTitle": "Error logging out"
+  "logoutErrorTitle": "Error logging out",
+  "networkError": "Network error. Please check your connection.",
+  "genericError": "An error occurred. Please try again.",
+  "profileNotFound": "Profile not found."
 }

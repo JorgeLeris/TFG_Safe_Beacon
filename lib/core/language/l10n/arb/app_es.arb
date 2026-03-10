@@ -58,5 +58,8 @@
   "registerEmailAlreadyInUse": "El correo ya está en uso. Usa otro correo o inicia sesión.",
   "registerWeakPassword": "Contraseña débil.",
   "logoutFailed": "Error al cerrar sesión. Inténtalo de nuevo.",
-  "logoutErrorTitle": "Error al cerrar sesión"
+  "logoutErrorTitle": "Error al cerrar sesión",
+  "networkError": "Error de red. Verifica tu conexión.",
+  "genericError": "Ocurrió un error. Inténtalo de nuevo.",
+  "profileNotFound": "Perfil no encontrado."
 }

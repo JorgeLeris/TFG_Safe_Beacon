@@ -58,5 +58,8 @@
   "registerEmailAlreadyInUse": "L'adresse e-mail est déjà utilisée. Veuillez utiliser une autre adresse e-mail ou vous connecter.",
   "registerWeakPassword": "Le mot de passe est trop faible.",
   "logoutFailed": "Une erreur s'est produite lors de la déconnexion. Veuillez réessayer.",
-  "logoutErrorTitle": "Error lors de la déconnexion"
+  "logoutErrorTitle": "Error lors de la déconnexion",
+  "networkError": "Error de réseau. Veuillez vérifier votre connexion.",
+  "genericError": "Une erreur s'est produite. Veuillez réessayer.",
+  "profileNotFound": "Profil non trouvé."
 }
