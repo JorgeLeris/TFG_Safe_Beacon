@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safe_beacon/core/assets/assets.dart';
 import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/extensions/context_extensions.dart';
+import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/presentation/features/profile/cubits/logout_cubit.dart';
@@ -153,7 +154,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           // Profile fields
                           _ProfileField(
                             label: l10n.name,
-                            value: profile?.name ?? '-',
+                            value: (profile?.name).orDash(),
                             textTheme: textTheme,
                             colorScheme: colorScheme,
                           ),
@@ -161,7 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                           _ProfileField(
                             label: l10n.surname,
-                            value: profile?.surname ?? '-',
+                            value: (profile?.surname).orDash(),
                             textTheme: textTheme,
                             colorScheme: colorScheme,
                           ),
@@ -169,7 +170,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                           _ProfileField(
                             label: l10n.birthDate,
-                            value: profile?.birthDate ?? '-',
+                            value: (profile?.birthDate).orDash(),
                             textTheme: textTheme,
                             colorScheme: colorScheme,
                           ),
@@ -185,7 +186,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                           _ProfileField(
                             label: l10n.descriptionObservation,
-                            value: profile?.description ?? '-',
+                            value: (profile?.description).orDash(),
                             textTheme: textTheme,
                             colorScheme: colorScheme,
                           ),
@@ -201,14 +202,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   CustomFilledButton(
                                     text: l10n.edit,
                                     onPressed: () {
+                                      final cubit = context
+                                          .read<ProfileCubit>();
                                       ProfileEditRoute(
-                                        name: profile?.name,
-                                        surname: profile?.surname,
-                                        birthDate: profile?.birthDate,
-                                        gender: profile?.gender,
-                                        description: profile?.description,
-                                        profilePhoto: profile?.profilePhoto,
-                                      ).push(context);
+                                            name: profile?.name,
+                                            surname: profile?.surname,
+                                            birthDate: profile?.birthDate,
+                                            gender: profile?.gender,
+                                            description: profile?.description,
+                                            profilePhoto: profile?.profilePhoto,
+                                          )
+                                          .push(context)
+                                          .then((_) => cubit.loadProfile());
                                     },
                                     backgroundColor: colorScheme.secondary,
                                     foregroundColor: colorScheme.onSecondary,

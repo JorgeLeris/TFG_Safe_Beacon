@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safe_beacon/presentation/features/profile/providers/edit_profile_provider.dart';
 import 'package:safe_beacon/presentation/features/profile/providers/profile_provider.dart';
 import 'package:safe_beacon/presentation/features/profile/screens/edit_profile_screen.dart';
 import 'package:safe_beacon/presentation/features/profile/screens/other_profile_screen.dart';
@@ -46,14 +47,17 @@ class ProfileEditRoute extends GoRouteData with $ProfileEditRoute {
   final String? profilePhoto;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => EditProfileScreen(
-    name: name,
-    surname: surname,
-    birthDate: birthDate,
-    gender: gender,
-    description: description,
-    profilePhoto: profilePhoto,
-  );
+  Widget build(BuildContext context, GoRouterState state) =>
+      EditProfileProvider(
+        child: EditProfileScreen(
+          name: name,
+          surname: surname,
+          birthDate: birthDate,
+          gender: gender,
+          description: description,
+          profilePhoto: profilePhoto,
+        ),
+      );
 }
 
 class OtherProfileRoute extends GoRouteData with $OtherProfileRoute {

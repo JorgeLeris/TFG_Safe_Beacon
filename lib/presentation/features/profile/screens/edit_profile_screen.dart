@@ -1,12 +1,15 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:safe_beacon/core/assets/assets.dart';
 import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/extensions/context_extensions.dart';
 import 'package:safe_beacon/core/extensions/date_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/domain/common/app_failure.dart';
+import 'package:safe_beacon/presentation/features/profile/cubits/edit_profile_cubit.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -33,10 +36,20 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   late final DateTime? _birthDate;
+  late String _name;
+  late String? _surname;
+  late String? _description;
+  late String? _gender;
+  late String? _selectedBirthDate;
 
   @override
   void initState() {
     super.initState();
+    _name = widget.name ?? '';
+    _surname = widget.surname;
+    _description = widget.description;
+    _gender = widget.gender;
+    _selectedBirthDate = widget.birthDate;
     _birthDate = DateTimeX.tryFromStringDate(widget.birthDate);
   }
 
@@ -65,132 +78,187 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
+  String _mapFailure(AppFailure failure, AppLocalizations l10n) {
+    return failure.when(
+      network: (_, __) => l10n.networkError,
+      unauthorized: () => l10n.genericError,
+      forbidden: () => l10n.genericError,
+      notFound: (_) => l10n.genericError,
+      conflict: (_) => l10n.genericError,
+      serialization: (_) => l10n.genericError,
+      business: (msg) => msg ?? l10n.genericError,
+      unknown: (_) => l10n.genericError,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
     final textTheme = context.textTheme;
     final l10n = context.l10n;
 
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        backgroundColor: colorScheme.surface,
-        appBar: const CustomAppBar(),
-        body: Column(
-          children: [
-            SectionHeader(text: l10n.editProfile),
+    return BlocListener<EditProfileCubit, EditProfileState>(
+      listenWhen: (prev, curr) => prev.isLoading && !curr.isLoading,
+      listener: (context, state) {
+        if (state.isSaved) {
+          context.pop();
+        } else if (state.failure != null) {
+          CustomDialog.show(
+            context: context,
+            title: l10n.genericError,
+            content: Text(_mapFailure(state.failure!, l10n)),
+            buttonText: l10n.accept,
+          );
+        }
+      },
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Scaffold(
+          backgroundColor: colorScheme.surface,
+          appBar: const CustomAppBar(),
+          body: Column(
+            children: [
+              SectionHeader(text: l10n.editProfile),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 24),
 
-            Expanded(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 24),
-
-                      // Profile picture
-                      Center(
-                        child: Stack(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: colorScheme.onSurface,
+                        // Profile picture
+                        Center(
+                          child: Stack(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: colorScheme.onSurface,
+                                  ),
                                 ),
+                                child: _buildProfileAvatar(colorScheme),
                               ),
-                              child: _buildProfileAvatar(colorScheme),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: GestureDetector(
-                                onTap: () {},
-                                child: Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    color: colorScheme.tertiary,
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: colorScheme.surface,
-                                      width: 1.5,
+                              Positioned(
+                                bottom: 0,
+                                right: 0,
+                                child: GestureDetector(
+                                  onTap: () {},
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: colorScheme.tertiary,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: colorScheme.surface,
+                                        width: 1.5,
+                                      ),
+                                    ),
+                                    child: Icon(
+                                      Icons.camera_alt,
+                                      size: 20,
+                                      color: colorScheme.onTertiary,
                                     ),
                                   ),
-                                  child: Icon(
-                                    Icons.camera_alt,
-                                    size: 20,
-                                    color: colorScheme.onTertiary,
-                                  ),
                                 ),
                               ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 15),
+
+                        // Profile fields
+                        InputField(
+                          hint: l10n.name,
+                          initialValue: widget.name,
+                          onChanged: (v) => _name = v,
+                        ),
+                        const SizedBox(height: 24),
+                        InputField(
+                          hint: l10n.surname,
+                          initialValue: widget.surname,
+                          onChanged: (v) => _surname = v,
+                        ),
+                        const SizedBox(height: 24),
+                        DateInputField(
+                          hint: l10n.birthDate,
+                          initialValue: _birthDate,
+                          onChanged: (date) =>
+                              _selectedBirthDate = date?.toStringDate(),
+                        ),
+                        const SizedBox(height: 24),
+                        DropdownInputField(
+                          hint: l10n.gender,
+                          value: widget.gender,
+                          onChanged: (v) => _gender = v,
+                          items: [
+                            DropdownMenuItem(
+                              value: Constants.maleFieldKey,
+                              child: Text(l10n.male),
+                            ),
+                            DropdownMenuItem(
+                              value: Constants.femaleFieldKey,
+                              child: Text(l10n.female),
+                            ),
+                            DropdownMenuItem(
+                              value: Constants.otherFieldKey,
+                              child: Text(l10n.other),
                             ),
                           ],
                         ),
-                      ),
-
-                      const SizedBox(height: 15),
-
-                      // Profile fields
-                      InputField(hint: l10n.name, initialValue: widget.name),
-                      const SizedBox(height: 24),
-                      InputField(
-                        hint: l10n.surname,
-                        initialValue: widget.surname,
-                      ),
-                      const SizedBox(height: 24),
-                      DateInputField(
-                        hint: l10n.birthDate,
-                        initialValue: _birthDate,
-                      ),
-                      const SizedBox(height: 24),
-                      DropdownInputField(
-                        hint: l10n.gender,
-                        value: widget.gender,
-                        items: [
-                          DropdownMenuItem(
-                            value: Constants.maleFieldKey,
-                            child: Text(l10n.male),
-                          ),
-                          DropdownMenuItem(
-                            value: Constants.femaleFieldKey,
-                            child: Text(l10n.female),
-                          ),
-                          DropdownMenuItem(
-                            value: Constants.otherFieldKey,
-                            child: Text(l10n.other),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      InputField(
-                        hint: l10n.descriptionObservation,
-                        initialValue: widget.description,
-                        maxLines: 5,
-                      ),
-                      const SizedBox(height: 25),
-
-                      // Save button
-                      Center(
-                        child: CustomFilledButton(
-                          text: l10n.save,
-                          onPressed: () => context.pop(),
-                          backgroundColor: colorScheme.secondary,
-                          foregroundColor: colorScheme.onSecondary,
-                          colorText: colorScheme.onSecondary,
-                          fontSizeText: textTheme.labelLarge!.fontSize! * 1.1,
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          width: 225,
+                        const SizedBox(height: 24),
+                        InputField(
+                          hint: l10n.descriptionObservation,
+                          initialValue: widget.description,
+                          onChanged: (v) => _description = v,
+                          maxLines: 5,
                         ),
-                      ),
+                        const SizedBox(height: 25),
 
-                      const SizedBox(height: 32),
-                    ],
+                        // Save button
+                        BlocBuilder<EditProfileCubit, EditProfileState>(
+                          builder: (context, state) {
+                            return Center(
+                              child: CustomFilledButton(
+                                text: l10n.save,
+                                isLoading: state.isLoading,
+                                onPressed: state.isLoading
+                                    ? () {}
+                                    : () => context
+                                          .read<EditProfileCubit>()
+                                          .saveProfile(
+                                            name: _name,
+                                            surname: _surname,
+                                            birthDate: _selectedBirthDate,
+                                            gender: _gender,
+                                            description: _description,
+                                            profilePhoto: widget.profilePhoto,
+                                          ),
+                                backgroundColor: colorScheme.secondary,
+                                foregroundColor: colorScheme.onSecondary,
+                                colorText: colorScheme.onSecondary,
+                                fontSizeText:
+                                    textTheme.labelLarge!.fontSize! * 1.1,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 10,
+                                ),
+                                width: 225,
+                              ),
+                            );
+                          },
+                        ),
+
+                        const SizedBox(height: 32),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
