@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:safe_beacon/core/assets/assets.dart';
 import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/extensions/context_extensions.dart';
@@ -41,6 +43,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late String? _description;
   late String? _gender;
   late String? _selectedBirthDate;
+  String? _selectedProfilePhoto;
 
   @override
   void initState() {
@@ -50,20 +53,33 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _description = widget.description;
     _gender = widget.gender;
     _selectedBirthDate = widget.birthDate;
+    _selectedProfilePhoto = widget.profilePhoto;
     _birthDate = DateTimeX.tryFromStringDate(widget.birthDate);
+  }
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70,
+    );
+
+    if (picked == null) return;
+
+    final bytes = await File(picked.path).readAsBytes();
+    setState(() => _selectedProfilePhoto = base64Encode(bytes));
   }
 
   Widget _buildProfileAvatar(ColorScheme colorScheme) {
     ImageProvider? imageProvider;
 
-    if (widget.profilePhoto != null && widget.profilePhoto!.isNotEmpty) {
-      if (widget.profilePhoto!.startsWith('http://') ||
-          widget.profilePhoto!.startsWith('https://')) {
-        imageProvider = NetworkImage(widget.profilePhoto!);
+    if (_selectedProfilePhoto != null && _selectedProfilePhoto!.isNotEmpty) {
+      if (_selectedProfilePhoto!.startsWith('http://') ||
+          _selectedProfilePhoto!.startsWith('https://')) {
+        imageProvider = NetworkImage(_selectedProfilePhoto!);
       } else {
         try {
-          final bytes = base64Decode(widget.profilePhoto!);
-          imageProvider = MemoryImage(bytes);
+          imageProvider = MemoryImage(base64Decode(_selectedProfilePhoto!));
         } catch (_) {
           imageProvider = null;
         }
@@ -80,7 +96,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   String _mapFailure(AppFailure failure, AppLocalizations l10n) {
     return failure.when(
-      network: (_, __) => l10n.networkError,
+      network: (_, _) => l10n.networkError,
       unauthorized: () => l10n.genericError,
       forbidden: () => l10n.genericError,
       notFound: (_) => l10n.genericError,
@@ -145,7 +161,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 bottom: 0,
                                 right: 0,
                                 child: GestureDetector(
-                                  onTap: () {},
+                                  onTap: _pickImage,
                                   child: Container(
                                     padding: const EdgeInsets.all(6),
                                     decoration: BoxDecoration(
@@ -235,7 +251,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                             birthDate: _selectedBirthDate,
                                             gender: _gender,
                                             description: _description,
-                                            profilePhoto: widget.profilePhoto,
+                                            profilePhoto: _selectedProfilePhoto,
                                           ),
                                 backgroundColor: colorScheme.secondary,
                                 foregroundColor: colorScheme.onSecondary,
