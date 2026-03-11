@@ -29,11 +29,31 @@ class ProfileRoute extends GoRouteData with $ProfileRoute {
 }
 
 class ProfileEditRoute extends GoRouteData with $ProfileEditRoute {
-  const ProfileEditRoute();
+  const ProfileEditRoute({
+    this.name,
+    this.surname,
+    this.birthDate,
+    this.gender,
+    this.description,
+    this.profilePhoto,
+  });
+
+  final String? name;
+  final String? surname;
+  final String? birthDate;
+  final String? gender;
+  final String? description;
+  final String? profilePhoto;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) =>
-      const EditProfileScreen();
+  Widget build(BuildContext context, GoRouterState state) => EditProfileScreen(
+    name: name,
+    surname: surname,
+    birthDate: birthDate,
+    gender: gender,
+    description: description,
+    profilePhoto: profilePhoto,
+  );
 }
 
 class OtherProfileRoute extends GoRouteData with $OtherProfileRoute {

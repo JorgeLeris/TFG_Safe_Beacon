@@ -90,7 +90,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           listener: (context, state) {
             if (state.failure != null) {
               final message = state.failure!.when(
-                network: (_, __) => l10n.networkError,
+                network: (_, _) => l10n.networkError,
                 unauthorized: () => l10n.genericError,
                 forbidden: () => l10n.genericError,
                 notFound: (_) => l10n.profileNotFound,
@@ -201,7 +201,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   CustomFilledButton(
                                     text: l10n.edit,
                                     onPressed: () {
-                                      const ProfileEditRoute().push(context);
+                                      ProfileEditRoute(
+                                        name: profile?.name,
+                                        surname: profile?.surname,
+                                        birthDate: profile?.birthDate,
+                                        gender: profile?.gender,
+                                        description: profile?.description,
+                                        profilePhoto: profile?.profilePhoto,
+                                      ).push(context);
                                     },
                                     backgroundColor: colorScheme.secondary,
                                     foregroundColor: colorScheme.onSecondary,

@@ -1,13 +1,69 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:safe_beacon/core/assets/assets.dart';
 import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/extensions/context_extensions.dart';
+import 'package:safe_beacon/core/extensions/date_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
-class EditProfileScreen extends StatelessWidget {
-  const EditProfileScreen({super.key});
+class EditProfileScreen extends StatefulWidget {
+  const EditProfileScreen({
+    super.key,
+    this.name,
+    this.surname,
+    this.birthDate,
+    this.gender,
+    this.description,
+    this.profilePhoto,
+  });
+
+  final String? name;
+  final String? surname;
+  final String? birthDate;
+  final String? gender;
+  final String? description;
+  final String? profilePhoto;
+
+  @override
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
+}
+
+class _EditProfileScreenState extends State<EditProfileScreen> {
+  late final DateTime? _birthDate;
+
+  @override
+  void initState() {
+    super.initState();
+    _birthDate = DateTimeX.tryFromStringDate(widget.birthDate);
+  }
+
+  Widget _buildProfileAvatar(ColorScheme colorScheme) {
+    ImageProvider? imageProvider;
+
+    if (widget.profilePhoto != null && widget.profilePhoto!.isNotEmpty) {
+      if (widget.profilePhoto!.startsWith('http://') ||
+          widget.profilePhoto!.startsWith('https://')) {
+        imageProvider = NetworkImage(widget.profilePhoto!);
+      } else {
+        try {
+          final bytes = base64Decode(widget.profilePhoto!);
+          imageProvider = MemoryImage(bytes);
+        } catch (_) {
+          imageProvider = null;
+        }
+      }
+    }
+
+    return CircleAvatar(
+      radius: 56,
+      backgroundColor: colorScheme.surfaceContainerHighest,
+      backgroundImage:
+          imageProvider ?? const AssetImage(AppImages.placeholderProfileImage),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,14 +100,7 @@ class EditProfileScreen extends StatelessWidget {
                                   color: colorScheme.onSurface,
                                 ),
                               ),
-                              child: CircleAvatar(
-                                radius: 56,
-                                backgroundColor:
-                                    colorScheme.surfaceContainerHighest,
-                                backgroundImage: const AssetImage(
-                                  AppImages.placeholderProfileImage,
-                                ),
-                              ),
+                              child: _buildProfileAvatar(colorScheme),
                             ),
                             Positioned(
                               bottom: 0,
@@ -83,14 +132,21 @@ class EditProfileScreen extends StatelessWidget {
                       const SizedBox(height: 15),
 
                       // Profile fields
-                      InputField(hint: l10n.name),
+                      InputField(hint: l10n.name, initialValue: widget.name),
                       const SizedBox(height: 24),
-                      InputField(hint: l10n.surname),
+                      InputField(
+                        hint: l10n.surname,
+                        initialValue: widget.surname,
+                      ),
                       const SizedBox(height: 24),
-                      DateInputField(hint: l10n.birthDate),
+                      DateInputField(
+                        hint: l10n.birthDate,
+                        initialValue: _birthDate,
+                      ),
                       const SizedBox(height: 24),
                       DropdownInputField(
                         hint: l10n.gender,
+                        value: widget.gender,
                         items: [
                           DropdownMenuItem(
                             value: Constants.maleFieldKey,
@@ -109,17 +165,16 @@ class EditProfileScreen extends StatelessWidget {
                       const SizedBox(height: 24),
                       InputField(
                         hint: l10n.descriptionObservation,
+                        initialValue: widget.description,
                         maxLines: 5,
                       ),
                       const SizedBox(height: 25),
 
-                      // Edit buttons
+                      // Save button
                       Center(
                         child: CustomFilledButton(
                           text: l10n.save,
-                          onPressed: () {
-                            context.pop();
-                          },
+                          onPressed: () => context.pop(),
                           backgroundColor: colorScheme.secondary,
                           foregroundColor: colorScheme.onSecondary,
                           colorText: colorScheme.onSecondary,
