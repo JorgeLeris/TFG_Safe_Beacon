@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safe_beacon/core/assets/assets.dart';
@@ -35,6 +37,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
       default:
         return '-';
     }
+  }
+
+  Widget _buildProfileAvatar(String? profilePhoto, ColorScheme colorScheme) {
+    ImageProvider? imageProvider;
+
+    if (profilePhoto != null && profilePhoto.isNotEmpty) {
+      if (profilePhoto.startsWith('http://') ||
+          profilePhoto.startsWith('https://')) {
+        imageProvider = NetworkImage(profilePhoto);
+      } else {
+        try {
+          final bytes = base64Decode(profilePhoto);
+          imageProvider = MemoryImage(bytes);
+        } catch (_) {
+          imageProvider = null;
+        }
+      }
+    }
+
+    return CircleAvatar(
+      radius: 56,
+      backgroundColor: colorScheme.surfaceContainerHighest,
+      backgroundImage:
+          imageProvider ?? const AssetImage(AppImages.placeholderProfileImage),
+    );
   }
 
   @override
@@ -114,13 +141,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   color: colorScheme.onSurface,
                                 ),
                               ),
-                              child: CircleAvatar(
-                                radius: 56,
-                                backgroundColor:
-                                    colorScheme.surfaceContainerHighest,
-                                backgroundImage: const AssetImage(
-                                  AppImages.placeholderProfileImage,
-                                ),
+                              child: _buildProfileAvatar(
+                                profile?.profilePhoto,
+                                colorScheme,
                               ),
                             ),
                           ),
