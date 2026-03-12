@@ -8,6 +8,37 @@ class AuthRepositoryImpl implements AuthRepository {
 
   const AuthRepositoryImpl({required AuthApi authApi}) : _authApi = authApi;
 
+  /// Sends an email verification link to the currently authenticated user.
+  ///
+  /// Throws an exception if the operation fails.
+  @override
+  Future<void> sendEmailVerificationLink() async {
+    try {
+      await _authApi.sendEmailVerificationLink();
+    } catch (e, st) {
+      appLogger.severe('Error sending email verification link:', e, st);
+      rethrow;
+    }
+  }
+
+  /// Reloads the currently authenticated user's data from the server.
+  ///
+  /// Throws an exception if the operation fails.
+  @override
+  Future<void> reloadUser() async {
+    try {
+      await _authApi.reloadUser();
+      appLogger.info('User reloaded successfully');
+    } catch (e, st) {
+      appLogger.severe('Error reloading user:', e, st);
+      rethrow;
+    }
+  }
+
+  /// Creates a new user with the given [email] and [password].
+  /// Returns the created [User] on success, or `null` if the operation fails.
+  ///
+  /// Throws an exception if the operation fails.
   @override
   Future<User?> createUserWithCredential(String email, String password) async {
     try {
@@ -20,6 +51,10 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  /// Logs in the user with the given [email] and [password].
+  /// Returns the logged-in [User] on success, or `null` if the operation fails.
+  ///
+  /// Throws an exception if the operation fails.
   @override
   Future<User?> loginWithCredential(String email, String password) async {
     try {
@@ -32,6 +67,11 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  /// Logs in the user with Google Sign-In.
+  /// Returns a record containing the logged-in [User] and a boolean indicating if
+  /// the user is new on success, or `null` if the operation fails.
+  ///
+  /// Throws an exception if the operation fails.
   @override
   Future<({User? user, bool isNewUser})?> loginWithGoogle() async {
     try {
@@ -46,6 +86,9 @@ class AuthRepositoryImpl implements AuthRepository {
     }
   }
 
+  /// Logs out the currently authenticated user.
+  ///
+  /// Throws an exception if the operation fails.
   @override
   Future<void> logout() async {
     try {

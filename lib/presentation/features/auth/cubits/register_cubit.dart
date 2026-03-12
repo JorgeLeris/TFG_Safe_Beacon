@@ -139,7 +139,8 @@ class RegisterCubit extends Cubit<RegisterState> {
         return;
       }
 
-      emit(state.copyWith(isLoading: false));
+      await _authRepository.sendEmailVerificationLink();
+      emit(state.copyWith(isLoading: false, requiresEmailVerification: true));
     } on FirebaseAuthException catch (e) {
       final message = _mapFirebaseError(e.code, l10n);
       emit(state.copyWith(isLoading: false, errorMessage: message));
@@ -148,6 +149,21 @@ class RegisterCubit extends Cubit<RegisterState> {
         state.copyWith(isLoading: false, errorMessage: l10n.registrationFailed),
       );
     }
+  }
+
+  Future<bool> checkEmailVerified() async {
+    await _authRepository.reloadUser();
+    return FirebaseAuth.instance.currentUser?.emailVerified ?? false;
+  }
+
+  Future<void> resendVerificationEmail() async {
+    try {
+      await _authRepository.sendEmailVerificationLink();
+    } catch (_) {}
+  }
+
+  void clearVerificationFlag() {
+    emit(state.copyWith(requiresEmailVerification: false));
   }
 
   void clearErrors() {

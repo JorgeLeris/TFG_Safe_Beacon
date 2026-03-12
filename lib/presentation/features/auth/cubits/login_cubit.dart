@@ -56,6 +56,12 @@ class LoginCubit extends Cubit<LoginState> {
         return;
       }
 
+      if (!user.emailVerified) {
+        await _authRepository.sendEmailVerificationLink();
+        emit(state.copyWith(isLoading: false, requiresEmailVerification: true));
+        return;
+      }
+
       emit(state.copyWith(isLoading: false));
     } on FirebaseAuthException catch (e) {
       final message = _mapFirebaseError(e.code, l10n);
@@ -63,6 +69,21 @@ class LoginCubit extends Cubit<LoginState> {
     } catch (e) {
       emit(state.copyWith(isLoading: false, errorMessage: l10n.loginFailed));
     }
+  }
+
+  Future<bool> checkEmailVerified() async {
+    await _authRepository.reloadUser();
+    return FirebaseAuth.instance.currentUser?.emailVerified ?? false;
+  }
+
+  Future<void> resendVerificationEmail() async {
+    try {
+      await _authRepository.sendEmailVerificationLink();
+    } catch (_) {}
+  }
+
+  void clearVerificationFlag() {
+    emit(state.copyWith(requiresEmailVerification: false));
   }
 
   Future<void> onGoogleLogin(AppLocalizations l10n) async {

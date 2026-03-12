@@ -61,5 +61,11 @@
   "logoutErrorTitle": "Error lors de la déconnexion",
   "networkError": "Error de réseau. Veuillez vérifier votre connexion.",
   "genericError": "Une erreur s'est produite. Veuillez réessayer.",
-  "profileNotFound": "Profil non trouvé."
+  "profileNotFound": "Profil non trouvé.",
+  "verifyAccountTitle": "Vérifiez votre compte",
+  "verifyAccountMessage": "Avant de continuer, veuillez consulter votre messagerie. Nous vous avons envoyé un message contenant un lien de vérification. Si vous ne le trouvez pas, vérifiez votre dossier de courriers indésirables.",
+  "resendVerificationEmail": "Renvoyer l'e-mail de vérification",
+  "continueButton": "Continuer",
+  "authFailedTitle": "Échec d'authentification",
+  "emailNotVerifiedError": "Vous n'avez pas encore vérifié votre adresse e-mail. Nous vous avons envoyé un message contenant un lien de vérification, si vous ne le trouvez pas, vérifiez votre dossier de courriers indésirables."
 }

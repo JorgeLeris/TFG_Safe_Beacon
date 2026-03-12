@@ -7,6 +7,7 @@ import 'package:safe_beacon/core/extensions/context_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/presentation/features/auth/cubits/login_cubit.dart';
 import 'package:safe_beacon/presentation/features/auth/routes/auth_routes.dart';
+import 'package:safe_beacon/presentation/features/auth/widgets/email_verification_widget.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -29,6 +30,22 @@ class _LoginView extends StatelessWidget {
     return BlocListener<LoginCubit, LoginState>(
       listenWhen: (prev, curr) => prev.isLoading && !curr.isLoading,
       listener: (context, state) {
+        if (state.requiresEmailVerification) {
+          cubit.clearVerificationFlag();
+          showEmailVerificationDialog(
+            context: context,
+            l10n: l10n,
+            onCheckVerified: cubit.checkEmailVerified,
+            onResend: cubit.resendVerificationEmail,
+            onNotVerified: () => CustomDialog.show(
+              context: context,
+              title: l10n.authFailedTitle,
+              content: Text(l10n.emailNotVerifiedError),
+              buttonText: l10n.accept,
+            ),
+          );
+          return;
+        }
         if (state.errorMessage != null) {
           CustomDialog.show(
             context: context,

@@ -17,6 +17,7 @@ abstract class RegisterState with _$RegisterState {
 
     // Common
     @Default(false) bool isLoading,
+    @Default(false) bool requiresEmailVerification,
     String? errorMessage,
 
     // Errors step 1

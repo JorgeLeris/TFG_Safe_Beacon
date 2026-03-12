@@ -106,8 +106,8 @@ GoRouter buildAppRouter() {
       final user = FirebaseAuth.instance.currentUser;
       final isOnAuth = state.matchedLocation.startsWith('/auth');
 
-      if (user != null && isOnAuth) return '/home';
       if (user == null && !isOnAuth) return '/auth';
+      if (user != null && user.emailVerified && isOnAuth) return '/home';
 
       return null;
     },
@@ -125,6 +125,6 @@ GoRouter buildAppRouter() {
 /// Listenable that notifies when the authentication state changes
 class _AuthStateListenable extends ChangeNotifier {
   _AuthStateListenable() {
-    FirebaseAuth.instance.authStateChanges().listen((_) => notifyListeners());
+    FirebaseAuth.instance.idTokenChanges().listen((_) => notifyListeners());
   }
 }

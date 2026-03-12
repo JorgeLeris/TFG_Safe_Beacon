@@ -61,5 +61,11 @@
   "logoutErrorTitle": "Error logging out",
   "networkError": "Network error. Please check your connection.",
   "genericError": "An error occurred. Please try again.",
-  "profileNotFound": "Profile not found."
+  "profileNotFound": "Profile not found.",
+  "verifyAccountTitle": "Verify your account",
+  "verifyAccountMessage": "Before continuing, please check your email. We have sent you a message with a verification link. If you can't find it, check your spam folder.",
+  "resendVerificationEmail": "Resend verification email",
+  "continueButton": "Continue",
+  "authFailedTitle": "Authentication failure",
+  "emailNotVerifiedError": "You haven't verified your email address yet. We've sent you a message with a verification link, ff you can't find it, check your spam folder."
 }

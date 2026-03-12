@@ -9,6 +9,9 @@ class CustomDialog extends StatelessWidget {
     required this.content,
     required this.buttonText,
     this.onButtonPressed,
+    this.topButtonText,
+    this.onTopButtonPressed,
+    this.dismissible = true,
   });
 
   final String title;
@@ -16,20 +19,32 @@ class CustomDialog extends StatelessWidget {
   final String buttonText;
   final VoidCallback? onButtonPressed;
 
+  final String? topButtonText;
+  final VoidCallback? onTopButtonPressed;
+
+  final bool dismissible;
+
   static Future<void> show({
     required BuildContext context,
     required String title,
     required Widget content,
     required String buttonText,
     VoidCallback? onButtonPressed,
+    String? topButtonText,
+    VoidCallback? onTopButtonPressed,
+    bool dismissible = true,
   }) {
     return showDialog(
       context: context,
+      barrierDismissible: dismissible,
       builder: (_) => CustomDialog(
         title: title,
         content: content,
         buttonText: buttonText,
         onButtonPressed: onButtonPressed,
+        topButtonText: topButtonText,
+        onTopButtonPressed: onTopButtonPressed,
+        dismissible: dismissible,
       ),
     );
   }
@@ -39,64 +54,86 @@ class CustomDialog extends StatelessWidget {
     final colorScheme = context.colorScheme;
     final textTheme = context.textTheme;
 
-    return Dialog(
-      backgroundColor: colorScheme.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.8,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(
-            right: 22,
-            left: 22,
-            top: 12,
-            bottom: 24,
+    return PopScope(
+      canPop: dismissible,
+      child: Dialog(
+        backgroundColor: colorScheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.8,
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(
+              right: 22,
+              left: 22,
+              top: 22,
+              bottom: 24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+
+                    if (dismissible)
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: Icon(Icons.close, color: colorScheme.onSurface),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                Flexible(child: SingleChildScrollView(child: content)),
+
+                const SizedBox(height: 24),
+
+                if (topButtonText != null) ...[
+                  TextButton(
+                    onPressed: onTopButtonPressed,
                     child: Text(
-                      title,
-                      style: textTheme.titleLarge?.copyWith(
+                      topButtonText!,
+                      style: textTheme.labelLarge?.copyWith(
+                        color: colorScheme.tertiary,
                         fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
+                        decoration: TextDecoration.underline,
+                        decorationColor: colorScheme.tertiary,
                       ),
                     ),
                   ),
-                  IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: Icon(Icons.close, color: colorScheme.onSurface),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
+                  const SizedBox(height: 8),
                 ],
-              ),
 
-              const SizedBox(height: 16),
-
-              Flexible(child: SingleChildScrollView(child: content)),
-
-              const SizedBox(height: 24),
-
-              CustomFilledButton(
-                text: buttonText,
-                onPressed: onButtonPressed ?? () => Navigator.of(context).pop(),
-                backgroundColor: colorScheme.secondary,
-                foregroundColor: colorScheme.onSecondary,
-                colorText: colorScheme.onSecondary,
-                fontSizeText: textTheme.labelLarge!.fontSize!,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
+                CustomFilledButton(
+                  text: buttonText,
+                  onPressed:
+                      onButtonPressed ?? () => Navigator.of(context).pop(),
+                  backgroundColor: colorScheme.secondary,
+                  foregroundColor: colorScheme.onSecondary,
+                  colorText: colorScheme.onSecondary,
+                  fontSizeText: textTheme.labelLarge!.fontSize!,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

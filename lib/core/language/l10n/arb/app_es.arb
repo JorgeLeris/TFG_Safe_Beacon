@@ -61,5 +61,11 @@
   "logoutErrorTitle": "Error al cerrar sesión",
   "networkError": "Error de red. Verifica tu conexión.",
   "genericError": "Ocurrió un error. Inténtalo de nuevo.",
-  "profileNotFound": "Perfil no encontrado."
+  "profileNotFound": "Perfil no encontrado.",
+  "verifyAccountTitle": "Verifica tu cuenta",
+  "verifyAccountMessage": "Antes de continuar, verifica tu correo electrónico. Te hemos enviado un mensaje con un enlace de verificación. Si no lo encuentras revisa tu bandeja de spam.",
+  "resendVerificationEmail": "Reenviar correo de verificación",
+  "continueButton": "Continuar",
+  "authFailedTitle": "Fallo de autenticación",
+  "emailNotVerifiedError": "Aún no has verificado tu correo electrónico. Te hemos enviado un mensaje con un enlace de verificación, si no lo encuentras revisa tu bandeja de spam."
 }
