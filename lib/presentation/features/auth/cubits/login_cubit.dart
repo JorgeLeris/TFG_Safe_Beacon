@@ -139,6 +139,31 @@ class LoginCubit extends Cubit<LoginState> {
     }
   }
 
+  Future<void> onForgotPassword(AppLocalizations l10n) async {
+    final emailError = _validateEmail(state.email, l10n);
+    if (emailError != null) {
+      emit(state.copyWith(emailError: emailError));
+      return;
+    }
+
+    emit(state.copyWith(isPasswordResetDialogReady: true));
+  }
+
+  Future<void> sendPasswordResetLink(AppLocalizations l10n) async {
+    try {
+      await _authRepository.sendPasswordResetLink(state.email);
+    } on FirebaseAuthException catch (e) {
+      final message = _mapFirebaseError(e.code, l10n);
+      emit(state.copyWith(errorMessage: message));
+    } catch (e) {
+      emit(state.copyWith(errorMessage: l10n.loginFailed));
+    }
+  }
+
+  void clearPasswordResetFlag() {
+    emit(state.copyWith(isPasswordResetDialogReady: false));
+  }
+
   void clearErrors() {
     emit(
       state.copyWith(errorMessage: null, emailError: null, passwordError: null),

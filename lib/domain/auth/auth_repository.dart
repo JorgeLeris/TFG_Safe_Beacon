@@ -18,4 +18,7 @@ abstract interface class AuthRepository {
 
   /// Logs out the current user.
   Future<void> logout();
+
+  /// Sends a password reset email.
+  Future<void> sendPasswordResetLink(String email);
 }

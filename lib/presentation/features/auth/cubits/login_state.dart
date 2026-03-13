@@ -7,6 +7,7 @@ abstract class LoginState with _$LoginState {
     @Default('') String password,
     @Default(false) bool isLoading,
     @Default(false) bool requiresEmailVerification,
+    @Default(false) bool isPasswordResetDialogReady,
     String? errorMessage,
     String? emailError,
     String? passwordError,

@@ -28,8 +28,24 @@ class _LoginView extends StatelessWidget {
     final cubit = context.read<LoginCubit>();
 
     return BlocListener<LoginCubit, LoginState>(
-      listenWhen: (prev, curr) => prev.isLoading && !curr.isLoading,
+      listenWhen: (prev, curr) =>
+          prev.isLoading && !curr.isLoading ||
+          !prev.isPasswordResetDialogReady && curr.isPasswordResetDialogReady,
       listener: (context, state) {
+        if (state.isPasswordResetDialogReady) {
+          cubit.clearPasswordResetFlag();
+          CustomDialog.show(
+            context: context,
+            title: l10n.passwordResetTitle,
+            content: Text(l10n.passwordResetMessage),
+            buttonText: l10n.accept,
+            onButtonPressed: () {
+              Navigator.of(context).pop();
+              cubit.sendPasswordResetLink(l10n);
+            },
+          );
+          return;
+        }
         if (state.requiresEmailVerification) {
           cubit.clearVerificationFlag();
           showEmailVerificationDialog(
@@ -126,10 +142,15 @@ class _LoginView extends StatelessWidget {
 
                     const SizedBox(height: 12),
 
-                    Text(
-                      l10n.forgotPassword,
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurface,
+                    GestureDetector(
+                      onTap: () {
+                        cubit.onForgotPassword(l10n);
+                      },
+                      child: Text(
+                        l10n.forgotPassword,
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface,
+                        ),
                       ),
                     ),
 

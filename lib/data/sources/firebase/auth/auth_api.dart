@@ -54,4 +54,9 @@ class AuthApi {
 
   // Logs out the currently authenticated user.
   Future<void> logout() => _auth.signOut();
+
+  /// Sends a password reset email.
+  Future<void> sendPasswordResetLink(String email) async {
+    await _auth.sendPasswordResetEmail(email: email);
+  }
 }

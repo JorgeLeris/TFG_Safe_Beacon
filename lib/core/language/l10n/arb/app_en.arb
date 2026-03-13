@@ -67,5 +67,7 @@
   "resendVerificationEmail": "Resend verification email",
   "continueButton": "Continue",
   "authFailedTitle": "Authentication failure",
-  "emailNotVerifiedError": "You haven't verified your email address yet. We've sent you a message with a verification link, ff you can't find it, check your spam folder."
+  "emailNotVerifiedError": "You haven't verified your email address yet. We've sent you a message with a verification link, ff you can't find it, check your spam folder.",
+  "passwordResetTitle": "Password change",
+  "passwordResetMessage": "If you wish, we can send you an email with instructions on how to change your password. Check your inbox or spam folder and follow the instructions."
 }

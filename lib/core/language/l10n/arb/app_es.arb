@@ -67,5 +67,7 @@
   "resendVerificationEmail": "Reenviar correo de verificación",
   "continueButton": "Continuar",
   "authFailedTitle": "Fallo de autenticación",
-  "emailNotVerifiedError": "Aún no has verificado tu correo electrónico. Te hemos enviado un mensaje con un enlace de verificación, si no lo encuentras revisa tu bandeja de spam."
+  "emailNotVerifiedError": "Aún no has verificado tu correo electrónico. Te hemos enviado un mensaje con un enlace de verificación, si no lo encuentras revisa tu bandeja de spam.",
+  "passwordResetTitle": "Cambio de contraseña",
+  "passwordResetMessage": "Si lo deseas podemos enviar un correo electrónico con las instrucciones para cambiar tu contraseña. Revisa tu bandeja de entrada o la de spam y sigue los pasos indicados."
 }

@@ -98,4 +98,18 @@ class AuthRepositoryImpl implements AuthRepository {
       appLogger.severe('Error logging out user:', e, st);
     }
   }
+
+  /// Sends a password reset email to the given [email].
+  ///
+  /// Throws an exception if the operation fails.
+  @override
+  Future<void> sendPasswordResetLink(String email) async {
+    try {
+      await _authApi.sendPasswordResetLink(email);
+      appLogger.info('Password reset link sent to: $email');
+    } catch (e, st) {
+      appLogger.severe('Error sending password reset link:', e, st);
+      rethrow;
+    }
+  }
 }
