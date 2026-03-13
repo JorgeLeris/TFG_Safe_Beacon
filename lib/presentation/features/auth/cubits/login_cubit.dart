@@ -147,7 +147,7 @@ class LoginCubit extends Cubit<LoginState> {
       return;
     }
 
-    emit(state.copyWith(isPasswordResetDialogReady: true));
+    emit(state.copyWith(emailError: null, isPasswordResetDialogReady: true));
   }
 
   Future<void> sendPasswordResetLink(AppLocalizations l10n) async {
