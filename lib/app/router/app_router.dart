@@ -9,6 +9,7 @@ import 'package:safe_beacon/presentation/features/home/routes/home_routes.dart';
 import 'package:safe_beacon/presentation/features/profile/routes/profile_routes.dart';
 import 'package:safe_beacon/presentation/features/settings/routes/settings_routes.dart';
 import 'package:safe_beacon/presentation/shared/routes/mock_routes.dart';
+import 'package:safe_beacon/presentation/shared/screens/splash_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -101,8 +102,11 @@ GoRouter buildAppRouter() {
       : <RouteBase>[];
 
   return GoRouter(
-    initialLocation: '/auth',
+    initialLocation: '/',
     redirect: (context, state) {
+      final isSplash = state.matchedLocation == '/';
+      if (isSplash) return null;
+
       final user = FirebaseAuth.instance.currentUser;
       final isOnAuth = state.matchedLocation.startsWith('/auth');
 
@@ -113,7 +117,7 @@ GoRouter buildAppRouter() {
     },
     refreshListenable: _AuthStateListenable(),
     routes: [
-      GoRoute(path: '/', redirect: (_, _) => '/auth'),
+      GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
       ...$appRoutes,
       $authRoute,
       $profileRoute,

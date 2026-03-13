@@ -69,5 +69,10 @@
   "authFailedTitle": "Échec d'authentification",
   "emailNotVerifiedError": "Vous n'avez pas encore vérifié votre adresse e-mail. Nous vous avons envoyé un message contenant un lien de vérification, si vous ne le trouvez pas, vérifiez votre dossier de courriers indésirables.",
   "passwordResetTitle": "Changement de mot de passe",
-  "passwordResetMessage": "Si vous le souhaitez, nous pouvons vous envoyer un courriel contenant les instructions pour modifier votre mot de passe. Veuillez vérifier votre boîte de réception ou votre dossier de courriers indésirables et suivre les instructions."
+  "passwordResetMessage": "Si vous le souhaitez, nous pouvons vous envoyer un courriel contenant les instructions pour modifier votre mot de passe. Veuillez vérifier votre boîte de réception ou votre dossier de courriers indésirables et suivre les instructions.",
+  "biometricReason": "Connectez-vous pour accéder à l'application",
+  "biometricSignInTitle": "Authentification requise",
+  "cancel": "Annuler",
+  "biometricFallbackTitle": "Utiliser le mot de passe",
+  "loading": "En charge..."
 }

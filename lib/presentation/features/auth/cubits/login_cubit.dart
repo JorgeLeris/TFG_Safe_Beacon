@@ -57,7 +57,8 @@ class LoginCubit extends Cubit<LoginState> {
       }
 
       if (!user.emailVerified) {
-        await _authRepository.sendEmailVerificationLink();
+        // ! Not send anothe one
+        // await _authRepository.sendEmailVerificationLink();
         emit(state.copyWith(isLoading: false, requiresEmailVerification: true));
         return;
       }
