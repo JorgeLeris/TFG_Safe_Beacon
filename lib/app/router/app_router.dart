@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safe_beacon/presentation/features/auth/routes/auth_routes.dart';
 import 'package:safe_beacon/presentation/features/chat/routes/chat_routes.dart';
 import 'package:safe_beacon/presentation/features/control/routes/control_routes.dart';
 import 'package:safe_beacon/presentation/features/dashboard/dashboard_shell.dart';
@@ -7,6 +9,7 @@ import 'package:safe_beacon/presentation/features/home/routes/home_routes.dart';
 import 'package:safe_beacon/presentation/features/profile/routes/profile_routes.dart';
 import 'package:safe_beacon/presentation/features/settings/routes/settings_routes.dart';
 import 'package:safe_beacon/presentation/shared/routes/mock_routes.dart';
+import 'package:safe_beacon/presentation/shared/screens/splash_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -99,7 +102,33 @@ GoRouter buildAppRouter() {
       : <RouteBase>[];
 
   return GoRouter(
-    routes: [...$appRoutes, ...mockRoutes],
-    initialLocation: HomeBranch.$initialLocation,
+    initialLocation: '/',
+    redirect: (context, state) {
+      final isSplash = state.matchedLocation == '/';
+      if (isSplash) return null;
+
+      final user = FirebaseAuth.instance.currentUser;
+      final isOnAuth = state.matchedLocation.startsWith('/auth');
+
+      if (user == null && !isOnAuth) return '/auth';
+      if (user != null && user.emailVerified && isOnAuth) return '/home';
+
+      return null;
+    },
+    refreshListenable: _AuthStateListenable(),
+    routes: [
+      GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+      ...$appRoutes,
+      $authRoute,
+      $profileRoute,
+      ...mockRoutes,
+    ],
   );
+}
+
+/// Listenable that notifies when the authentication state changes
+class _AuthStateListenable extends ChangeNotifier {
+  _AuthStateListenable() {
+    FirebaseAuth.instance.idTokenChanges().listen((_) => notifyListeners());
+  }
 }

@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
   <dict>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Esta app necesita acceso a tu galería para cambiar tu foto de perfil.</string>
+    <key>NSFaceIDUsageDescription</key>
+    <string>Se requiere autenticación para acceder a la app</string>
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
@@ -45,5 +49,16 @@
     <true/>
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
+    <key>CFBundleURLTypes</key>
+    <array>
+      <dict>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>com.googleusercontent.apps.666649668288-m09vgng1vi5q6aub10f47beua6n1enu7</string>
+        </array>
+      </dict>
+    </array>
   </dict>
 </plist>

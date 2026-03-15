@@ -9,4 +9,10 @@ abstract final class AppImages {
 
   /// The path to the app icon image.
   static const appIconImage = '$_basePath/app-icon-android.png';
+
+  /// The path to login image
+  static const loginImage = '$_basePath/login-image.svg';
+
+  /// The path to the placeholder user profile image.
+  static const placeholderProfileImage = '$_basePath/default-profile-image.png';
 }
