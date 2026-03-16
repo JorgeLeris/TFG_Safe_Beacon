@@ -75,5 +75,9 @@
   "cancel": "Annuler",
   "biometricFallbackTitle": "Utiliser le mot de passe",
   "loading": "En charge...",
-  "trustedContacts": "Vos contacts de confiance"
+  "yourTrustedContacts": "Vos contacts de confiance",
+  "trustedContacts": "Contacts de confiance",
+  "yourUserCode": "Votre code utilisateur:",
+  "addTrustedContact": "Ajouter un contact de confiance",
+  "pendingRequests": "Demandes en attente"
 }

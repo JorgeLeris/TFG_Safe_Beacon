@@ -8,6 +8,7 @@ class SectionButton extends StatelessWidget {
     required this.onPressed,
     this.backgroundColor,
     this.contentColor,
+    this.showArrow = true,
   });
 
   final IconData icon;
@@ -15,6 +16,7 @@ class SectionButton extends StatelessWidget {
   final VoidCallback onPressed;
   final Color? backgroundColor;
   final Color? contentColor;
+  final bool showArrow;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +55,8 @@ class SectionButton extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Icon(Icons.arrow_forward_ios, color: fgColor, size: 18),
+                  if (showArrow)
+                    Icon(Icons.arrow_forward_ios, color: fgColor, size: 18),
                 ],
               ),
             ],

@@ -5,21 +5,81 @@ import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 class TrustedContactsScreen extends StatelessWidget {
   const TrustedContactsScreen({super.key});
 
+  // TODO: replace with real user code from cubit/provider
+  static const String _mockUserCode = 'USR-4F2A-9C1B';
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final l10n = context.l10n;
+    final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: const CustomAppBar(),
       body: Column(
         children: [
-          SectionHeader(text: l10n.trustedContacts),
-          const Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-              child: Column(children: [Placeholder()]),
+          SectionHeader(text: l10n.yourTrustedContacts),
+
+          // Section 1: user code + add contact
+          Container(
+            width: double.infinity,
+            color: isDark
+                ? Colors.white.withValues(alpha: 0.05)
+                : colorScheme.surfaceContainerHigh.withValues(alpha: 0.30),
+            padding: const EdgeInsets.only(
+              left: 24,
+              right: 24,
+              top: 16,
+              bottom: 24,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.yourUserCode,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const CopyableCodeField(code: _mockUserCode),
+                const SizedBox(height: 16),
+                SectionButton(
+                  icon: Icons.person_add_outlined,
+                  text: l10n.addTrustedContact,
+                  showArrow: false,
+                  onPressed: () {},
+                  backgroundColor: colorScheme.secondary,
+                  contentColor: colorScheme.onSecondary,
+                ),
+              ],
+            ),
+          ),
+
+          // Section 2: tabs
+          Expanded(
+            child: CustomTabView(
+              tabs: [l10n.trustedContacts, l10n.pendingRequests],
+              children: [
+                // Tab 1 — trusted contacts list
+                const Center(
+                  child: Text(
+                    'No tienes contactos de confianza aún',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+
+                // Tab 2 — pending requests
+                const Center(
+                  child: Text(
+                    'No tienes solicitudes pendientes',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
