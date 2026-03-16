@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -20,7 +21,7 @@ class HomeScreen extends StatelessWidget {
             SectionButton(
               icon: Icons.group_outlined,
               text: l10n.trustedContacts,
-              onPressed: () {},
+              onPressed: () => const TrustedContactsRoute().push(context),
               backgroundColor: colorScheme.tertiary,
               contentColor: colorScheme.onTertiary,
             ),
