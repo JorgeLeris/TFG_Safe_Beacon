@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const CustomAppBar({super.key});
+  const CustomAppBar({super.key, this.showBottomBorder = false});
+
+  final bool showBottomBorder;
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -25,6 +27,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           fontWeight: FontWeight.bold,
         ),
       ),
+      bottom: showBottomBorder
+          ? PreferredSize(
+              preferredSize: const Size.fromHeight(0),
+              child: Divider(
+                height: 0,
+                thickness: 0.75,
+                color: colorScheme.outlineVariant,
+              ),
+            )
+          : null,
     );
   }
 }
