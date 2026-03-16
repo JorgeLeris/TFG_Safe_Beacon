@@ -74,5 +74,6 @@
   "biometricSignInTitle": "Autenticación requerida",
   "cancel": "Cancelar",
   "biometricFallbackTitle": "Usar contraseña",
-  "loading": "Cargando..."
+  "loading": "Cargando...",
+  "trustedContacts": "Tus contactos de confianza"
 }
