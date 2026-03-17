@@ -88,5 +88,10 @@
   "noResultsTitle": "Aucun résultat trouvé",
   "noResultsDescription": "Désolé, aucun résultat n'a été trouvé pour cette recherche.",
   "noPendingRequestsTitle": "Aucune demande en attente",
-  "noPendingRequestsDescription": "Vous n'avez aucune demande de contact en attente."
+  "noPendingRequestsDescription": "Vous n'avez aucune demande de contact en attente.",
+  "headerControl": "Panneau de contrôle",
+  "yourProtectedPeople": "Vos personnes protégées",
+  "alerts": "Alertes",
+  "followUps": "Suivis",
+  "history": "Historique"
 }

@@ -88,5 +88,10 @@
   "noResultsTitle": "No results found",
   "noResultsDescription": "Sorry, no results were found for this search.",
   "noPendingRequestsTitle": "No pending requests",
-  "noPendingRequestsDescription": "You don't have any pending contact requests."
+  "noPendingRequestsDescription": "You don't have any pending contact requests.",
+  "headerControl": "Control panel",
+  "yourProtectedPeople": "Your protected people",
+  "alerts": "Alerts",
+  "followUps": "Follow-ups",
+  "history": "History"
 }

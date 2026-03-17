@@ -88,5 +88,10 @@
   "noResultsTitle": "No se encontraron resultados",
   "noResultsDescription": "Lo sentimos, no se encontraron resultados para esta búsqueda.",
   "noPendingRequestsTitle": "Sin solicitudes pendientes",
-  "noPendingRequestsDescription": "No tienes solicitudes de contacto pendientes."
+  "noPendingRequestsDescription": "No tienes solicitudes de contacto pendientes.",
+  "headerControl": "Panel de control",
+  "yourProtectedPeople": "Tus personas protegidas",
+  "alerts": "Alertas",
+  "followUps": "Seguimientos",
+  "history": "Histórico"
 }
