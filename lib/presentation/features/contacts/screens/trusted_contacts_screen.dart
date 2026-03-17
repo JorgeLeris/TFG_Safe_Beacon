@@ -68,6 +68,14 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
       );
     }
 
+    if (_mockContacts.isEmpty) {
+      return EmptyStateView(
+        type: EmptyStateType.empty,
+        title: l10n.noTrustedContactsTitle,
+        description: l10n.noTrustedContactsDescription,
+      );
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
@@ -82,17 +90,11 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
             child: Divider(height: 24),
           ),
           if (_filteredContacts.isEmpty)
-            _contactsQuery.isEmpty
-                ? EmptyStateView(
-                    type: EmptyStateType.empty,
-                    title: l10n.noTrustedContactsTitle,
-                    description: l10n.noTrustedContactsDescription,
-                  )
-                : EmptyStateView(
-                    type: EmptyStateType.noResults,
-                    title: l10n.noResultsTitle,
-                    description: l10n.noResultsDescription,
-                  )
+            EmptyStateView(
+              type: EmptyStateType.noResults,
+              title: l10n.noResultsTitle,
+              description: l10n.noResultsDescription,
+            )
           else
             ..._filteredContacts.map(
               (contact) => Padding(
@@ -119,6 +121,14 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
       );
     }
 
+    if (_mockPending.isEmpty) {
+      return EmptyStateView(
+        type: EmptyStateType.empty,
+        title: l10n.noPendingRequestsTitle,
+        description: l10n.noPendingRequestsDescription,
+      );
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
@@ -133,17 +143,11 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
             child: Divider(height: 24),
           ),
           if (_filteredPending.isEmpty)
-            _pendingQuery.isEmpty
-                ? EmptyStateView(
-                    type: EmptyStateType.empty,
-                    title: l10n.noPendingRequestsTitle,
-                    description: l10n.noPendingRequestsDescription,
-                  )
-                : EmptyStateView(
-                    type: EmptyStateType.noResults,
-                    title: l10n.noResultsTitle,
-                    description: l10n.noResultsDescription,
-                  )
+            EmptyStateView(
+              type: EmptyStateType.noResults,
+              title: l10n.noResultsTitle,
+              description: l10n.noResultsDescription,
+            )
           else
             ..._filteredPending.map(
               (request) => Padding(
