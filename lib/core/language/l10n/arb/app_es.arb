@@ -93,5 +93,9 @@
   "yourProtectedPeople": "Tus personas protegidas",
   "alerts": "Alertas",
   "followUps": "Seguimientos",
-  "history": "Histórico"
+  "history": "Histórico",
+  "noProtectedPeopleTitle": "Sin personas protegidas",
+  "noProtectedPeopleDescription": "Aún no has añadido ninguna persona protegida.",
+  "protectedPeople": "Personas protegidas",
+  "requestsReceived": "Solicitudes recibidas"
 }

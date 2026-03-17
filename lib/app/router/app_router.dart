@@ -123,6 +123,7 @@ GoRouter buildAppRouter() {
       $authRoute,
       $profileRoute,
       $trustedContactsRoute,
+      $protectedPeopleRoute,
       ...mockRoutes,
     ],
   );

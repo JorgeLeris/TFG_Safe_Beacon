@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class ControlScreen extends StatelessWidget {
@@ -35,7 +36,9 @@ class ControlScreen extends StatelessWidget {
                 SectionButton(
                   icon: Icons.group_outlined,
                   text: l10n.yourProtectedPeople,
-                  onPressed: () {},
+                  onPressed: () {
+                    const ProtectedPeopleRoute().push(context);
+                  },
                   backgroundColor: colorScheme.secondary,
                   contentColor: colorScheme.onSecondary,
                   notificationCount: 2,
