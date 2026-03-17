@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class SearchInputField extends StatefulWidget {
+  const SearchInputField({super.key, required this.hint, this.onChanged});
+
   final String hint;
   final ValueChanged<String>? onChanged;
-
-  const SearchInputField({super.key, required this.hint, this.onChanged});
 
   @override
   State<SearchInputField> createState() => _SearchInputFieldState();
@@ -28,9 +28,7 @@ class _SearchInputFieldState extends State<SearchInputField> {
     super.dispose();
   }
 
-  void _unfocus() {
-    _focusNode.unfocus();
-  }
+  void _unfocus() => _focusNode.unfocus();
 
   @override
   Widget build(BuildContext context) {

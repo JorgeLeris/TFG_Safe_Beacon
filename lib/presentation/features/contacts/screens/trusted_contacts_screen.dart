@@ -21,11 +21,27 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
 
   static const List<Map<String, String?>> _mockPending = [];
 
+  Key _contactsSearchKey = UniqueKey();
+  Key _pendingSearchKey = UniqueKey();
+
   String _contactsQuery = '';
   String _pendingQuery = '';
 
   // TODO: set to true when the cubit reports a load failure
   static const bool _hasError = false;
+
+  void _onTabChanged(int index) {
+    setState(() {
+      if (index == 1) {
+        _contactsSearchKey = UniqueKey();
+        _contactsQuery = '';
+      } else {
+        _pendingSearchKey = UniqueKey();
+        _pendingQuery = '';
+      }
+    });
+    FocusManager.instance.primaryFocus?.unfocus();
+  }
 
   List<Map<String, String?>> get _filteredContacts {
     if (_contactsQuery.isEmpty) return _mockContacts;
@@ -57,6 +73,7 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
       child: Column(
         children: [
           SearchInputField(
+            key: _contactsSearchKey,
             hint: l10n.searchContact,
             onChanged: (q) => setState(() => _contactsQuery = q),
           ),
@@ -107,6 +124,7 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
       child: Column(
         children: [
           SearchInputField(
+            key: _pendingSearchKey,
             hint: l10n.searchContact,
             onChanged: (q) => setState(() => _pendingQuery = q),
           ),
@@ -201,6 +219,7 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
             Expanded(
               child: CustomTabView(
                 tabs: [l10n.trustedContacts, l10n.pendingRequests],
+                onTabChanged: _onTabChanged,
                 children: [_buildContactsList(l10n), _buildPendingList(l10n)],
               ),
             ),
