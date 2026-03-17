@@ -34,6 +34,11 @@ class _SearchInputFieldState extends State<SearchInputField> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final contentColor = isDark
+        ? Theme.of(context).colorScheme.onSurface
+        : Colors.black;
+
     return GestureDetector(
       onTap: _unfocus,
       behavior: HitTestBehavior.translucent,
@@ -49,14 +54,14 @@ class _SearchInputFieldState extends State<SearchInputField> {
               setState(() => _hasText = value.isNotEmpty);
               widget.onChanged?.call(value);
             },
-            style: const TextStyle(color: Colors.black, fontSize: 14),
+            style: TextStyle(color: contentColor, fontSize: 14),
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.grey.withValues(alpha: 0.10),
               hintText: widget.hint,
               hintStyle: TextStyle(
                 fontSize: 14,
-                color: Colors.black.withValues(alpha: 0.4),
+                color: contentColor.withValues(alpha: 0.4),
               ),
               isDense: true,
               contentPadding: const EdgeInsets.symmetric(
@@ -77,7 +82,7 @@ class _SearchInputFieldState extends State<SearchInputField> {
               ),
               prefixIcon: Icon(
                 Icons.search_rounded,
-                color: Colors.black.withValues(alpha: 0.5),
+                color: contentColor.withValues(alpha: 0.5),
                 size: 20,
               ),
               prefixIconConstraints: const BoxConstraints(minWidth: 40),
@@ -85,7 +90,7 @@ class _SearchInputFieldState extends State<SearchInputField> {
                   ? IconButton(
                       icon: Icon(
                         Icons.close_rounded,
-                        color: Colors.black.withValues(alpha: 0.5),
+                        color: contentColor.withValues(alpha: 0.5),
                         size: 20,
                       ),
                       onPressed: () {
