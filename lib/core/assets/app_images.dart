@@ -15,4 +15,13 @@ abstract final class AppImages {
 
   /// The path to the placeholder user profile image.
   static const placeholderProfileImage = '$_basePath/default-profile-image.png';
+
+  /// The path to the error image.
+  static const errorImage = '$_basePath/error-image.svg';
+
+  /// The path to the no content image.
+  static const noContentImage = '$_basePath/no-content-image.svg';
+
+  /// The path to the no results image.
+  static const noResultsImage = '$_basePath/no-results-image.svg';
 }

@@ -81,6 +81,12 @@
   "addTrustedContact": "Add trusted contact",
   "pendingRequests": "Pending requests",
   "searchContact": "Search user",
-  "noTrustedContactsYet": "You don't have any trusted contacts yet",
-  "noPendingRequestsYet": "You don't have any pending requests"
+  "errorTitle": "Oops! Something went wrong",
+  "errorDescription": "Sorry, we couldn't process your request at this time. Please try again later.",
+  "noTrustedContactsTitle": "No trusted contacts",
+  "noTrustedContactsDescription": "You haven't added any trusted contacts yet.",
+  "noResultsTitle": "No results found",
+  "noResultsDescription": "Sorry, no results were found for this search.",
+  "noPendingRequestsTitle": "No pending requests",
+  "noPendingRequestsDescription": "You don't have any pending contact requests."
 }

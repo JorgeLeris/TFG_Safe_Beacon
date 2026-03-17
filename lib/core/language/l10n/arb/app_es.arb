@@ -81,6 +81,12 @@
   "addTrustedContact": "Añadir contacto de confianza",
   "pendingRequests": "Solicitudes pendientes",
   "searchContact": "Buscar usuario",
-  "noTrustedContactsYet": "No tienes contactos de confianza aún",
-  "noPendingRequestsYet": "No tienes solicitudes pendientes"
+  "errorTitle": "¡Ups! Algo salió mal",
+  "errorDescription": "Lo sentimos, no podemos procesar su solicitud en este momento. Inténtelo de nuevo más tarde.",
+  "noTrustedContactsTitle": "Sin contactos de confianza",
+  "noTrustedContactsDescription": "Aún no has añadido ningún contacto de confianza.",
+  "noResultsTitle": "No se encontraron resultados",
+  "noResultsDescription": "Lo sentimos, no se encontraron resultados para esta búsqueda.",
+  "noPendingRequestsTitle": "Sin solicitudes pendientes",
+  "noPendingRequestsDescription": "No tienes solicitudes de contacto pendientes."
 }

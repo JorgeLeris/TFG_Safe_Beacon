@@ -81,6 +81,12 @@
   "addTrustedContact": "Ajouter un utilisateur de confiance",
   "pendingRequests": "Demandes en attente",
   "searchContact": "Rechercher un utilisateur",
-  "noTrustedContactsYet": "Vous n'avez pas encore d'utilisateurs de confiance",
-  "noPendingRequestsYet": "Vous n'avez pas encore de demandes en attente"
+  "errorTitle": "¡Ups! Quelque chose a mal tourné",
+  "errorDescription": "Désolé, nous ne pouvons pas traiter votre demande pour le moment. Veuillez réessayer plus tard.",
+  "noTrustedContactsTitle": "Aucun contact de confiance",
+  "noTrustedContactsDescription": "Vous n'avez ajouté aucun contact de confiance.",
+  "noResultsTitle": "Aucun résultat trouvé",
+  "noResultsDescription": "Désolé, aucun résultat n'a été trouvé pour cette recherche.",
+  "noPendingRequestsTitle": "Aucune demande en attente",
+  "noPendingRequestsDescription": "Vous n'avez aucune demande de contact en attente."
 }

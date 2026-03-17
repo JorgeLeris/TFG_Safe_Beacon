@@ -13,19 +13,19 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
   // TODO: replace with real user code from cubit/provider
   static const String _mockUserCode = 'USR-4F2A-9C1B';
 
-  static const _mockContacts = [
+  static const List<Map<String, String?>> _mockContacts = [
     {'username': 'Ana García', 'photo': null},
     {'username': 'Carlos López', 'photo': null},
     {'username': 'María Martínez', 'photo': null},
   ];
 
-  static const _mockPending = [
-    {'username': 'Luis Sánchez', 'photo': null},
-    {'username': 'Laura Fernández', 'photo': null},
-  ];
+  static const List<Map<String, String?>> _mockPending = [];
 
   String _contactsQuery = '';
   String _pendingQuery = '';
+
+  // TODO: set to true when the cubit reports a load failure
+  static const bool _hasError = false;
 
   List<Map<String, String?>> get _filteredContacts {
     if (_contactsQuery.isEmpty) return _mockContacts;
@@ -41,6 +41,106 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
     return _mockPending
         .where((c) => (c['username'] ?? '').toLowerCase().contains(q))
         .toList();
+  }
+
+  Widget _buildContactsList(AppLocalizations l10n) {
+    if (_hasError) {
+      return EmptyStateView(
+        type: EmptyStateType.error,
+        title: l10n.errorTitle,
+        description: l10n.errorDescription,
+      );
+    }
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: Column(
+        children: [
+          SearchInputField(
+            hint: l10n.searchContact,
+            onChanged: (q) => setState(() => _contactsQuery = q),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4),
+            child: Divider(height: 24),
+          ),
+          if (_filteredContacts.isEmpty)
+            _contactsQuery.isEmpty
+                ? EmptyStateView(
+                    type: EmptyStateType.empty,
+                    title: l10n.noTrustedContactsTitle,
+                    description: l10n.noTrustedContactsDescription,
+                  )
+                : EmptyStateView(
+                    type: EmptyStateType.noResults,
+                    title: l10n.noResultsTitle,
+                    description: l10n.noResultsDescription,
+                  )
+          else
+            ..._filteredContacts.map(
+              (contact) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: UserListItem(
+                  username: contact['username'] as String,
+                  profilePhoto: contact['photo'],
+                  onProfileTap: () {},
+                  onDelete: () {},
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPendingList(AppLocalizations l10n) {
+    if (_hasError) {
+      return EmptyStateView(
+        type: EmptyStateType.error,
+        title: l10n.errorTitle,
+        description: l10n.errorDescription,
+      );
+    }
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: Column(
+        children: [
+          SearchInputField(
+            hint: l10n.searchContact,
+            onChanged: (q) => setState(() => _pendingQuery = q),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4),
+            child: Divider(height: 24),
+          ),
+          if (_filteredPending.isEmpty)
+            _pendingQuery.isEmpty
+                ? EmptyStateView(
+                    type: EmptyStateType.empty,
+                    title: l10n.noPendingRequestsTitle,
+                    description: l10n.noPendingRequestsDescription,
+                  )
+                : EmptyStateView(
+                    type: EmptyStateType.noResults,
+                    title: l10n.noResultsTitle,
+                    description: l10n.noResultsDescription,
+                  )
+          else
+            ..._filteredPending.map(
+              (request) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: UserListItem(
+                  username: request['username'] as String,
+                  profilePhoto: request['photo'],
+                  onProfileTap: () {},
+                  onDelete: () {},
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -101,87 +201,7 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
             Expanded(
               child: CustomTabView(
                 tabs: [l10n.trustedContacts, l10n.pendingRequests],
-                children: [
-                  // Tab 1 — trusted contacts list
-                  SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
-                    ),
-                    child: Column(
-                      children: [
-                        SearchInputField(
-                          hint: l10n.searchContact,
-                          onChanged: (q) => setState(() => _contactsQuery = q),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 4),
-                          child: Divider(height: 24),
-                        ),
-                        if (_filteredContacts.isEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 32),
-                            child: Text(
-                              l10n.noTrustedContactsYet,
-                              textAlign: TextAlign.center,
-                            ),
-                          )
-                        else
-                          ..._filteredContacts.map(
-                            (contact) => Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
-                              child: UserListItem(
-                                username: contact['username'] as String,
-                                profilePhoto: contact['photo'],
-                                onProfileTap: () {},
-                                onDelete: () {},
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-
-                  // Tab 2 — pending requests
-                  SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
-                    ),
-                    child: Column(
-                      children: [
-                        SearchInputField(
-                          hint: l10n.searchContact,
-                          onChanged: (q) => setState(() => _pendingQuery = q),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 4),
-                          child: Divider(height: 24),
-                        ),
-                        if (_filteredPending.isEmpty)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 32),
-                            child: Text(
-                              l10n.noPendingRequestsYet,
-                              textAlign: TextAlign.center,
-                            ),
-                          )
-                        else
-                          ..._filteredPending.map(
-                            (request) => Padding(
-                              padding: const EdgeInsets.only(bottom: 10),
-                              child: UserListItem(
-                                username: request['username'] as String,
-                                profilePhoto: request['photo'],
-                                onProfileTap: () {},
-                                onDelete: () {},
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ],
+                children: [_buildContactsList(l10n), _buildPendingList(l10n)],
               ),
             ),
           ],
