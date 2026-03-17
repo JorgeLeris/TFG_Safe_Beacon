@@ -78,6 +78,9 @@
   "yourTrustedContacts": "Vos contacts de confiance",
   "trustedContacts": "Contacts de confiance",
   "yourUserCode": "Votre code utilisateur:",
-  "addTrustedContact": "Ajouter un contact de confiance",
-  "pendingRequests": "Demandes en attente"
+  "addTrustedContact": "Ajouter un utilisateur de confiance",
+  "pendingRequests": "Demandes en attente",
+  "searchContact": "Rechercher un utilisateur",
+  "noTrustedContactsYet": "Vous n'avez pas encore d'utilisateurs de confiance",
+  "noPendingRequestsYet": "Vous n'avez pas encore de demandes en attente"
 }

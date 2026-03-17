@@ -79,5 +79,8 @@
   "trustedContacts": "Trusted contacts",
   "yourUserCode": "Your user code:",
   "addTrustedContact": "Add trusted contact",
-  "pendingRequests": "Pending requests"
+  "pendingRequests": "Pending requests",
+  "searchContact": "Search user",
+  "noTrustedContactsYet": "You don't have any trusted contacts yet",
+  "noPendingRequestsYet": "You don't have any pending requests"
 }

@@ -79,5 +79,8 @@
   "trustedContacts": "Contactos de confianza",
   "yourUserCode": "Tu código de usuario:",
   "addTrustedContact": "Añadir contacto de confianza",
-  "pendingRequests": "Solicitudes pendientes"
+  "pendingRequests": "Solicitudes pendientes",
+  "searchContact": "Buscar usuario",
+  "noTrustedContactsYet": "No tienes contactos de confianza aún",
+  "noPendingRequestsYet": "No tienes solicitudes pendientes"
 }
