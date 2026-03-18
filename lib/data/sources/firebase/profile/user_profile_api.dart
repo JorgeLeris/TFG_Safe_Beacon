@@ -8,6 +8,14 @@ class UserProfileApi {
   CollectionReference<Map<String, dynamic>> get _collection =>
       _firestore.collection('user_profiles');
 
+  // Returns a reference to the usernames collection, which maps usernames to uids.
+  CollectionReference<Map<String, dynamic>> get _usernames =>
+      _firestore.collection('usernames');
+
+  // =================================
+  // MARK: - User Profile Operations
+  // =================================
+
   // Creates a new user profile document using the uid as the document ID.
   Future<void> createProfile(String uid, UserProfileDto dto) async {
     final data = dto.toJson();
@@ -29,5 +37,40 @@ class UserProfileApi {
   // Fields with null values are omitted so existing data is preserved.
   Future<void> updateProfile(String uid, Map<String, dynamic> fields) async {
     await _collection.doc(uid).update(fields);
+  }
+
+  // =================================
+  // MARK: - Username Reservation
+  // =================================
+
+  /// Returns true if the username document already exists.
+  Future<bool> usernameExists(String username) async {
+    final doc = await _usernames.doc(username).get();
+    return doc.exists;
+  }
+
+  /// Creates the user profile and reserves the username atomically.
+  /// Throws if the username was taken between the check and the write.
+  Future<void> createProfileWithUsername(
+    String uid,
+    UserProfileDto dto,
+    String username,
+  ) async {
+    final usernameRef = _usernames.doc(username);
+    final profileRef = _collection.doc(uid);
+
+    await _firestore.runTransaction((tx) async {
+      final usernameSnap = await tx.get(usernameRef);
+      if (usernameSnap.exists) {
+        throw Exception('username_taken');
+      }
+
+      final profileData = dto.toJson();
+      profileData['createdAt'] = FieldValue.serverTimestamp();
+      profileData['username'] = username;
+
+      tx.set(profileRef, profileData);
+      tx.set(usernameRef, {'uid': uid});
+    });
   }
 }

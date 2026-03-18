@@ -127,6 +127,7 @@ class RegisterCubit extends Cubit<RegisterState> {
           birthDate: state.birthDate?.toStringDate(),
           description: state.description.trim(),
         ),
+        state.email,
       );
 
       if (profileResult.isFailure) {

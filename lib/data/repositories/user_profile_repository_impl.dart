@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:safe_beacon/app/monitoring/logging.dart';
 import 'package:safe_beacon/data/sources/firebase/profile/dto/user_profile_dto.dart';
@@ -23,25 +25,43 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
   /// The [profile] uid is used as the Firestore document ID and must
   /// correspond to the currently authenticated user. The [createdAt] timestamp
   /// is set server-side by Firestore and is not taken from [profile].
+  /// The username is generated automatically from [email] and guaranteed
+  /// to be unique via an atomic Firestore transaction.
   /// Returns a [Result] containing `null` on success or an [AppFailure] if an error occurs.
   @override
-  Future<Result<void>> createProfile(UserProfile profile) async {
+  Future<Result<void>> createProfile(UserProfile profile, String email) async {
     appLogger.fine('Creating UserProfile for uid: ${profile.uid}');
     try {
-      await _api.createProfile(
-        profile.uid,
-        UserProfileDto(
-          name: profile.name,
-          surname: profile.surname,
-          gender: profile.gender,
-          birthDate: profile.birthDate,
-          description: profile.description,
-          profilePhoto: profile.profilePhoto,
-          createdAt: DateTime.now(),
-        ),
-      );
+      String? username;
+
+      username = await _resolveUsername(email);
+      try {
+        await _api.createProfileWithUsername(
+          profile.uid,
+          UserProfileDto(
+            name: profile.name,
+            surname: profile.surname,
+            gender: profile.gender,
+            birthDate: profile.birthDate,
+            description: profile.description,
+            profilePhoto: profile.profilePhoto,
+            username: username,
+            createdAt: DateTime.now(),
+          ),
+          username,
+        );
+      } on Exception catch (e) {
+        if (e.toString().contains('username_taken')) {
+          appLogger.warning(
+            'Username race condition detected for "$username", retrying...',
+          );
+        }
+        rethrow;
+      }
+
       appLogger.info(
-        'UserProfile created successfully for uid: ${profile.uid}',
+        'UserProfile created successfully for uid: ${profile.uid} '
+        'with username: $username',
       );
       return const Result.success(null);
     } on FirebaseException catch (e, st) {
@@ -73,6 +93,7 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
         birthDate: dto.birthDate,
         description: dto.description,
         profilePhoto: dto.profilePhoto,
+        username: dto.username,
       );
       appLogger.info('UserProfile fetched successfully for uid: $uid');
       return Result.success(profile);
@@ -135,5 +156,49 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
       default:
         return const AppFailure.unknown();
     }
+  }
+
+  Future<String> _resolveUsername(String email) async {
+    final base = UsernameGenerator.fromEmail(email);
+
+    // First try the base username without suffix.
+    if (!await _api.usernameExists(base)) return base;
+
+    // Try up to 5 times with random suffixes to resolve collisions.
+    for (var i = 0; i < 5; i++) {
+      final candidate = UsernameGenerator.withSuffix(base);
+      if (!await _api.usernameExists(candidate)) return candidate;
+    }
+
+    // Fallback almost impossible: timestamp
+    return '${base}_${DateTime.now().millisecondsSinceEpoch}';
+  }
+}
+
+class UsernameGenerator {
+  /// Derives a sanitized base username from an email address.
+  static String fromEmail(String email) {
+    final local = email.split('@').first;
+    final noTag = local.split('+').first;
+    final lower = noTag.toLowerCase();
+    final ascii = _removeDiacritics(lower);
+    final clean = ascii.replaceAll(RegExp(r'[^a-z0-9]'), '_');
+    return clean;
+  }
+
+  /// Appends a random 4-digit suffix to resolve collisions.
+  static String withSuffix(String base) {
+    final suffix = (1000 + Random().nextInt(9000)).toString();
+    return '${base}_$suffix';
+  }
+
+  static String _removeDiacritics(String s) {
+    const accents = 'áàäâãåéèëêíìïîóòöôõúùüûñç';
+    const base = 'aaaaaaeeeeiiiioooooouuuunc';
+    var result = s;
+    for (var i = 0; i < accents.length; i++) {
+      result = result.replaceAll(accents[i], base[i]);
+    }
+    return result;
   }
 }

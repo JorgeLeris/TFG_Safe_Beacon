@@ -8,6 +8,7 @@ abstract class UserProfile with _$UserProfile {
   const factory UserProfile({
     required String uid,
     required String name,
+    String? username,
     String? surname,
     String? gender,
     String? birthDate,
@@ -22,6 +23,7 @@ abstract class UserProfile with _$UserProfile {
     return {
       'name': name,
       if (surname != null) 'surname': surname,
+      if (username != null) 'username': username,
       if (gender != null) 'gender': gender,
       if (birthDate != null) 'birthDate': birthDate,
       if (description != null) 'description': description,
