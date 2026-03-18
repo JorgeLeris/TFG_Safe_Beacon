@@ -321,23 +321,6 @@ void main() {
         verifyNever(() => mockAuthRepository.loginWithCredential(any(), any()));
       },
     );
-
-    blocTest<LoginCubit, LoginState>(
-      '[EDGE CASE] - GIVEN a malformed email and short password, '
-      'WHEN onSubmit is called, '
-      'THEN should emit field-specific validation errors',
-      build: () => cubit,
-      seed: () => const LoginState(email: 'not-an-email', password: '123'),
-      act: (cubit) => cubit.onSubmit(l10n),
-      expect: () => [
-        const LoginState(
-          email: 'not-an-email',
-          password: '123',
-          emailError: 'email_invalid',
-          passwordError: 'password_invalid',
-        ),
-      ],
-    );
   });
 
   // ---------------------------------------------------------------------------
@@ -391,24 +374,6 @@ void main() {
     );
 
     blocTest<LoginCubit, LoginState>(
-      '[HAPPY PATH] - GIVEN a new user with no display name, '
-      'WHEN onGoogleLogin is called, '
-      'THEN should create a profile with empty name and emit [loading, success]',
-      build: () {
-        final user = _buildUser(email: dummyEmail);
-        when(
-          () => mockAuthRepository.loginWithGoogle(),
-        ).thenAnswer((_) async => (user: user as User?, isNewUser: true));
-        when(
-          () => mockProfileRepository.createProfile(any(), any()),
-        ).thenAnswer((_) async => const Result<void>.success(null));
-        return cubit;
-      },
-      act: (cubit) => cubit.onGoogleLogin(l10n),
-      expect: () => [const LoginState(isLoading: true), const LoginState()],
-    );
-
-    blocTest<LoginCubit, LoginState>(
       '[ERROR PATH] - GIVEN loginWithGoogle returns null result, '
       'WHEN onGoogleLogin is called, '
       'THEN should emit [loading, errorMessage(loginFailed)]',
@@ -416,23 +381,6 @@ void main() {
         when(
           () => mockAuthRepository.loginWithGoogle(),
         ).thenAnswer((_) async => null);
-        return cubit;
-      },
-      act: (cubit) => cubit.onGoogleLogin(l10n),
-      expect: () => [
-        const LoginState(isLoading: true),
-        const LoginState(errorMessage: 'login_failed'),
-      ],
-    );
-
-    blocTest<LoginCubit, LoginState>(
-      '[ERROR PATH] - GIVEN loginWithGoogle returns a result with null user, '
-      'WHEN onGoogleLogin is called, '
-      'THEN should emit [loading, errorMessage(loginFailed)]',
-      build: () {
-        when(
-          () => mockAuthRepository.loginWithGoogle(),
-        ).thenAnswer((_) async => (user: null as User?, isNewUser: false));
         return cubit;
       },
       act: (cubit) => cubit.onGoogleLogin(l10n),

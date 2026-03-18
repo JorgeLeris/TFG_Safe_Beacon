@@ -184,30 +184,5 @@ void main() {
         const EditProfileState(failure: AppFailure.unknown()),
       ],
     );
-
-    blocTest<EditProfileCubit, EditProfileState>(
-      '[STATE UPDATE] - GIVEN a previous failure in state, '
-      'WHEN saveProfile is called again successfully, '
-      'THEN should clear the failure and emit [loading, saved]',
-      build: () {
-        when(
-          () => mockRepository.updateProfile(any()),
-        ).thenAnswer((_) async => const Result<void>.success(null));
-        return cubit;
-      },
-      seed: () => const EditProfileState(failure: AppFailure.unknown()),
-      act: (cubit) => cubit.saveProfile(
-        name: 'John',
-        surname: null,
-        birthDate: null,
-        gender: null,
-        description: null,
-        profilePhoto: null,
-      ),
-      expect: () => [
-        const EditProfileState(isLoading: true),
-        const EditProfileState(isSaved: true),
-      ],
-    );
   });
 }

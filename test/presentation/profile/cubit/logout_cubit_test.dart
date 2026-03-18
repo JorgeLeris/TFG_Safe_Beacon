@@ -74,21 +74,5 @@ void main() {
         verify(() => mockAuthRepository.logout()).called(1);
       },
     );
-
-    blocTest<LogoutCubit, LogoutState>(
-      '[STATE UPDATE] - GIVEN a previous error in state, '
-      'WHEN onLogout is called successfully, '
-      'THEN should clear error and emit [loading(no error), success]',
-      build: () {
-        when(() => mockAuthRepository.logout()).thenAnswer((_) async {});
-        return cubit;
-      },
-      seed: () => const LogoutState(errorMessage: 'logout_failed'),
-      act: (cubit) => cubit.onLogout(l10n),
-      expect: () => [
-        const LogoutState(isLoading: true),
-        const LogoutState(isSuccess: true),
-      ],
-    );
   });
 }

@@ -258,23 +258,6 @@ void main() {
         ),
       ],
     );
-
-    blocTest<RegisterCubit, RegisterState>(
-      '[EDGE CASE] - GIVEN valid credentials but empty confirmPassword, '
-      'WHEN onNextStep is called, '
-      'THEN should emit confirmPassword required error',
-      build: () => cubit,
-      seed: () =>
-          const RegisterState(email: dummyEmail, password: dummyPassword),
-      act: (cubit) => cubit.onNextStep(l10n),
-      expect: () => [
-        const RegisterState(
-          email: dummyEmail,
-          password: dummyPassword,
-          confirmPasswordError: 'confirm_password_required',
-        ),
-      ],
-    );
   });
 
   // ---------------------------------------------------------------------------

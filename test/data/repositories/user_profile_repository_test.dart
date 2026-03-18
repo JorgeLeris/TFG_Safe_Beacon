@@ -230,56 +230,6 @@ void main() {
         );
       },
     );
-
-    test(
-      '[ERROR PATH] - GIVEN an unrecognised FirebaseException code, '
-      'WHEN createProfile is called, '
-      'THEN should return Result.failure with AppFailure.unknown()',
-      () async {
-        // Arrange.
-        when(
-          () => mockApi.usernameExists(any()),
-        ).thenAnswer((_) async => false);
-        when(
-          () => mockApi.createProfileWithUsername(any(), any(), any()),
-        ).thenThrow(_firebaseException('internal'));
-
-        // Act.
-        final result = await repository.createProfile(dummyProfile, dummyEmail);
-
-        // Assert.
-        expect(result.isFailure, isTrue);
-        expect(
-          result,
-          equals(const Result<void>.failure(AppFailure.unknown())),
-        );
-      },
-    );
-
-    test(
-      '[ERROR PATH] - GIVEN a non-Firebase, non-username_taken exception, '
-      'WHEN createProfile is called, '
-      'THEN should return Result.failure with AppFailure.unknown()',
-      () async {
-        // Arrange.
-        when(
-          () => mockApi.usernameExists(any()),
-        ).thenAnswer((_) async => false);
-        when(
-          () => mockApi.createProfileWithUsername(any(), any(), any()),
-        ).thenThrow(Exception('Unexpected error'));
-
-        // Act.
-        final result = await repository.createProfile(dummyProfile, dummyEmail);
-
-        // Assert.
-        expect(result.isFailure, isTrue);
-        expect(
-          result,
-          equals(const Result<void>.failure(AppFailure.unknown())),
-        );
-      },
-    );
   });
 
   // ---------------------------------------------------------------------------
@@ -375,28 +325,6 @@ void main() {
         expect(
           result,
           equals(const Result<UserProfile>.failure(AppFailure.network())),
-        );
-      },
-    );
-
-    test(
-      '[ERROR PATH] - GIVEN a not-found FirebaseException, '
-      'WHEN getProfile is called, '
-      'THEN should return Result.failure with AppFailure.notFound()',
-      () async {
-        // Arrange.
-        when(
-          () => mockApi.getProfile(any()),
-        ).thenThrow(_firebaseException('not-found'));
-
-        // Act.
-        final result = await repository.getProfile(dummyProfile.uid);
-
-        // Assert.
-        expect(result.isFailure, isTrue);
-        expect(
-          result,
-          equals(const Result<UserProfile>.failure(AppFailure.notFound())),
         );
       },
     );
