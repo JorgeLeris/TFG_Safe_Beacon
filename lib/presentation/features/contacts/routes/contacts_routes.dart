@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safe_beacon/presentation/features/contacts/providers/protected_people_provider.dart';
+import 'package:safe_beacon/presentation/features/contacts/providers/trusted_contacts_provider.dart';
 import 'package:safe_beacon/presentation/features/contacts/screens/protected_people_screen.dart';
 import 'package:safe_beacon/presentation/features/contacts/screens/trusted_contacts_screen.dart';
 
@@ -14,7 +16,7 @@ class TrustedContactsRoute extends GoRouteData with $TrustedContactsRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
-      const TrustedContactsScreen();
+      const TrustedContactsProvider(child: TrustedContactsScreen());
 }
 
 /// Contacts feature routes
@@ -26,5 +28,5 @@ class ProtectedPeopleRoute extends GoRouteData with $ProtectedPeopleRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
-      const ProtectedPeopleScreen();
+      const ProtectedPeopleProvider(child: ProtectedPeopleScreen());
 }

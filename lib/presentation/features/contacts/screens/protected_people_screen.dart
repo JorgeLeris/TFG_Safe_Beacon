@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/presentation/features/contacts/cubits/protected_people_cubit.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class ProtectedPeopleScreen extends StatefulWidget {
@@ -10,9 +13,6 @@ class ProtectedPeopleScreen extends StatefulWidget {
 }
 
 class _ProtectedPeopleScreenState extends State<ProtectedPeopleScreen> {
-  // TODO: replace with real user code from cubit/provider
-  static const String _mockUserCode = 'USR-4F2A-9C1B';
-
   static const List<Map<String, String?>> _mockProtectedPeople = [];
 
   static const List<Map<String, String?>> _mockRequestsReceived = [
@@ -29,6 +29,12 @@ class _ProtectedPeopleScreenState extends State<ProtectedPeopleScreen> {
 
   // TODO: set to true when the cubit reports a load failure
   static const bool _hasError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<ProtectedPeopleCubit>().loadUserCode();
+  }
 
   void _onTabChanged(int index) {
     setState(() {
@@ -195,19 +201,26 @@ class _ProtectedPeopleScreenState extends State<ProtectedPeopleScreen> {
                 top: 16,
                 bottom: 24,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.yourUserCode,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const CopyableCodeField(code: _mockUserCode),
-                ],
+              child: BlocBuilder<ProtectedPeopleCubit, ProtectedPeopleState>(
+                builder: (context, state) {
+                  final code = state.isLoading
+                      ? '...'
+                      : (state.username.orDash());
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.yourUserCode,
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      CopyableCodeField(code: code),
+                    ],
+                  );
+                },
               ),
             ),
 

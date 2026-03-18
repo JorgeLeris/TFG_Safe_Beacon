@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/presentation/features/contacts/cubits/trusted_contacts_cubit.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class TrustedContactsScreen extends StatefulWidget {
@@ -10,9 +13,6 @@ class TrustedContactsScreen extends StatefulWidget {
 }
 
 class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
-  // TODO: replace with real user code from cubit/provider
-  static const String _mockUserCode = 'USR-4F2A-9C1B';
-
   static const List<Map<String, String?>> _mockContacts = [
     {'username': 'Ana García', 'photo': null},
     {'username': 'Carlos López', 'photo': null},
@@ -29,6 +29,12 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
 
   // TODO: set to true when the cubit reports a load failure
   static const bool _hasError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<TrustedContactsCubit>().loadUserCode();
+  }
 
   void _onTabChanged(int index) {
     setState(() {
@@ -194,28 +200,35 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
                 top: 16,
                 bottom: 24,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.yourUserCode,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colorScheme.onSurface,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const CopyableCodeField(code: _mockUserCode),
-                  const SizedBox(height: 16),
-                  SectionButton(
-                    icon: Icons.person_add_outlined,
-                    text: l10n.addTrustedContact,
-                    showArrow: false,
-                    onPressed: () {},
-                    backgroundColor: colorScheme.secondary,
-                    contentColor: colorScheme.onSecondary,
-                  ),
-                ],
+              child: BlocBuilder<TrustedContactsCubit, TrustedContactsState>(
+                builder: (context, state) {
+                  final code = state.isLoading
+                      ? '...'
+                      : (state.username.orDash());
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.yourUserCode,
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurface,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      CopyableCodeField(code: code),
+                      const SizedBox(height: 16),
+                      SectionButton(
+                        icon: Icons.person_add_outlined,
+                        text: l10n.addTrustedContact,
+                        showArrow: false,
+                        onPressed: () {},
+                        backgroundColor: colorScheme.secondary,
+                        contentColor: colorScheme.onSecondary,
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
 
