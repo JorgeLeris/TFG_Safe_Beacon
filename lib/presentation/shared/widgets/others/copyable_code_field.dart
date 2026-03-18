@@ -16,17 +16,22 @@ class CopyableCodeField extends StatelessWidget {
           color: Colors.white,
           borderRadius: BorderRadius.circular(14),
         ),
-        padding: const EdgeInsets.only(left: 12, top: 4, right: 4, bottom: 4),
+        padding: const EdgeInsets.only(left: 12, bottom: 4),
         child: Row(
           children: [
             Expanded(
-              child: Text(
-                code,
-                style: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                  letterSpacing: 1.2,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Text(
+                  code,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 1.2,
+                  ),
+                  maxLines: 1,
+                  softWrap: false,
                 ),
               ),
             ),
