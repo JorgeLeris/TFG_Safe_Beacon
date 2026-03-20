@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/domain/common/result.dart';
 import 'package:safe_beacon/domain/contacts/contact_request_repository.dart';
@@ -50,18 +51,25 @@ class TrustedContactsCubit extends Cubit<TrustedContactsState> {
         final items = await Future.wait(
           requests.map((r) async {
             String? photo;
+            String? name;
             final profileResult = await _userProfileRepository.getProfile(
               r.receiverUid,
             );
             profileResult.when(
-              success: (profile) => photo = profile.profilePhoto,
-              failure: (_) => photo = null,
+              success: (profile) {
+                photo = profile.profilePhoto;
+                name = '${profile.name} ${profile.surname}'.capitalized();
+              },
+              failure: (_) {
+                photo = null;
+                name = null;
+              },
             );
             return ContactRequestItem(
               requestId: r.id,
               direction: ContactRequestDirection.sent,
               peerUid: r.receiverUid,
-              peerUsername: r.receiverUsername,
+              peerUsername: name ?? r.receiverUsername,
               peerPhoto: photo,
             );
           }),
