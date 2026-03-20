@@ -106,4 +106,32 @@ class TrustedContactsCubit extends Cubit<TrustedContactsState> {
   void clearSendRequestFailure() {
     emit(state.copyWith(sendRequestFailure: null));
   }
+
+  /// Deletes a sent contact request identified by [requestId].
+  /// On success removes the item from the list without reloading.
+  Future<void> deleteSentRequest(String requestId) async {
+    emit(state.copyWith(isDeletingRequest: true, deleteRequestFailure: null));
+
+    final result = await _contactRequestRepository.deleteRequest(
+      requestId: requestId,
+      requesterUid: _uid,
+    );
+
+    result.when(
+      success: (_) {
+        final updated = state.sentRequests
+            .where((r) => r.requestId != requestId)
+            .toList();
+        emit(state.copyWith(isDeletingRequest: false, sentRequests: updated));
+      },
+      failure: (failure) => emit(
+        state.copyWith(isDeletingRequest: false, deleteRequestFailure: failure),
+      ),
+    );
+  }
+
+  /// Clears a previous delete request failure from the state.
+  void clearDeleteRequestFailure() {
+    emit(state.copyWith(deleteRequestFailure: null));
+  }
 }

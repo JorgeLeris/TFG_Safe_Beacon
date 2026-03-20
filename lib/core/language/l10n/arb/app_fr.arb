@@ -105,5 +105,8 @@
   "sendRequestErrorTitle": "Erreur lors de l'envoi de la demande",
   "userCodeNotFound": "Aucun utilisateur trouvé avec ce code. Veuillez vérifier le code et réessayer.",
   "requestAlreadyExists": "Il existe déjà une demande active avec cet utilisateur.",
-  "selfRequestError": "Vous ne pouvez pas vous envoyer une demande à vous-même."
+  "selfRequestError": "Vous ne pouvez pas vous envoyer une demande à vous-même.",
+  "cancelRequest": "Annuler la demande",
+  "cancelRequestDescription": "En supprimant cette demande, l'invitation envoyée à \"{username}\" sera annulée et aucune connexion ne sera établie. Vous pourrez envoyer une nouvelle demande plus tard si vous le souhaitez.",
+  "cancelRequestErrorTitle": "Erreur lors de l'annulation de la demande"
 }

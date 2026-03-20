@@ -105,5 +105,8 @@
   "sendRequestErrorTitle": "Error sending request",
   "userCodeNotFound": "No user found with that code. Please check the code and try again.",
   "requestAlreadyExists": "There is already an active request with this user.",
-  "selfRequestError": "You cannot send a request to yourself."
+  "selfRequestError": "You cannot send a request to yourself.",
+  "cancelRequest": "Cancel request",
+  "cancelRequestDescription": "By deleting this request, the invitation sent to \"{username}\" will be canceled and no connection will be established. You can send a new request later if you wish.",
+  "cancelRequestErrorTitle": "Error canceling request"
 }

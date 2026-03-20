@@ -105,5 +105,8 @@
   "sendRequestErrorTitle": "Error al enviar solicitud",
   "userCodeNotFound": "No se ha encontrado ningún usuario con ese código. Comprueba que el código es correcto e inténtalo de nuevo.",
   "requestAlreadyExists": "Ya existe una solicitud activa con este usuario.",
-  "selfRequestError": "No puedes enviarte una solicitud a ti mismo."
+  "selfRequestError": "No puedes enviarte una solicitud a ti mismo.",
+  "cancelRequest": "Cancelar solicitud",
+  "cancelRequestDescription": "Al eliminar esta solicitud, se cancelará la invitación enviada a \"{username}\" y no se establecerá ninguna conexión. Podrás enviar una nueva solicitud más adelante si lo deseas.",
+  "cancelRequestErrorTitle": "Error al cancelar solicitud"
 }

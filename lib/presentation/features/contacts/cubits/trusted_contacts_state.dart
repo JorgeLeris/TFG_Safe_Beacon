@@ -6,10 +6,12 @@ abstract class TrustedContactsState with _$TrustedContactsState {
     @Default(false) bool isLoading,
     @Default(false) bool isSendingRequest,
     @Default(false) bool isLoadingSentRequests,
+    @Default(false) bool isDeletingRequest,
     @Default([]) List<ContactRequestItem> sentRequests,
     String? username,
     AppFailure? failure,
     AppFailure? sendRequestFailure,
     AppFailure? sentRequestsFailure,
+    AppFailure? deleteRequestFailure,
   }) = _TrustedContactsState;
 }

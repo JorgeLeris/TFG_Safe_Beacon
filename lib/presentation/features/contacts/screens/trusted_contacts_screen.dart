@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
+import 'package:safe_beacon/domain/contacts/entities/contact_request_item.dart';
 import 'package:safe_beacon/presentation/features/contacts/cubits/trusted_contacts_cubit.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
@@ -55,6 +56,10 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
         .toList();
   }
 
+  // ---------------------------------------------------------------------------
+  // Dialogs
+  // ---------------------------------------------------------------------------
+
   void _showSendRequestDialog(BuildContext context, AppLocalizations l10n) {
     CustomDialog.show(
       context: context,
@@ -94,6 +99,54 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
     CustomDialog.show(
       context: context,
       title: l10n.sendRequestErrorTitle,
+      content: Text(message, style: Theme.of(context).textTheme.bodyMedium),
+      buttonText: l10n.accept,
+    );
+  }
+
+  void _showDeleteRequestDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    ContactRequestItem request,
+  ) {
+    CustomDialog.show(
+      context: context,
+      title: l10n.cancelRequest,
+      content: Text(
+        l10n.cancelRequestDescription(request.peerUsername),
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
+      buttonText: l10n.accept,
+      onButtonPressed: () {
+        Navigator.of(context).pop();
+        context.read<TrustedContactsCubit>().deleteSentRequest(
+          request.requestId,
+        );
+      },
+      secondButtonText: l10n.cancel,
+      onSecondButtonPressed: () => Navigator.of(context).pop(),
+    );
+  }
+
+  void _showDeleteRequestErrorDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    AppFailure failure,
+  ) {
+    final message = failure.when(
+      network: (_, _) => l10n.networkError,
+      notFound: (_) => l10n.genericError,
+      forbidden: () => l10n.genericError,
+      unauthorized: () => l10n.genericError,
+      conflict: (_) => l10n.genericError,
+      business: (_) => l10n.genericError,
+      serialization: (_) => l10n.genericError,
+      unknown: (_) => l10n.genericError,
+    );
+
+    CustomDialog.show(
+      context: context,
+      title: l10n.cancelRequestErrorTitle,
       content: Text(message, style: Theme.of(context).textTheme.bodyMedium),
       buttonText: l10n.accept,
     );
@@ -160,7 +213,11 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
   // Tab 2 — Sent requests
   // ---------------------------------------------------------------------------
 
-  Widget _buildPendingList(AppLocalizations l10n, TrustedContactsState state) {
+  Widget _buildPendingList(
+    BuildContext context,
+    AppLocalizations l10n,
+    TrustedContactsState state,
+  ) {
     if (state.isLoadingSentRequests) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -218,7 +275,8 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
                   username: request.peerUsername,
                   profilePhoto: request.peerPhoto,
                   onProfileTap: () {},
-                  onDelete: () {},
+                  onDelete: () =>
+                      _showDeleteRequestDialog(context, l10n, request),
                 ),
               ),
             ),
@@ -238,12 +296,31 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
     final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return BlocListener<TrustedContactsCubit, TrustedContactsState>(
-      listenWhen: (prev, curr) => curr.sendRequestFailure != null,
-      listener: (context, state) {
-        context.read<TrustedContactsCubit>().clearSendRequestFailure();
-        _showSendRequestErrorDialog(context, l10n, state.sendRequestFailure!);
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<TrustedContactsCubit, TrustedContactsState>(
+          listenWhen: (prev, curr) => curr.sendRequestFailure != null,
+          listener: (context, state) {
+            context.read<TrustedContactsCubit>().clearSendRequestFailure();
+            _showSendRequestErrorDialog(
+              context,
+              l10n,
+              state.sendRequestFailure!,
+            );
+          },
+        ),
+        BlocListener<TrustedContactsCubit, TrustedContactsState>(
+          listenWhen: (prev, curr) => curr.deleteRequestFailure != null,
+          listener: (context, state) {
+            context.read<TrustedContactsCubit>().clearDeleteRequestFailure();
+            _showDeleteRequestErrorDialog(
+              context,
+              l10n,
+              state.deleteRequestFailure!,
+            );
+          },
+        ),
+      ],
       child: Scaffold(
         backgroundColor: colorScheme.surface,
         appBar: const CustomAppBar(),
@@ -307,7 +384,7 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
                       onTabChanged: _onTabChanged,
                       children: [
                         _buildContactsList(l10n, state),
-                        _buildPendingList(l10n, state),
+                        _buildPendingList(context, l10n, state),
                       ],
                     ),
                   ),
