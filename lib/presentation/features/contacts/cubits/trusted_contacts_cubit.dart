@@ -3,6 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/domain/common/result.dart';
 import 'package:safe_beacon/domain/contacts/contact_request_repository.dart';
+import 'package:safe_beacon/domain/contacts/entities/contact_request_item.dart';
 import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
 
 part 'trusted_contacts_state.dart';
@@ -36,7 +37,48 @@ class TrustedContactsCubit extends Cubit<TrustedContactsState> {
     );
   }
 
+  /// Loads the list of contact requests sent by the current user.
+  Future<void> loadSentRequests() async {
+    emit(
+      state.copyWith(isLoadingSentRequests: true, sentRequestsFailure: null),
+    );
+
+    final result = await _contactRequestRepository.getSentRequests(_uid);
+
+    await result.when(
+      success: (requests) async {
+        final items = await Future.wait(
+          requests.map((r) async {
+            String? photo;
+            final profileResult = await _userProfileRepository.getProfile(
+              r.receiverUid,
+            );
+            profileResult.when(
+              success: (profile) => photo = profile.profilePhoto,
+              failure: (_) => photo = null,
+            );
+            return ContactRequestItem(
+              requestId: r.id,
+              direction: ContactRequestDirection.sent,
+              peerUid: r.receiverUid,
+              peerUsername: r.receiverUsername,
+              peerPhoto: photo,
+            );
+          }),
+        );
+        emit(state.copyWith(isLoadingSentRequests: false, sentRequests: items));
+      },
+      failure: (failure) async => emit(
+        state.copyWith(
+          isLoadingSentRequests: false,
+          sentRequestsFailure: failure,
+        ),
+      ),
+    );
+  }
+
   /// Sends a contact request to the user identified by [receiverUsername].
+  /// On success reloads the sent requests list.
   Future<void> sendRequest(String receiverUsername) async {
     final senderUsername = state.username;
     if (senderUsername == null) return;
@@ -50,7 +92,10 @@ class TrustedContactsCubit extends Cubit<TrustedContactsState> {
     );
 
     result.when(
-      success: (_) => emit(state.copyWith(isSendingRequest: false)),
+      success: (_) {
+        emit(state.copyWith(isSendingRequest: false));
+        loadSentRequests();
+      },
       failure: (failure) => emit(
         state.copyWith(isSendingRequest: false, sendRequestFailure: failure),
       ),

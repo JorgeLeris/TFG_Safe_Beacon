@@ -14,13 +14,12 @@ class TrustedContactsScreen extends StatefulWidget {
 }
 
 class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
+  // TODO: replace with real contacts data from cubit
   static const List<Map<String, String?>> _mockContacts = [
     {'username': 'Ana García', 'photo': null},
     {'username': 'Carlos López', 'photo': null},
     {'username': 'María Martínez', 'photo': null},
   ];
-
-  static const List<Map<String, String?>> _mockPending = [];
 
   Key _contactsSearchKey = UniqueKey();
   Key _pendingSearchKey = UniqueKey();
@@ -28,13 +27,11 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
   String _contactsQuery = '';
   String _pendingQuery = '';
 
-  // TODO: set to true when the cubit reports a load failure
-  static const bool _hasError = false;
-
   @override
   void initState() {
     super.initState();
     context.read<TrustedContactsCubit>().loadUserCode();
+    context.read<TrustedContactsCubit>().loadSentRequests();
   }
 
   void _onTabChanged(int index) {
@@ -54,14 +51,6 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
     if (_contactsQuery.isEmpty) return _mockContacts;
     final q = _contactsQuery.toLowerCase();
     return _mockContacts
-        .where((c) => (c['username'] ?? '').toLowerCase().contains(q))
-        .toList();
-  }
-
-  List<Map<String, String?>> get _filteredPending {
-    if (_pendingQuery.isEmpty) return _mockPending;
-    final q = _pendingQuery.toLowerCase();
-    return _mockPending
         .where((c) => (c['username'] ?? '').toLowerCase().contains(q))
         .toList();
   }
@@ -110,8 +99,12 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
     );
   }
 
-  Widget _buildContactsList(AppLocalizations l10n) {
-    if (_hasError) {
+  // ---------------------------------------------------------------------------
+  // Tab 1 — Trusted contacts list
+  // ---------------------------------------------------------------------------
+  Widget _buildContactsList(AppLocalizations l10n, TrustedContactsState state) {
+    // TODO: replace with real loading state and error handling from cubit
+    if (state.failure != null) {
       return EmptyStateView(
         type: EmptyStateType.error,
         title: l10n.errorTitle,
@@ -163,8 +156,16 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
     );
   }
 
-  Widget _buildPendingList(AppLocalizations l10n) {
-    if (_hasError) {
+  // ---------------------------------------------------------------------------
+  // Tab 2 — Sent requests
+  // ---------------------------------------------------------------------------
+
+  Widget _buildPendingList(AppLocalizations l10n, TrustedContactsState state) {
+    if (state.isLoadingSentRequests) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state.sentRequestsFailure != null) {
       return EmptyStateView(
         type: EmptyStateType.error,
         title: l10n.errorTitle,
@@ -172,13 +173,23 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
       );
     }
 
-    if (_mockPending.isEmpty) {
+    if (state.sentRequests.isEmpty) {
       return EmptyStateView(
         type: EmptyStateType.empty,
         title: l10n.noPendingRequestsTitle,
         description: l10n.noPendingRequestsDescription,
       );
     }
+
+    final filtered = _pendingQuery.isEmpty
+        ? state.sentRequests
+        : state.sentRequests
+              .where(
+                (r) => r.peerUsername.toLowerCase().contains(
+                  _pendingQuery.toLowerCase(),
+                ),
+              )
+              .toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -193,19 +204,19 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
             padding: EdgeInsets.symmetric(horizontal: 4),
             child: Divider(height: 24),
           ),
-          if (_filteredPending.isEmpty)
+          if (filtered.isEmpty)
             EmptyStateView(
               type: EmptyStateType.noResults,
               title: l10n.noResultsTitle,
               description: l10n.noResultsDescription,
             )
           else
-            ..._filteredPending.map(
+            ...filtered.map(
               (request) => Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: UserListItem(
-                  username: request['username'] as String,
-                  profilePhoto: request['photo'],
+                  username: request.peerUsername,
+                  profilePhoto: request.peerPhoto,
                   onProfileTap: () {},
                   onDelete: () {},
                 ),
@@ -215,6 +226,10 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
       ),
     );
   }
+
+  // ---------------------------------------------------------------------------
+  // Build
+  // ---------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -235,28 +250,27 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
         body: GestureDetector(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           behavior: HitTestBehavior.translucent,
-          child: Column(
-            children: [
-              SectionHeader(text: l10n.yourTrustedContacts),
+          child: BlocBuilder<TrustedContactsCubit, TrustedContactsState>(
+            builder: (context, state) {
+              return Column(
+                children: [
+                  SectionHeader(text: l10n.yourTrustedContacts),
 
-              // Section 1: user code + add contact
-              Container(
-                width: double.infinity,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.05)
-                    : colorScheme.surfaceContainerHigh.withValues(alpha: 0.30),
-                padding: const EdgeInsets.only(
-                  left: 24,
-                  right: 24,
-                  top: 16,
-                  bottom: 24,
-                ),
-                child: BlocBuilder<TrustedContactsCubit, TrustedContactsState>(
-                  builder: (context, state) {
-                    final code = state.isLoading
-                        ? '...'
-                        : (state.username.orDash());
-                    return Column(
+                  // Section 1: user code + add contact
+                  Container(
+                    width: double.infinity,
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.05)
+                        : colorScheme.surfaceContainerHigh.withValues(
+                            alpha: 0.30,
+                          ),
+                    padding: const EdgeInsets.only(
+                      left: 24,
+                      right: 24,
+                      top: 16,
+                      bottom: 24,
+                    ),
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
@@ -267,7 +281,11 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        CopyableCodeField(code: code),
+                        CopyableCodeField(
+                          code: state.isLoading
+                              ? '...'
+                              : (state.username.orDash()),
+                        ),
                         const SizedBox(height: 16),
                         SectionButton(
                           icon: Icons.person_add_outlined,
@@ -279,20 +297,23 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
                           contentColor: colorScheme.onSecondary,
                         ),
                       ],
-                    );
-                  },
-                ),
-              ),
+                    ),
+                  ),
 
-              // Section 2: tabs
-              Expanded(
-                child: CustomTabView(
-                  tabs: [l10n.trustedContacts, l10n.pendingRequests],
-                  onTabChanged: _onTabChanged,
-                  children: [_buildContactsList(l10n), _buildPendingList(l10n)],
-                ),
-              ),
-            ],
+                  // Section 2: tabs
+                  Expanded(
+                    child: CustomTabView(
+                      tabs: [l10n.trustedContacts, l10n.pendingRequests],
+                      onTabChanged: _onTabChanged,
+                      children: [
+                        _buildContactsList(l10n, state),
+                        _buildPendingList(l10n, state),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ),
       ),
