@@ -76,27 +76,30 @@ class ContactRequestApi {
   ) async {
     final snap = await _requests
         .where('receiverUid', isEqualTo: receiverUid)
-        .orderBy('createdAt', descending: true)
         .get();
 
-    return snap.docs.map((doc) {
+    final results = snap.docs.map((doc) {
       return (id: doc.id, dto: ContactRequestDto.fromFirestore(doc.data()));
     }).toList();
+
+    results.sort((a, b) => b.dto.createdAt.compareTo(a.dto.createdAt));
+
+    return results;
   }
 
-  /// Returns all requests sent by [senderUid],
-  /// ordered by creation date descending.
+  /// Returns all requests sent by [senderUid].
   Future<List<({String id, ContactRequestDto dto})>> getSentRequests(
     String senderUid,
   ) async {
-    final snap = await _requests
-        .where('senderUid', isEqualTo: senderUid)
-        .orderBy('createdAt', descending: true)
-        .get();
+    final snap = await _requests.where('senderUid', isEqualTo: senderUid).get();
 
-    return snap.docs.map((doc) {
+    final results = snap.docs.map((doc) {
       return (id: doc.id, dto: ContactRequestDto.fromFirestore(doc.data()));
     }).toList();
+
+    results.sort((a, b) => b.dto.createdAt.compareTo(a.dto.createdAt));
+
+    return results;
   }
 
   /// Returns the count of requests received by [receiverUid].
