@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/presentation/features/contacts/cubits/trusted_contacts_cubit.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
@@ -63,6 +64,50 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
     return _mockPending
         .where((c) => (c['username'] ?? '').toLowerCase().contains(q))
         .toList();
+  }
+
+  void _showSendRequestDialog(BuildContext context, AppLocalizations l10n) {
+    CustomDialog.show(
+      context: context,
+      title: l10n.sendRequest,
+      content: Text(
+        l10n.sendRequestDescription,
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
+      inputHint: l10n.userCode,
+      buttonText: l10n.send,
+      onInputButtonPressed: (receiverUsername) {
+        Navigator.of(context).pop();
+        context.read<TrustedContactsCubit>().sendRequest(
+          receiverUsername.trim(),
+        );
+      },
+    );
+  }
+
+  void _showSendRequestErrorDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    AppFailure failure,
+  ) {
+    final message = failure.when(
+      network: (_, _) => l10n.networkError,
+      notFound: (_) => l10n.userCodeNotFound,
+      conflict: (_) => l10n.requestAlreadyExists,
+      business: (msg) =>
+          msg == 'self_request' ? l10n.selfRequestError : l10n.genericError,
+      forbidden: () => l10n.genericError,
+      unauthorized: () => l10n.genericError,
+      serialization: (_) => l10n.genericError,
+      unknown: (_) => l10n.genericError,
+    );
+
+    CustomDialog.show(
+      context: context,
+      title: l10n.sendRequestErrorTitle,
+      content: Text(message, style: Theme.of(context).textTheme.bodyMedium),
+      buttonText: l10n.accept,
+    );
   }
 
   Widget _buildContactsList(AppLocalizations l10n) {
@@ -178,69 +223,77 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
     final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: const CustomAppBar(),
-      body: GestureDetector(
-        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-        behavior: HitTestBehavior.translucent,
-        child: Column(
-          children: [
-            SectionHeader(text: l10n.yourTrustedContacts),
+    return BlocListener<TrustedContactsCubit, TrustedContactsState>(
+      listenWhen: (prev, curr) => curr.sendRequestFailure != null,
+      listener: (context, state) {
+        context.read<TrustedContactsCubit>().clearSendRequestFailure();
+        _showSendRequestErrorDialog(context, l10n, state.sendRequestFailure!);
+      },
+      child: Scaffold(
+        backgroundColor: colorScheme.surface,
+        appBar: const CustomAppBar(),
+        body: GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          behavior: HitTestBehavior.translucent,
+          child: Column(
+            children: [
+              SectionHeader(text: l10n.yourTrustedContacts),
 
-            // Section 1: user code + add contact
-            Container(
-              width: double.infinity,
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.05)
-                  : colorScheme.surfaceContainerHigh.withValues(alpha: 0.30),
-              padding: const EdgeInsets.only(
-                left: 24,
-                right: 24,
-                top: 16,
-                bottom: 24,
-              ),
-              child: BlocBuilder<TrustedContactsCubit, TrustedContactsState>(
-                builder: (context, state) {
-                  final code = state.isLoading
-                      ? '...'
-                      : (state.username.orDash());
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.yourUserCode,
-                        style: textTheme.bodyMedium?.copyWith(
-                          color: colorScheme.onSurface,
-                          fontWeight: FontWeight.w500,
+              // Section 1: user code + add contact
+              Container(
+                width: double.infinity,
+                color: isDark
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : colorScheme.surfaceContainerHigh.withValues(alpha: 0.30),
+                padding: const EdgeInsets.only(
+                  left: 24,
+                  right: 24,
+                  top: 16,
+                  bottom: 24,
+                ),
+                child: BlocBuilder<TrustedContactsCubit, TrustedContactsState>(
+                  builder: (context, state) {
+                    final code = state.isLoading
+                        ? '...'
+                        : (state.username.orDash());
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.yourUserCode,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      CopyableCodeField(code: code),
-                      const SizedBox(height: 16),
-                      SectionButton(
-                        icon: Icons.person_add_outlined,
-                        text: l10n.addTrustedContact,
-                        showArrow: false,
-                        onPressed: () {},
-                        backgroundColor: colorScheme.secondary,
-                        contentColor: colorScheme.onSecondary,
-                      ),
-                    ],
-                  );
-                },
+                        const SizedBox(height: 8),
+                        CopyableCodeField(code: code),
+                        const SizedBox(height: 16),
+                        SectionButton(
+                          icon: Icons.person_add_outlined,
+                          text: l10n.addTrustedContact,
+                          showArrow: false,
+                          onPressed: () =>
+                              _showSendRequestDialog(context, l10n),
+                          backgroundColor: colorScheme.secondary,
+                          contentColor: colorScheme.onSecondary,
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
-            ),
 
-            // Section 2: tabs
-            Expanded(
-              child: CustomTabView(
-                tabs: [l10n.trustedContacts, l10n.pendingRequests],
-                onTabChanged: _onTabChanged,
-                children: [_buildContactsList(l10n), _buildPendingList(l10n)],
+              // Section 2: tabs
+              Expanded(
+                child: CustomTabView(
+                  tabs: [l10n.trustedContacts, l10n.pendingRequests],
+                  onTabChanged: _onTabChanged,
+                  children: [_buildContactsList(l10n), _buildPendingList(l10n)],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

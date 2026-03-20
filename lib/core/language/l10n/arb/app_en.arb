@@ -97,5 +97,13 @@
   "noProtectedPeopleTitle": "No protected people",
   "noProtectedPeopleDescription": "You haven't added any protected people yet.",
   "protectedPeople": "Protected people",
-  "requestsReceived": "Requests received"
+  "requestsReceived": "Requests received",
+  "sendRequest": "Send request",
+  "sendRequestDescription": "Enter the user code of the person you want to add as a trusted contact. If you don't have this code, you will need to ask for it to continue.",
+  "userCode": "User code",
+  "send": "Send",
+  "sendRequestErrorTitle": "Error sending request",
+  "userCodeNotFound": "No user found with that code. Please check the code and try again.",
+  "requestAlreadyExists": "There is already an active request with this user.",
+  "selfRequestError": "You cannot send a request to yourself."
 }

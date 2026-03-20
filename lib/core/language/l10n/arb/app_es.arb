@@ -97,5 +97,13 @@
   "noProtectedPeopleTitle": "Sin personas protegidas",
   "noProtectedPeopleDescription": "Aún no has añadido ninguna persona protegida.",
   "protectedPeople": "Personas protegidas",
-  "requestsReceived": "Solicitudes recibidas"
+  "requestsReceived": "Solicitudes recibidas",
+  "sendRequest": "Enviar solicitud",
+  "sendRequestDescription": "Introduce el código de usuario de la persona que deseas añadir como contacto de confianza. Si no dispones de este código, deberás pedírselo para poder continuar.",
+  "userCode": "Código de usuario",
+  "send": "Enviar",
+  "sendRequestErrorTitle": "Error al enviar solicitud",
+  "userCodeNotFound": "No se ha encontrado ningún usuario con ese código. Comprueba que el código es correcto e inténtalo de nuevo.",
+  "requestAlreadyExists": "Ya existe una solicitud activa con este usuario.",
+  "selfRequestError": "No puedes enviarte una solicitud a ti mismo."
 }
