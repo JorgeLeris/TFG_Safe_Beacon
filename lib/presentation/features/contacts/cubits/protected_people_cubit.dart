@@ -3,6 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/domain/common/result.dart';
+import 'package:safe_beacon/domain/contacts/contact_repository.dart';
 import 'package:safe_beacon/domain/contacts/contact_request_repository.dart';
 import 'package:safe_beacon/domain/contacts/entities/contact_request_item.dart';
 import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
@@ -15,14 +16,17 @@ class ProtectedPeopleCubit extends Cubit<ProtectedPeopleState> {
     required String uid,
     required UserProfileRepository userProfileRepository,
     required ContactRequestRepository contactRequestRepository,
+    required ContactRepository contactRepository,
   }) : _uid = uid,
        _userProfileRepository = userProfileRepository,
        _contactRequestRepository = contactRequestRepository,
+       _contactRepository = contactRepository,
        super(const ProtectedPeopleState());
 
   final String _uid;
   final UserProfileRepository _userProfileRepository;
   final ContactRequestRepository _contactRequestRepository;
+  final ContactRepository _contactRepository;
 
   /// Loads the current user's username to display as a contact code.
   Future<void> loadUserCode() async {
@@ -93,6 +97,69 @@ class ProtectedPeopleCubit extends Cubit<ProtectedPeopleState> {
     );
   }
 
+  /// Accepts a received contact request:
+  /// 1. Creates the contact relationship.
+  /// 2. Deletes the request on success.
+  /// 3. Removes the item from the local list of requests.
+  Future<void> acceptRequest(ContactRequestItem request) async {
+    emit(state.copyWith(isAcceptingRequest: true, acceptRequestFailure: null));
+
+    final currentUsername = state.username;
+    if (currentUsername == null) {
+      emit(
+        state.copyWith(
+          isAcceptingRequest: false,
+          acceptRequestFailure: const AppFailure.unknown(),
+        ),
+      );
+      return;
+    }
+
+    // Create the contact relationship.
+    // The sender of the request is the protected person,
+    // the current user (receiver) is the trusted contact.
+    final createResult = await _contactRepository.createContact(
+      protectedPersonUid: request.peerUid,
+      protectedPersonUsername: request.peerUsername,
+      trustedContactUid: _uid,
+      trustedContactUsername: currentUsername,
+    );
+
+    if (createResult.isFailure) {
+      emit(
+        state.copyWith(
+          isAcceptingRequest: false,
+          acceptRequestFailure: (createResult as Failure).failure,
+        ),
+      );
+      return;
+    }
+
+    // Delete the request after successful contact creation.
+    final deleteResult = await _contactRequestRepository.deleteRequest(
+      requestId: request.requestId,
+      requesterUid: _uid,
+    );
+
+    if (deleteResult.isFailure) {
+      // Contact was created but request deletion failed.
+      emit(
+        state.copyWith(
+          isAcceptingRequest: false,
+          acceptRequestFailure: (deleteResult as Failure).failure,
+        ),
+      );
+      return;
+    }
+
+    // Remove from local list on full success.
+    final updated = state.receivedRequests
+        .where((r) => r.requestId != request.requestId)
+        .toList();
+
+    emit(state.copyWith(isAcceptingRequest: false, receivedRequests: updated));
+  }
+
   /// Deletes a received contact request identified by [requestId].
   Future<void> deleteReceivedRequest(String requestId) async {
     emit(state.copyWith(isDeletingRequest: true, deleteRequestFailure: null));
@@ -120,5 +187,10 @@ class ProtectedPeopleCubit extends Cubit<ProtectedPeopleState> {
   /// Clears a previous delete request failure from the state.
   void clearDeleteRequestFailure() {
     emit(state.copyWith(deleteRequestFailure: null));
+  }
+
+  /// Clears a previous accept request failure from the state.
+  void clearAcceptRequestFailure() {
+    emit(state.copyWith(acceptRequestFailure: null));
   }
 }

@@ -6,10 +6,12 @@ abstract class ProtectedPeopleState with _$ProtectedPeopleState {
     @Default(false) bool isLoading,
     @Default(false) bool isLoadingReceivedRequests,
     @Default(false) bool isDeletingRequest,
+    @Default(false) bool isAcceptingRequest,
     @Default([]) List<ContactRequestItem> receivedRequests,
     String? username,
     AppFailure? failure,
     AppFailure? receivedRequestsFailure,
     AppFailure? deleteRequestFailure,
+    AppFailure? acceptRequestFailure,
   }) = _ProtectedPeopleState;
 }

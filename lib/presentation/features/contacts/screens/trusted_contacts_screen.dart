@@ -87,7 +87,9 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
     final message = failure.when(
       network: (_, _) => l10n.networkError,
       notFound: (_) => l10n.userCodeNotFound,
-      conflict: (_) => l10n.requestAlreadyExists,
+      conflict: (msg) => msg == 'contact_already_exists'
+          ? l10n.contactAlreadyExists
+          : l10n.requestAlreadyExists,
       business: (msg) =>
           msg == 'self_request' ? l10n.selfRequestError : l10n.genericError,
       forbidden: () => l10n.genericError,

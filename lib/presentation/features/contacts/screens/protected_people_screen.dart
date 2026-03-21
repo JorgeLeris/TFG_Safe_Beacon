@@ -108,6 +108,52 @@ class _ProtectedPeopleScreenState extends State<ProtectedPeopleScreen> {
     );
   }
 
+  void _showAcceptRequestDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    ContactRequestItem request,
+  ) {
+    CustomDialog.show(
+      context: context,
+      title: l10n.acceptRequest,
+      content: Text(
+        l10n.acceptRequestDescription(request.peerUsername),
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
+      buttonText: l10n.accept,
+      onButtonPressed: () {
+        Navigator.of(context).pop();
+        context.read<ProtectedPeopleCubit>().acceptRequest(request);
+      },
+      secondButtonText: l10n.cancel,
+      onSecondButtonPressed: () => Navigator.of(context).pop(),
+    );
+  }
+
+  void _showAcceptRequestErrorDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    AppFailure failure,
+  ) {
+    final message = failure.when(
+      network: (_, _) => l10n.networkError,
+      conflict: (_) => l10n.contactAlreadyExists,
+      notFound: (_) => l10n.genericError,
+      forbidden: () => l10n.genericError,
+      unauthorized: () => l10n.genericError,
+      business: (_) => l10n.genericError,
+      serialization: (_) => l10n.genericError,
+      unknown: (_) => l10n.genericError,
+    );
+
+    CustomDialog.show(
+      context: context,
+      title: l10n.acceptRequestErrorTitle,
+      content: Text(message, style: Theme.of(context).textTheme.bodyMedium),
+      buttonText: l10n.accept,
+    );
+  }
+
   // ---------------------------------------------------------------------------
   // Tab 1 — Protected people list
   // ---------------------------------------------------------------------------
@@ -237,7 +283,8 @@ class _ProtectedPeopleScreenState extends State<ProtectedPeopleScreen> {
                   onProfileTap: () {},
                   onDelete: () =>
                       _showDeleteRequestDialog(context, l10n, request),
-                  onAccept: () {},
+                  onAccept: () =>
+                      _showAcceptRequestDialog(context, l10n, request),
                 ),
               ),
             ),
@@ -257,16 +304,31 @@ class _ProtectedPeopleScreenState extends State<ProtectedPeopleScreen> {
     final l10n = AppLocalizations.of(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return BlocListener<ProtectedPeopleCubit, ProtectedPeopleState>(
-      listenWhen: (prev, curr) => curr.deleteRequestFailure != null,
-      listener: (context, state) {
-        context.read<ProtectedPeopleCubit>().clearDeleteRequestFailure();
-        _showDeleteRequestErrorDialog(
-          context,
-          l10n,
-          state.deleteRequestFailure!,
-        );
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<ProtectedPeopleCubit, ProtectedPeopleState>(
+          listenWhen: (prev, curr) => curr.deleteRequestFailure != null,
+          listener: (context, state) {
+            context.read<ProtectedPeopleCubit>().clearDeleteRequestFailure();
+            _showDeleteRequestErrorDialog(
+              context,
+              l10n,
+              state.deleteRequestFailure!,
+            );
+          },
+        ),
+        BlocListener<ProtectedPeopleCubit, ProtectedPeopleState>(
+          listenWhen: (prev, curr) => curr.acceptRequestFailure != null,
+          listener: (context, state) {
+            context.read<ProtectedPeopleCubit>().clearAcceptRequestFailure();
+            _showAcceptRequestErrorDialog(
+              context,
+              l10n,
+              state.acceptRequestFailure!,
+            );
+          },
+        ),
+      ],
       child: Scaffold(
         backgroundColor: colorScheme.surface,
         appBar: const CustomAppBar(),

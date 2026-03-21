@@ -113,5 +113,9 @@
   "declineRequestDescription": "Al rechazar esta solicitud, se eliminará la invitación recibida por \"{username}\" para ser su contacto de confianza y no se establecerá ninguna conexión.",
   "declineRequestErrorTitle": "Error al rechazar solicitud",
   "noReceivedRequestsTitle": "Sin solicitudes recibidas",
-  "noReceivedRequestsDescription": "Cuando alguien te envíe una solicitud de contacto aparecerá aquí."
+  "noReceivedRequestsDescription": "Cuando alguien te envíe una solicitud de contacto aparecerá aquí.",
+  "acceptRequest": "Aceptar solicitud",
+  "acceptRequestDescription": "Al aceptar esta solicitud, se establecerá la conexión y pasarás a ser contacto de confianza de \"{username}\".",
+  "acceptRequestErrorTitle": "Error al aceptar solicitud",
+  "contactAlreadyExists": "Ya existe una conexión con este usuario."
 }
