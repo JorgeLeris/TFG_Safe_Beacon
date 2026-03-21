@@ -10,6 +10,9 @@ class ContactRequestApi {
   CollectionReference<Map<String, dynamic>> get _usernames =>
       _firestore.collection('usernames');
 
+  CollectionReference<Map<String, dynamic>> get _contacts =>
+      _firestore.collection('contacts');
+
   // ==============================================
   // MARK: - Create
   // ==============================================
@@ -20,6 +23,7 @@ class ContactRequestApi {
   /// - Resolves [receiverUsername] to a UID via the usernames collection.
   /// - Verifies the sender is not adding themselves.
   /// - Verifies no existing request between this pair already exists.
+  /// - Verifies no active contact relationship between this pair already exists.
   /// - Writes the new request document with a server timestamp.
   ///
   /// Throws [Exception] with a descriptive code on business rule violations.
@@ -53,6 +57,24 @@ class ContactRequestApi {
 
       if (existingSent.docs.isNotEmpty || existingReceived.docs.isNotEmpty) {
         throw Exception('request_already_exists');
+      }
+
+      // Check for existing contact relationship between this pair (both directions).
+      final existingContactA = await _contacts
+          .where('protectedPersonUid', isEqualTo: dto.senderUid)
+          .where('trustedContactUid', isEqualTo: receiverUid)
+          .limit(1)
+          .get();
+
+      final existingContactB = await _contacts
+          .where('protectedPersonUid', isEqualTo: receiverUid)
+          .where('trustedContactUid', isEqualTo: dto.senderUid)
+          .limit(1)
+          .get();
+
+      if (existingContactA.docs.isNotEmpty ||
+          existingContactB.docs.isNotEmpty) {
+        throw Exception('contact_already_exists');
       }
 
       // Write the new request.

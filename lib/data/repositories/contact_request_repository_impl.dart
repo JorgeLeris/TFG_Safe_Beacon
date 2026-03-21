@@ -17,7 +17,8 @@ class ContactRequestRepositoryImpl implements ContactRequestRepository {
   /// by [receiverUsername].
   ///
   /// Fails with [AppFailure.notFound] if the username does not exist,
-  /// [AppFailure.conflict] if a request between the pair already exists,
+  /// [AppFailure.conflict] if a request between the pair already exists
+  /// or an active contact relationship already exists,
   /// [AppFailure.business] if the sender tries to add themselves.
   @override
   Future<Result<void>> createRequest({
@@ -181,6 +182,12 @@ class ContactRequestRepositoryImpl implements ContactRequestRepository {
     if (message.contains('request_already_exists')) {
       appLogger.warning('Contact request failed: request already exists');
       return const AppFailure.conflict('request_already_exists');
+    }
+    if (message.contains('contact_already_exists')) {
+      appLogger.warning(
+        'Contact request failed: contact relationship already exists',
+      );
+      return const AppFailure.conflict('contact_already_exists');
     }
     appLogger.severe(
       'Unexpected business error creating contact request',
