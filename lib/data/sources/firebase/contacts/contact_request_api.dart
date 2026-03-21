@@ -42,38 +42,26 @@ class ContactRequestApi {
         throw Exception('self_request');
       }
 
-      // Check for existing request between this pair (both directions).
-      final existingSent = await _requests
+      // Only check the exact same direction — reversed roles are allowed.
+      final existingRequest = await _requests
           .where('senderUid', isEqualTo: dto.senderUid)
           .where('receiverUid', isEqualTo: receiverUid)
           .limit(1)
           .get();
 
-      final existingReceived = await _requests
-          .where('senderUid', isEqualTo: receiverUid)
-          .where('receiverUid', isEqualTo: dto.senderUid)
-          .limit(1)
-          .get();
-
-      if (existingSent.docs.isNotEmpty || existingReceived.docs.isNotEmpty) {
+      if (existingRequest.docs.isNotEmpty) {
         throw Exception('request_already_exists');
       }
 
-      // Check for existing contact relationship between this pair (both directions).
-      final existingContactA = await _contacts
+      // Only check the exact same direction for contact relationships.
+      // A can be protected by B and B can be protected by A simultaneously.
+      final existingContact = await _contacts
           .where('protectedPersonUid', isEqualTo: dto.senderUid)
           .where('trustedContactUid', isEqualTo: receiverUid)
           .limit(1)
           .get();
 
-      final existingContactB = await _contacts
-          .where('protectedPersonUid', isEqualTo: receiverUid)
-          .where('trustedContactUid', isEqualTo: dto.senderUid)
-          .limit(1)
-          .get();
-
-      if (existingContactA.docs.isNotEmpty ||
-          existingContactB.docs.isNotEmpty) {
+      if (existingContact.docs.isNotEmpty) {
         throw Exception('contact_already_exists');
       }
 

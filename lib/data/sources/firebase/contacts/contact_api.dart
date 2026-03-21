@@ -20,20 +20,14 @@ class ContactApi {
   /// Throws [Exception] with a descriptive code on business rule violations.
   Future<void> createContact(ContactDto dto) async {
     await _firestore.runTransaction((tx) async {
-      // Check for existing relationship between this pair (both directions).
-      final existingA = await _contacts
+      // Only check the exact same direction — reversed roles are allowed.
+      final existing = await _contacts
           .where('protectedPersonUid', isEqualTo: dto.protectedPersonUid)
           .where('trustedContactUid', isEqualTo: dto.trustedContactUid)
           .limit(1)
           .get();
 
-      final existingB = await _contacts
-          .where('protectedPersonUid', isEqualTo: dto.trustedContactUid)
-          .where('trustedContactUid', isEqualTo: dto.protectedPersonUid)
-          .limit(1)
-          .get();
-
-      if (existingA.docs.isNotEmpty || existingB.docs.isNotEmpty) {
+      if (existing.docs.isNotEmpty) {
         throw Exception('contact_already_exists');
       }
 
