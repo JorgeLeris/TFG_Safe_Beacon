@@ -108,5 +108,10 @@
   "selfRequestError": "You cannot send a request to yourself.",
   "cancelRequest": "Cancel request",
   "cancelRequestDescription": "By deleting this request, the invitation sent to \"{username}\" will be canceled and no connection will be established. You can send a new request later if you wish.",
-  "cancelRequestErrorTitle": "Error canceling request"
+  "cancelRequestErrorTitle": "Error canceling request",
+  "declineRequest": "Decline request",
+  "declineRequestDescription": "By declining this request, the invitation received from \"{username}\" to be your trusted contact will be removed and no connection will be established.",
+  "declineRequestErrorTitle": "Error declining request",
+  "noReceivedRequestsTitle": "No received requests",
+  "noReceivedRequestsDescription": "When someone sends you a contact request, it will appear here."
 }

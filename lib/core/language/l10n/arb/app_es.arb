@@ -108,5 +108,10 @@
   "selfRequestError": "No puedes enviarte una solicitud a ti mismo.",
   "cancelRequest": "Cancelar solicitud",
   "cancelRequestDescription": "Al eliminar esta solicitud, se cancelará la invitación enviada a \"{username}\" y no se establecerá ninguna conexión. Podrás enviar una nueva solicitud más adelante si lo deseas.",
-  "cancelRequestErrorTitle": "Error al cancelar solicitud"
+  "cancelRequestErrorTitle": "Error al cancelar solicitud",
+  "declineRequest": "Rechazar solicitud",
+  "declineRequestDescription": "Al rechazar esta solicitud, se eliminará la invitación recibida por \"{username}\" para ser su contacto de confianza y no se establecerá ninguna conexión.",
+  "declineRequestErrorTitle": "Error al rechazar solicitud",
+  "noReceivedRequestsTitle": "Sin solicitudes recibidas",
+  "noReceivedRequestsDescription": "Cuando alguien te envíe una solicitud de contacto aparecerá aquí."
 }

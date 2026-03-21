@@ -108,5 +108,10 @@
   "selfRequestError": "Vous ne pouvez pas vous envoyer une demande à vous-même.",
   "cancelRequest": "Annuler la demande",
   "cancelRequestDescription": "En supprimant cette demande, l'invitation envoyée à \"{username}\" sera annulée et aucune connexion ne sera établie. Vous pourrez envoyer une nouvelle demande plus tard si vous le souhaitez.",
-  "cancelRequestErrorTitle": "Erreur lors de l'annulation de la demande"
+  "cancelRequestErrorTitle": "Erreur lors de l'annulation de la demande",
+  "declineRequest": "Refuser la demande",
+  "declineRequestDescription": "En refusant cette demande, l'invitation reçue de \"{username}\" pour être votre contact de confiance sera supprimée et aucune connexion ne sera établie.",
+  "declineRequestErrorTitle": "Erreur lors du refus de la demande",
+  "noReceivedRequestsTitle": "Aucune demande reçue",
+  "noReceivedRequestsDescription": "Lorsque quelqu'un vous enverra une demande de contact, elle apparaîtra ici."
 }
