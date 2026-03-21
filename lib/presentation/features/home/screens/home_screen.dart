@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             SectionButton(
               icon: Icons.group_outlined,
-              text: l10n.trustedContacts,
+              text: l10n.yourTrustedContacts,
               onPressed: () => const TrustedContactsRoute().push(context),
               backgroundColor: colorScheme.secondary,
               contentColor: colorScheme.onSecondary,
