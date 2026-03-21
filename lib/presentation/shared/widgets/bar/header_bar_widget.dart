@@ -1,10 +1,52 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
-class SectionHeader extends StatelessWidget {
+class SectionHeader extends StatefulWidget {
   const SectionHeader({super.key, required this.text, this.onRefresh});
 
   final String text;
-  final VoidCallback? onRefresh;
+  final Future<void> Function()? onRefresh;
+
+  @override
+  State<SectionHeader> createState() => _SectionHeaderState();
+}
+
+class _SectionHeaderState extends State<SectionHeader>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  bool _isRefreshing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleRefresh() async {
+    if (_isRefreshing) return;
+
+    setState(() => _isRefreshing = true);
+    unawaited(_controller.repeat());
+
+    await Future.wait([
+      widget.onRefresh?.call() ?? Future.value(),
+      Future.delayed(const Duration(milliseconds: 700)),
+    ]);
+
+    _controller.stop();
+    _controller.reset();
+    setState(() => _isRefreshing = false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,22 +61,27 @@ class SectionHeader extends StatelessWidget {
         alignment: Alignment.center,
         children: [
           Text(
-            text,
+            widget.text,
             textAlign: TextAlign.center,
             style: textTheme.titleMedium?.copyWith(
               color: colorScheme.onPrimary,
               fontWeight: FontWeight.w700,
             ),
           ),
-          if (onRefresh != null)
+          if (widget.onRefresh != null)
             Positioned(
               right: 0,
               child: GestureDetector(
-                onTap: onRefresh,
-                child: Icon(
-                  Icons.refresh_rounded,
-                  color: colorScheme.onPrimary,
-                  size: 25,
+                onTap: _isRefreshing ? null : _handleRefresh,
+                child: RotationTransition(
+                  turns: _controller,
+                  child: Icon(
+                    Icons.refresh_rounded,
+                    color: colorScheme.onPrimary.withValues(
+                      alpha: _isRefreshing ? 0.5 : 1.0,
+                    ),
+                    size: 25,
+                  ),
                 ),
               ),
             ),
