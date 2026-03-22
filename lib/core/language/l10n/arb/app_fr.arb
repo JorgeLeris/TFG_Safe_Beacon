@@ -120,5 +120,7 @@
   "contactAlreadyExists": "Une connexion avec cet utilisateur existe déjà.",
   "deleteContact": "Supprimer le contact",
   "deleteContactDescription": "En supprimant \"{username}\" de vos contacts de confiance, toute connexion avec cette personne sera perdue. Cette action est permanente et ne peut pas être annulée.",
-  "deleteContactErrorTitle": "Erreur lors de la suppression du contact"
+  "deleteContactErrorTitle": "Erreur lors de la suppression du contact",
+  "sendRequestSuccessTitle": "Demande envoyée",
+  "sendRequestSuccessDescription": "La demande a été envoyée avec succès. Lorsque l'utilisateur l'acceptera, la connexion sera établie."
 }

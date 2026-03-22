@@ -65,6 +65,21 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
     );
   }
 
+  void _showSendRequestSuccessDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
+    CustomDialog.show(
+      context: context,
+      title: l10n.sendRequestSuccessTitle,
+      content: Text(
+        l10n.sendRequestSuccessDescription,
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
+      buttonText: l10n.accept,
+    );
+  }
+
   void _showSendRequestErrorDialog(
     BuildContext context,
     AppLocalizations l10n,
@@ -351,6 +366,14 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
 
     return MultiBlocListener(
       listeners: [
+        BlocListener<TrustedContactsCubit, TrustedContactsState>(
+          listenWhen: (prev, curr) =>
+              !prev.requestSentSuccess && curr.requestSentSuccess,
+          listener: (context, state) {
+            context.read<TrustedContactsCubit>().clearRequestSentSuccess();
+            _showSendRequestSuccessDialog(context, l10n);
+          },
+        ),
         BlocListener<TrustedContactsCubit, TrustedContactsState>(
           listenWhen: (prev, curr) => curr.sendRequestFailure != null,
           listener: (context, state) {

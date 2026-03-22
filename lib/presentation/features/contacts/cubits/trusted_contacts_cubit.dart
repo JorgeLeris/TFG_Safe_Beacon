@@ -170,7 +170,7 @@ class TrustedContactsCubit extends Cubit<TrustedContactsState> {
   }
 
   /// Sends a contact request to the user identified by [receiverUsername].
-  /// On success reloads the sent requests list.
+  /// On success reloads the sent requests list and sets [requestSentSuccess].
   Future<void> sendRequest(String receiverUsername) async {
     final senderUsername = state.username;
     if (senderUsername == null) return;
@@ -185,7 +185,7 @@ class TrustedContactsCubit extends Cubit<TrustedContactsState> {
 
     result.when(
       success: (_) {
-        emit(state.copyWith(isSendingRequest: false));
+        emit(state.copyWith(isSendingRequest: false, requestSentSuccess: true));
         loadSentRequests();
       },
       failure: (failure) => emit(
@@ -197,6 +197,11 @@ class TrustedContactsCubit extends Cubit<TrustedContactsState> {
   /// Clears a previous send request failure from the state.
   void clearSendRequestFailure() {
     emit(state.copyWith(sendRequestFailure: null));
+  }
+
+  /// Clears the request sent success flag from the state.
+  void clearRequestSentSuccess() {
+    emit(state.copyWith(requestSentSuccess: false));
   }
 
   /// Deletes a sent contact request identified by [requestId].

@@ -9,6 +9,7 @@ abstract class TrustedContactsState with _$TrustedContactsState {
     @Default(false) bool isLoadingTrustedContacts,
     @Default(false) bool isDeletingRequest,
     @Default(false) bool isDeletingContact,
+    @Default(false) bool requestSentSuccess,
     @Default([]) List<ContactRequestItem> sentRequests,
     @Default([]) List<ContactRequestItem> trustedContacts,
     String? username,
