@@ -5,6 +5,7 @@ import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/domain/contacts/entities/contact_request_item.dart';
 import 'package:safe_beacon/presentation/features/contacts/cubits/protected_people_cubit.dart';
+import 'package:safe_beacon/presentation/features/profile/routes/profile_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class ProtectedPeopleScreen extends StatefulWidget {
@@ -251,7 +252,8 @@ class _ProtectedPeopleScreenState extends State<ProtectedPeopleScreen> {
                 child: UserListItem(
                   username: contact.peerUsername,
                   profilePhoto: contact.peerPhoto,
-                  onProfileTap: () {},
+                  onProfileTap: () =>
+                      OtherProfileRoute(uid: contact.peerUid).push(context),
                   onDelete: () =>
                       _showDeleteContactDialog(context, l10n, contact),
                 ),
