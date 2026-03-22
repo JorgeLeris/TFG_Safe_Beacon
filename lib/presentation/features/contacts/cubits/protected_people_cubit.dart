@@ -42,6 +42,86 @@ class ProtectedPeopleCubit extends Cubit<ProtectedPeopleState> {
     );
   }
 
+  /// Loads the list of people the current user is protecting.
+  Future<void> loadProtectedPeople() async {
+    emit(
+      state.copyWith(
+        isLoadingProtectedPeople: true,
+        protectedPeopleFailure: null,
+      ),
+    );
+
+    final result = await _contactRepository.getProtectedPeople(_uid);
+
+    await result.when(
+      success: (contacts) async {
+        final items = await Future.wait(
+          contacts.map((c) async {
+            String? photo;
+            String? name;
+            final profileResult = await _userProfileRepository.getProfile(
+              c.protectedPersonUid,
+            );
+            profileResult.when(
+              success: (profile) {
+                photo = profile.profilePhoto;
+                name = '${profile.name} ${profile.surname}'.capitalized();
+              },
+              failure: (_) {
+                photo = null;
+                name = null;
+              },
+            );
+            return ContactRequestItem(
+              requestId: c.id,
+              direction: ContactRequestDirection.received,
+              peerUid: c.protectedPersonUid,
+              peerUsername: name ?? c.protectedPersonUsername,
+              peerPhoto: photo,
+            );
+          }),
+        );
+        emit(
+          state.copyWith(
+            isLoadingProtectedPeople: false,
+            protectedPeople: items,
+          ),
+        );
+      },
+      failure: (failure) async => emit(
+        state.copyWith(
+          isLoadingProtectedPeople: false,
+          protectedPeopleFailure: failure,
+        ),
+      ),
+    );
+  }
+
+  /// Deletes a contact relationship identified by [contactId].
+  /// On success removes the item from the local list without reloading.
+  Future<void> deleteContact(String contactId) async {
+    emit(state.copyWith(isDeletingContact: true, deleteContactFailure: null));
+
+    final result = await _contactRepository.deleteContact(
+      contactId: contactId,
+      requesterUid: _uid,
+    );
+
+    result.when(
+      success: (_) {
+        final updated = state.protectedPeople
+            .where((p) => p.requestId != contactId)
+            .toList();
+        emit(
+          state.copyWith(isDeletingContact: false, protectedPeople: updated),
+        );
+      },
+      failure: (failure) => emit(
+        state.copyWith(isDeletingContact: false, deleteContactFailure: failure),
+      ),
+    );
+  }
+
   /// Loads the list of contact requests received by the current user.
   Future<void> loadReceivedRequests() async {
     emit(
@@ -158,6 +238,7 @@ class ProtectedPeopleCubit extends Cubit<ProtectedPeopleState> {
         .toList();
 
     emit(state.copyWith(isAcceptingRequest: false, receivedRequests: updated));
+    await loadProtectedPeople();
   }
 
   /// Deletes a received contact request identified by [requestId].
@@ -192,5 +273,10 @@ class ProtectedPeopleCubit extends Cubit<ProtectedPeopleState> {
   /// Clears a previous accept request failure from the state.
   void clearAcceptRequestFailure() {
     emit(state.copyWith(acceptRequestFailure: null));
+  }
+
+  /// Clears a previous delete contact failure from the state.
+  void clearDeleteContactFailure() {
+    emit(state.copyWith(deleteContactFailure: null));
   }
 }

@@ -117,5 +117,8 @@
   "acceptRequest": "Accept request",
   "acceptRequestDescription": "By accepting this request, the connection will be established and you will become a trusted contact of \"{username}\".",
   "acceptRequestErrorTitle": "Error accepting request",
-  "contactAlreadyExists": "A connection with this user already exists."
+  "contactAlreadyExists": "A connection with this user already exists.",
+  "deleteContact": "Delete contact",
+  "deleteContactDescription": "By deleting \"{username}\" from your trusted contacts, all connection with this person will be lost. This action is permanent and cannot be undone.",
+  "deleteContactErrorTitle": "Error deleting contact"
 }

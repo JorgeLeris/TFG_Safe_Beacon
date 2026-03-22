@@ -15,13 +15,6 @@ class ProtectedPeopleScreen extends StatefulWidget {
 }
 
 class _ProtectedPeopleScreenState extends State<ProtectedPeopleScreen> {
-  // TODO: replace with real protected people data from cubit
-  static const List<Map<String, String?>> _mockProtectedPeople = [
-    {'username': 'Ana García', 'photo': null},
-    {'username': 'Carlos López', 'photo': null},
-    {'username': 'María Martínez', 'photo': null},
-  ];
-
   Key _protectedPeopleSearchKey = UniqueKey();
   Key _requestsReceivedSearchKey = UniqueKey();
 
@@ -32,6 +25,7 @@ class _ProtectedPeopleScreenState extends State<ProtectedPeopleScreen> {
   void initState() {
     super.initState();
     context.read<ProtectedPeopleCubit>().loadUserCode();
+    context.read<ProtectedPeopleCubit>().loadProtectedPeople();
     context.read<ProtectedPeopleCubit>().loadReceivedRequests();
   }
 
@@ -48,17 +42,55 @@ class _ProtectedPeopleScreenState extends State<ProtectedPeopleScreen> {
     FocusManager.instance.primaryFocus?.unfocus();
   }
 
-  List<Map<String, String?>> get _filteredProtectedPeople {
-    if (_protectedPeopleQuery.isEmpty) return _mockProtectedPeople;
-    final q = _protectedPeopleQuery.toLowerCase();
-    return _mockProtectedPeople
-        .where((c) => (c['username'] ?? '').toLowerCase().contains(q))
-        .toList();
-  }
-
   // ---------------------------------------------------------------------------
   // Dialogs
   // ---------------------------------------------------------------------------
+
+  void _showDeleteContactDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    ContactRequestItem contact,
+  ) {
+    CustomDialog.show(
+      context: context,
+      title: l10n.deleteContact,
+      content: Text(
+        l10n.deleteContactDescription(contact.peerUsername),
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
+      buttonText: l10n.accept,
+      onButtonPressed: () {
+        Navigator.of(context).pop();
+        context.read<ProtectedPeopleCubit>().deleteContact(contact.requestId);
+      },
+      secondButtonText: l10n.cancel,
+      onSecondButtonPressed: () => Navigator.of(context).pop(),
+    );
+  }
+
+  void _showDeleteContactErrorDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    AppFailure failure,
+  ) {
+    final message = failure.when(
+      network: (_, _) => l10n.networkError,
+      notFound: (_) => l10n.genericError,
+      forbidden: () => l10n.genericError,
+      unauthorized: () => l10n.genericError,
+      conflict: (_) => l10n.genericError,
+      business: (_) => l10n.genericError,
+      serialization: (_) => l10n.genericError,
+      unknown: (_) => l10n.genericError,
+    );
+
+    CustomDialog.show(
+      context: context,
+      title: l10n.deleteContactErrorTitle,
+      content: Text(message, style: Theme.of(context).textTheme.bodyMedium),
+      buttonText: l10n.accept,
+    );
+  }
 
   void _showDeleteRequestDialog(
     BuildContext context,
@@ -159,11 +191,15 @@ class _ProtectedPeopleScreenState extends State<ProtectedPeopleScreen> {
   // ---------------------------------------------------------------------------
 
   Widget _buildProtectedPeopleList(
+    BuildContext context,
     AppLocalizations l10n,
     ProtectedPeopleState state,
   ) {
-    // TODO: replace with real loading state and error handling from cubit
-    if (state.failure != null) {
+    if (state.isLoadingProtectedPeople) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state.protectedPeopleFailure != null) {
       return EmptyStateView(
         type: EmptyStateType.error,
         title: l10n.errorTitle,
@@ -171,13 +207,23 @@ class _ProtectedPeopleScreenState extends State<ProtectedPeopleScreen> {
       );
     }
 
-    if (_mockProtectedPeople.isEmpty) {
+    if (state.protectedPeople.isEmpty) {
       return EmptyStateView(
         type: EmptyStateType.empty,
         title: l10n.noProtectedPeopleTitle,
         description: l10n.noProtectedPeopleDescription,
       );
     }
+
+    final filtered = _protectedPeopleQuery.isEmpty
+        ? state.protectedPeople
+        : state.protectedPeople
+              .where(
+                (p) => p.peerUsername.toLowerCase().contains(
+                  _protectedPeopleQuery.toLowerCase(),
+                ),
+              )
+              .toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -192,21 +238,22 @@ class _ProtectedPeopleScreenState extends State<ProtectedPeopleScreen> {
             padding: EdgeInsets.symmetric(horizontal: 4),
             child: Divider(height: 24),
           ),
-          if (_filteredProtectedPeople.isEmpty)
+          if (filtered.isEmpty)
             EmptyStateView(
               type: EmptyStateType.noResults,
               title: l10n.noResultsTitle,
               description: l10n.noResultsDescription,
             )
           else
-            ..._filteredProtectedPeople.map(
+            ...filtered.map(
               (contact) => Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: UserListItem(
-                  username: contact['username'] as String,
-                  profilePhoto: contact['photo'],
+                  username: contact.peerUsername,
+                  profilePhoto: contact.peerPhoto,
                   onProfileTap: () {},
-                  onDelete: () {},
+                  onDelete: () =>
+                      _showDeleteContactDialog(context, l10n, contact),
                 ),
               ),
             ),
@@ -307,6 +354,17 @@ class _ProtectedPeopleScreenState extends State<ProtectedPeopleScreen> {
     return MultiBlocListener(
       listeners: [
         BlocListener<ProtectedPeopleCubit, ProtectedPeopleState>(
+          listenWhen: (prev, curr) => curr.deleteContactFailure != null,
+          listener: (context, state) {
+            context.read<ProtectedPeopleCubit>().clearDeleteContactFailure();
+            _showDeleteContactErrorDialog(
+              context,
+              l10n,
+              state.deleteContactFailure!,
+            );
+          },
+        ),
+        BlocListener<ProtectedPeopleCubit, ProtectedPeopleState>(
           listenWhen: (prev, curr) => curr.deleteRequestFailure != null,
           listener: (context, state) {
             context.read<ProtectedPeopleCubit>().clearDeleteRequestFailure();
@@ -381,7 +439,7 @@ class _ProtectedPeopleScreenState extends State<ProtectedPeopleScreen> {
                       tabs: [l10n.protectedPeople, l10n.requestsReceived],
                       onTabChanged: _onTabChanged,
                       children: [
-                        _buildProtectedPeopleList(l10n, state),
+                        _buildProtectedPeopleList(context, l10n, state),
                         _buildRequestsReceivedList(context, l10n, state),
                       ],
                     ),

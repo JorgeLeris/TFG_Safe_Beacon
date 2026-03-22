@@ -117,5 +117,8 @@
   "acceptRequest": "Aceptar solicitud",
   "acceptRequestDescription": "Al aceptar esta solicitud, se establecerá la conexión y pasarás a ser contacto de confianza de \"{username}\".",
   "acceptRequestErrorTitle": "Error al aceptar solicitud",
-  "contactAlreadyExists": "Ya existe una conexión con este usuario."
+  "contactAlreadyExists": "Ya existe una conexión con este usuario.",
+  "deleteContact": "Eliminar contacto",
+  "deleteContactDescription": "Al eliminar a \"{username}\" de tus contactos de confianza, se perderá toda conexión con esta persona. Esta acción es permanente y no se puede deshacer.",
+  "deleteContactErrorTitle": "Error al eliminar contacto"
 }
