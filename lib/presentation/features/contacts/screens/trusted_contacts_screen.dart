@@ -15,13 +15,6 @@ class TrustedContactsScreen extends StatefulWidget {
 }
 
 class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
-  // TODO: replace with real contacts data from cubit
-  static const List<Map<String, String?>> _mockContacts = [
-    {'username': 'Ana García', 'photo': null},
-    {'username': 'Carlos López', 'photo': null},
-    {'username': 'María Martínez', 'photo': null},
-  ];
-
   Key _contactsSearchKey = UniqueKey();
   Key _pendingSearchKey = UniqueKey();
 
@@ -32,6 +25,7 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
   void initState() {
     super.initState();
     context.read<TrustedContactsCubit>().loadUserCode();
+    context.read<TrustedContactsCubit>().loadTrustedContacts();
     context.read<TrustedContactsCubit>().loadSentRequests();
   }
 
@@ -46,14 +40,6 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
       }
     });
     FocusManager.instance.primaryFocus?.unfocus();
-  }
-
-  List<Map<String, String?>> get _filteredContacts {
-    if (_contactsQuery.isEmpty) return _mockContacts;
-    final q = _contactsQuery.toLowerCase();
-    return _mockContacts
-        .where((c) => (c['username'] ?? '').toLowerCase().contains(q))
-        .toList();
   }
 
   // ---------------------------------------------------------------------------
@@ -101,6 +87,52 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
     CustomDialog.show(
       context: context,
       title: l10n.sendRequestErrorTitle,
+      content: Text(message, style: Theme.of(context).textTheme.bodyMedium),
+      buttonText: l10n.accept,
+    );
+  }
+
+  void _showDeleteContactDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    ContactRequestItem contact,
+  ) {
+    CustomDialog.show(
+      context: context,
+      title: l10n.deleteContact,
+      content: Text(
+        l10n.deleteContactDescription(contact.peerUsername),
+        style: Theme.of(context).textTheme.bodyMedium,
+      ),
+      buttonText: l10n.accept,
+      onButtonPressed: () {
+        Navigator.of(context).pop();
+        context.read<TrustedContactsCubit>().deleteContact(contact.requestId);
+      },
+      secondButtonText: l10n.cancel,
+      onSecondButtonPressed: () => Navigator.of(context).pop(),
+    );
+  }
+
+  void _showDeleteContactErrorDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    AppFailure failure,
+  ) {
+    final message = failure.when(
+      network: (_, _) => l10n.networkError,
+      notFound: (_) => l10n.genericError,
+      forbidden: () => l10n.genericError,
+      unauthorized: () => l10n.genericError,
+      conflict: (_) => l10n.genericError,
+      business: (_) => l10n.genericError,
+      serialization: (_) => l10n.genericError,
+      unknown: (_) => l10n.genericError,
+    );
+
+    CustomDialog.show(
+      context: context,
+      title: l10n.deleteContactErrorTitle,
       content: Text(message, style: Theme.of(context).textTheme.bodyMedium),
       buttonText: l10n.accept,
     );
@@ -157,9 +189,17 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
   // ---------------------------------------------------------------------------
   // Tab 1 — Trusted contacts list
   // ---------------------------------------------------------------------------
-  Widget _buildContactsList(AppLocalizations l10n, TrustedContactsState state) {
-    // TODO: replace with real loading state and error handling from cubit
-    if (state.failure != null) {
+
+  Widget _buildContactsList(
+    BuildContext context,
+    AppLocalizations l10n,
+    TrustedContactsState state,
+  ) {
+    if (state.isLoadingTrustedContacts) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state.trustedContactsFailure != null) {
       return EmptyStateView(
         type: EmptyStateType.error,
         title: l10n.errorTitle,
@@ -167,13 +207,23 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
       );
     }
 
-    if (_mockContacts.isEmpty) {
+    if (state.trustedContacts.isEmpty) {
       return EmptyStateView(
         type: EmptyStateType.empty,
         title: l10n.noTrustedContactsTitle,
         description: l10n.noTrustedContactsDescription,
       );
     }
+
+    final filtered = _contactsQuery.isEmpty
+        ? state.trustedContacts
+        : state.trustedContacts
+              .where(
+                (c) => c.peerUsername.toLowerCase().contains(
+                  _contactsQuery.toLowerCase(),
+                ),
+              )
+              .toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -188,21 +238,22 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
             padding: EdgeInsets.symmetric(horizontal: 4),
             child: Divider(height: 24),
           ),
-          if (_filteredContacts.isEmpty)
+          if (filtered.isEmpty)
             EmptyStateView(
               type: EmptyStateType.noResults,
               title: l10n.noResultsTitle,
               description: l10n.noResultsDescription,
             )
           else
-            ..._filteredContacts.map(
+            ...filtered.map(
               (contact) => Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: UserListItem(
-                  username: contact['username'] as String,
-                  profilePhoto: contact['photo'],
+                  username: contact.peerUsername,
+                  profilePhoto: contact.peerPhoto,
                   onProfileTap: () {},
-                  onDelete: () {},
+                  onDelete: () =>
+                      _showDeleteContactDialog(context, l10n, contact),
                 ),
               ),
             ),
@@ -322,6 +373,17 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
             );
           },
         ),
+        BlocListener<TrustedContactsCubit, TrustedContactsState>(
+          listenWhen: (prev, curr) => curr.deleteContactFailure != null,
+          listener: (context, state) {
+            context.read<TrustedContactsCubit>().clearDeleteContactFailure();
+            _showDeleteContactErrorDialog(
+              context,
+              l10n,
+              state.deleteContactFailure!,
+            );
+          },
+        ),
       ],
       child: Scaffold(
         backgroundColor: colorScheme.surface,
@@ -385,7 +447,7 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
                       tabs: [l10n.trustedContacts, l10n.pendingRequests],
                       onTabChanged: _onTabChanged,
                       children: [
-                        _buildContactsList(l10n, state),
+                        _buildContactsList(context, l10n, state),
                         _buildPendingList(context, l10n, state),
                       ],
                     ),

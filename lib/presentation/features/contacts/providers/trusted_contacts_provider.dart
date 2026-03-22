@@ -1,10 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:safe_beacon/data/repositories/contact_repository_impl.dart';
 import 'package:safe_beacon/data/repositories/contact_request_repository_impl.dart';
 import 'package:safe_beacon/data/repositories/user_profile_repository_impl.dart';
+import 'package:safe_beacon/data/sources/firebase/contacts/contact_api.dart';
 import 'package:safe_beacon/data/sources/firebase/contacts/contact_request_api.dart';
 import 'package:safe_beacon/data/sources/firebase/profile/user_profile_api.dart';
+import 'package:safe_beacon/domain/contacts/contact_repository.dart';
 import 'package:safe_beacon/domain/contacts/contact_request_repository.dart';
 import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
 import 'package:safe_beacon/presentation/features/contacts/cubits/trusted_contacts_cubit.dart';
@@ -26,12 +29,16 @@ class TrustedContactsProvider extends StatelessWidget {
         RepositoryProvider<ContactRequestRepository>(
           create: (_) => ContactRequestRepositoryImpl(api: ContactRequestApi()),
         ),
+        RepositoryProvider<ContactRepository>(
+          create: (_) => ContactRepositoryImpl(api: ContactApi()),
+        ),
       ],
       child: BlocProvider(
         create: (context) => TrustedContactsCubit(
           uid: uid,
           userProfileRepository: context.read<UserProfileRepository>(),
           contactRequestRepository: context.read<ContactRequestRepository>(),
+          contactRepository: context.read<ContactRepository>(),
         ),
         child: child,
       ),

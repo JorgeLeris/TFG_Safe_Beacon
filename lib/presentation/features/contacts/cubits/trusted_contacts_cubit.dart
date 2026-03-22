@@ -3,6 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/domain/common/result.dart';
+import 'package:safe_beacon/domain/contacts/contact_repository.dart';
 import 'package:safe_beacon/domain/contacts/contact_request_repository.dart';
 import 'package:safe_beacon/domain/contacts/entities/contact_request_item.dart';
 import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
@@ -15,14 +16,17 @@ class TrustedContactsCubit extends Cubit<TrustedContactsState> {
     required String uid,
     required UserProfileRepository userProfileRepository,
     required ContactRequestRepository contactRequestRepository,
+    required ContactRepository contactRepository,
   }) : _uid = uid,
        _userProfileRepository = userProfileRepository,
        _contactRequestRepository = contactRequestRepository,
+       _contactRepository = contactRepository,
        super(const TrustedContactsState());
 
   final String _uid;
   final UserProfileRepository _userProfileRepository;
   final ContactRequestRepository _contactRequestRepository;
+  final ContactRepository _contactRepository;
 
   /// Loads the current user's username to display as a contact code.
   Future<void> loadUserCode() async {
@@ -35,6 +39,86 @@ class TrustedContactsCubit extends Cubit<TrustedContactsState> {
           emit(state.copyWith(isLoading: false, username: profile.username)),
       failure: (failure) =>
           emit(state.copyWith(isLoading: false, failure: failure)),
+    );
+  }
+
+  /// Loads the list of trusted contacts of the current user.
+  Future<void> loadTrustedContacts() async {
+    emit(
+      state.copyWith(
+        isLoadingTrustedContacts: true,
+        trustedContactsFailure: null,
+      ),
+    );
+
+    final result = await _contactRepository.getTrustedContacts(_uid);
+
+    await result.when(
+      success: (contacts) async {
+        final items = await Future.wait(
+          contacts.map((c) async {
+            String? photo;
+            String? name;
+            final profileResult = await _userProfileRepository.getProfile(
+              c.trustedContactUid,
+            );
+            profileResult.when(
+              success: (profile) {
+                photo = profile.profilePhoto;
+                name = '${profile.name} ${profile.surname}'.capitalized();
+              },
+              failure: (_) {
+                photo = null;
+                name = null;
+              },
+            );
+            return ContactRequestItem(
+              requestId: c.id,
+              direction: ContactRequestDirection.sent,
+              peerUid: c.trustedContactUid,
+              peerUsername: name ?? c.trustedContactUsername,
+              peerPhoto: photo,
+            );
+          }),
+        );
+        emit(
+          state.copyWith(
+            isLoadingTrustedContacts: false,
+            trustedContacts: items,
+          ),
+        );
+      },
+      failure: (failure) async => emit(
+        state.copyWith(
+          isLoadingTrustedContacts: false,
+          trustedContactsFailure: failure,
+        ),
+      ),
+    );
+  }
+
+  /// Deletes a trusted contact relationship identified by [contactId].
+  /// On success removes the item from the local list without reloading.
+  Future<void> deleteContact(String contactId) async {
+    emit(state.copyWith(isDeletingContact: true, deleteContactFailure: null));
+
+    final result = await _contactRepository.deleteContact(
+      contactId: contactId,
+      requesterUid: _uid,
+    );
+
+    result.when(
+      success: (_) {
+        final updated = state.trustedContacts
+            .where((c) => c.requestId != contactId)
+            .toList();
+        emit(
+          state.copyWith(isDeletingContact: false, trustedContacts: updated),
+        );
+      },
+      failure: (failure) => emit(
+        state.copyWith(isDeletingContact: false, deleteContactFailure: failure),
+      ),
     );
   }
 
@@ -141,5 +225,10 @@ class TrustedContactsCubit extends Cubit<TrustedContactsState> {
   /// Clears a previous delete request failure from the state.
   void clearDeleteRequestFailure() {
     emit(state.copyWith(deleteRequestFailure: null));
+  }
+
+  /// Clears a previous delete contact failure from the state.
+  void clearDeleteContactFailure() {
+    emit(state.copyWith(deleteContactFailure: null));
   }
 }
