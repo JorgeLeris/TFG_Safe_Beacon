@@ -395,7 +395,16 @@ class _TrustedContactsScreenState extends State<TrustedContactsScreen> {
             builder: (context, state) {
               return Column(
                 children: [
-                  SectionHeader(text: l10n.yourTrustedContacts),
+                  SectionHeader(
+                    text: l10n.yourTrustedContacts,
+                    onRefresh: () async {
+                      final cubit = context.read<TrustedContactsCubit>();
+                      await Future.wait([
+                        cubit.loadTrustedContacts(),
+                        cubit.loadSentRequests(),
+                      ]);
+                    },
+                  ),
 
                   // Section 1: user code + add contact
                   Container(

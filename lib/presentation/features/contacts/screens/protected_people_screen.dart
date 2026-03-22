@@ -397,7 +397,16 @@ class _ProtectedPeopleScreenState extends State<ProtectedPeopleScreen> {
             builder: (context, state) {
               return Column(
                 children: [
-                  SectionHeader(text: l10n.yourProtectedPeople),
+                  SectionHeader(
+                    text: l10n.yourProtectedPeople,
+                    onRefresh: () async {
+                      final cubit = context.read<ProtectedPeopleCubit>();
+                      await Future.wait([
+                        cubit.loadProtectedPeople(),
+                        cubit.loadReceivedRequests(),
+                      ]);
+                    },
+                  ),
 
                   // Section 1: user code
                   Container(
