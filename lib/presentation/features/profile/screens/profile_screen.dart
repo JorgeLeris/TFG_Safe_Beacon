@@ -195,69 +195,65 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                           // Edit buttons
                           Center(
-                            child: IntrinsicWidth(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  CustomFilledButton(
-                                    text: l10n.edit,
-                                    onPressed: () {
-                                      final cubit = context
-                                          .read<ProfileCubit>();
-                                      ProfileEditRoute(
-                                            name: profile?.name,
-                                            surname: profile?.surname,
-                                            birthDate: profile?.birthDate,
-                                            gender: profile?.gender,
-                                            description: profile?.description,
-                                            profilePhoto: profile?.profilePhoto,
-                                          )
-                                          .push(context)
-                                          .then((_) => cubit.loadProfile());
-                                    },
-                                    backgroundColor: colorScheme.secondary,
-                                    foregroundColor: colorScheme.onSecondary,
-                                    colorText: colorScheme.onSecondary,
-                                    fontSizeText:
-                                        textTheme.labelLarge!.fontSize! * 1.1,
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 10,
-                                    ),
-                                    width: 225,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                CustomFilledButton(
+                                  text: l10n.edit,
+                                  onPressed: () {
+                                    final cubit = context.read<ProfileCubit>();
+                                    ProfileEditRoute(
+                                          name: profile?.name,
+                                          surname: profile?.surname,
+                                          birthDate: profile?.birthDate,
+                                          gender: profile?.gender,
+                                          description: profile?.description,
+                                          profilePhoto: profile?.profilePhoto,
+                                        )
+                                        .push(context)
+                                        .then((_) => cubit.loadProfile());
+                                  },
+                                  backgroundColor: colorScheme.secondary,
+                                  foregroundColor: colorScheme.onSecondary,
+                                  colorText: colorScheme.onSecondary,
+                                  fontSizeText:
+                                      textTheme.labelLarge!.fontSize! * 1.1,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
                                   ),
+                                  width: 225,
+                                ),
 
-                                  const SizedBox(height: 12),
-                                  const Divider(),
-                                  const SizedBox(height: 12),
+                                const SizedBox(height: 12),
+                                const Divider(),
+                                const SizedBox(height: 12),
 
-                                  BlocBuilder<LogoutCubit, LogoutState>(
-                                    builder: (context, logoutState) {
-                                      return CustomFilledButton(
-                                        text: l10n.logout,
-                                        onPressed: logoutState.isLoading
-                                            ? () {}
-                                            : () => context
-                                                  .read<LogoutCubit>()
-                                                  .onLogout(l10n),
-                                        backgroundColor: colorScheme.primary,
-                                        foregroundColor: colorScheme.onPrimary,
-                                        colorText: colorScheme.onPrimary,
-                                        fontSizeText:
-                                            textTheme.labelLarge!.fontSize! *
-                                            1.1,
-                                        icon: logoutState.isLoading
-                                            ? null
-                                            : Icons.logout,
-                                        isLoading: logoutState.isLoading,
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 10,
-                                        ),
-                                        width: 225,
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
+                                BlocBuilder<LogoutCubit, LogoutState>(
+                                  builder: (context, logoutState) {
+                                    return CustomFilledButton(
+                                      text: l10n.logout,
+                                      onPressed: logoutState.isLoading
+                                          ? () {}
+                                          : () => context
+                                                .read<LogoutCubit>()
+                                                .onLogout(l10n),
+                                      backgroundColor: colorScheme.primary,
+                                      foregroundColor: colorScheme.onPrimary,
+                                      colorText: colorScheme.onPrimary,
+                                      fontSizeText:
+                                          textTheme.labelLarge!.fontSize! * 1.1,
+                                      icon: logoutState.isLoading
+                                          ? null
+                                          : Icons.logout,
+                                      isLoading: logoutState.isLoading,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                      ),
+                                      width: 225,
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
                           ),
 

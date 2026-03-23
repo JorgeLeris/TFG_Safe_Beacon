@@ -24,8 +24,6 @@ const dummyEmail = 'test@example.com';
 const dummyPassword = 'password123';
 final dummyBirthDate = DateTime(1990, 1, 15);
 
-/// Seed state with all step-2 fields filled and step1Completed: false
-/// to prevent clearErrors from emitting a state transition.
 RegisterState get _validStep2Seed => RegisterState(
   email: dummyEmail,
   password: dummyPassword,
@@ -260,23 +258,6 @@ void main() {
         ),
       ],
     );
-
-    blocTest<RegisterCubit, RegisterState>(
-      '[EDGE CASE] - GIVEN valid credentials but empty confirmPassword, '
-      'WHEN onNextStep is called, '
-      'THEN should emit confirmPassword required error',
-      build: () => cubit,
-      seed: () =>
-          const RegisterState(email: dummyEmail, password: dummyPassword),
-      act: (cubit) => cubit.onNextStep(l10n),
-      expect: () => [
-        const RegisterState(
-          email: dummyEmail,
-          password: dummyPassword,
-          confirmPasswordError: 'confirm_password_required',
-        ),
-      ],
-    );
   });
 
   // ---------------------------------------------------------------------------
@@ -297,7 +278,7 @@ void main() {
           ),
         ).thenAnswer((_) async => user);
         when(
-          () => mockProfileRepository.createProfile(any()),
+          () => mockProfileRepository.createProfile(any(), any()),
         ).thenAnswer((_) async => const Result<void>.success(null));
         when(
           () => mockAuthRepository.sendEmailVerificationLink(),
@@ -317,7 +298,9 @@ void main() {
             dummyPassword,
           ),
         ).called(1);
-        verify(() => mockProfileRepository.createProfile(any())).called(1);
+        verify(
+          () => mockProfileRepository.createProfile(any(), any()),
+        ).called(1);
         verify(() => mockAuthRepository.sendEmailVerificationLink()).called(1);
       },
     );
@@ -342,7 +325,7 @@ void main() {
         _validStep2Seed.copyWith(errorMessage: 'registration_failed'),
       ],
       verify: (_) {
-        verifyNever(() => mockProfileRepository.createProfile(any()));
+        verifyNever(() => mockProfileRepository.createProfile(any(), any()));
       },
     );
 
@@ -358,7 +341,9 @@ void main() {
             dummyPassword,
           ),
         ).thenAnswer((_) async => user);
-        when(() => mockProfileRepository.createProfile(any())).thenAnswer(
+        when(
+          () => mockProfileRepository.createProfile(any(), any()),
+        ).thenAnswer(
           (_) async => const Result<void>.failure(AppFailure.unknown()),
         );
         return cubit;

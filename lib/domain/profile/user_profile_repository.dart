@@ -9,7 +9,8 @@ abstract class UserProfileRepository {
   ///
   /// The [profile] uid must match the authenticated user's UID,
   /// as it is used as the Firestore document ID.
-  Future<Result<void>> createProfile(UserProfile profile);
+  /// The username is generated automatically from [email].
+  Future<Result<void>> createProfile(UserProfile profile, String email);
 
   /// Retrieves a single [UserProfile] by its [uid].
   Future<Result<UserProfile>> getProfile(String uid);

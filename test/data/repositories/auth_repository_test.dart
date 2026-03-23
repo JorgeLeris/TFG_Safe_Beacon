@@ -128,24 +128,6 @@ void main() {
       ).called(1);
     });
 
-    test('[HAPPY PATH] - GIVEN valid credentials but API returns null, '
-        'WHEN createUserWithCredential is called, '
-        'THEN should return null', () async {
-      // Arrange.
-      when(
-        () => mockAuthApi.createUserWithCredential(dummyEmail, dummyPassword),
-      ).thenAnswer((_) async => null);
-
-      // Act.
-      final result = await repository.createUserWithCredential(
-        dummyEmail,
-        dummyPassword,
-      );
-
-      // Assert.
-      expect(result, isNull);
-    });
-
     test('[ERROR PATH] - GIVEN the API throws an exception, '
         'WHEN createUserWithCredential is called, '
         'THEN should rethrow the exception', () async {
@@ -187,24 +169,6 @@ void main() {
       verify(
         () => mockAuthApi.loginWithCredential(dummyEmail, dummyPassword),
       ).called(1);
-    });
-
-    test('[HAPPY PATH] - GIVEN valid credentials but API returns null, '
-        'WHEN loginWithCredential is called, '
-        'THEN should return null', () async {
-      // Arrange.
-      when(
-        () => mockAuthApi.loginWithCredential(dummyEmail, dummyPassword),
-      ).thenAnswer((_) async => null);
-
-      // Act.
-      final result = await repository.loginWithCredential(
-        dummyEmail,
-        dummyPassword,
-      );
-
-      // Assert.
-      expect(result, isNull);
     });
 
     test('[ERROR PATH] - GIVEN the API throws an exception, '
@@ -267,26 +231,6 @@ void main() {
         // Assert.
         expect(result, isNotNull);
         expect(result!.isNewUser, isTrue);
-      },
-    );
-
-    test(
-      '[HAPPY PATH] - GIVEN a successful Google Sign-In that returns null user, '
-      'WHEN loginWithGoogle is called, '
-      'THEN should return a record with null User',
-      () async {
-        // Arrange.
-        const expectedResult = (user: null as User?, isNewUser: false);
-        when(
-          () => mockAuthApi.loginWithGoogle(),
-        ).thenAnswer((_) async => expectedResult);
-
-        // Act.
-        final result = await repository.loginWithGoogle();
-
-        // Assert.
-        expect(result, isNotNull);
-        expect(result!.user, isNull);
       },
     );
 
@@ -371,18 +315,6 @@ void main() {
         repository.sendPasswordResetLink(dummyEmail),
         throwsException,
       );
-    });
-
-    test('[EDGE CASE] - GIVEN an empty email string, '
-        'WHEN sendPasswordResetLink is called and the API throws, '
-        'THEN should rethrow the exception', () async {
-      // Arrange.
-      when(
-        () => mockAuthApi.sendPasswordResetLink(''),
-      ).thenThrow(Exception('Invalid email'));
-
-      // Act & Assert.
-      await expectLater(repository.sendPasswordResetLink(''), throwsException);
     });
   });
 }

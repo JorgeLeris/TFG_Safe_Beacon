@@ -13,10 +13,12 @@ class UserProfileDto {
     this.description,
     this.profilePhoto,
     this.createdAt,
+    required this.username,
   });
 
   final String name;
   final String? surname;
+  final String username;
 
   /// One of: "male", "female", "other".
   final String? gender;
@@ -48,6 +50,7 @@ class UserProfileDto {
     return UserProfileDto(
       name: data['name'] as String? ?? '',
       surname: data['surname'] as String?,
+      username: data['username'] as String? ?? '',
       gender: data['gender'] as String?,
       birthDate: data['birthDate'] as String?,
       description: data['description'] as String?,

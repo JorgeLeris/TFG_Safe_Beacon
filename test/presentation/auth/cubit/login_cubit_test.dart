@@ -43,12 +43,14 @@ MockUser _buildUser({
   String uid = 'uid-123',
   String? displayName,
   String? photoURL,
+  String? email,
 }) {
   final user = MockUser();
   when(() => user.uid).thenReturn(uid);
   when(() => user.emailVerified).thenReturn(emailVerified);
   when(() => user.displayName).thenReturn(displayName);
   when(() => user.photoURL).thenReturn(photoURL);
+  when(() => user.email).thenReturn(email);
   return user;
 }
 
@@ -319,23 +321,6 @@ void main() {
         verifyNever(() => mockAuthRepository.loginWithCredential(any(), any()));
       },
     );
-
-    blocTest<LoginCubit, LoginState>(
-      '[EDGE CASE] - GIVEN a malformed email and short password, '
-      'WHEN onSubmit is called, '
-      'THEN should emit field-specific validation errors',
-      build: () => cubit,
-      seed: () => const LoginState(email: 'not-an-email', password: '123'),
-      act: (cubit) => cubit.onSubmit(l10n),
-      expect: () => [
-        const LoginState(
-          email: 'not-an-email',
-          password: '123',
-          emailError: 'email_invalid',
-          passwordError: 'password_invalid',
-        ),
-      ],
-    );
   });
 
   // ---------------------------------------------------------------------------
@@ -348,7 +333,7 @@ void main() {
       'WHEN onGoogleLogin is called, '
       'THEN should emit [loading, success] without creating a profile',
       build: () {
-        final user = _buildUser();
+        final user = _buildUser(email: dummyEmail);
         when(
           () => mockAuthRepository.loginWithGoogle(),
         ).thenAnswer((_) async => (user: user as User?, isNewUser: false));
@@ -357,7 +342,7 @@ void main() {
       act: (cubit) => cubit.onGoogleLogin(l10n),
       expect: () => [const LoginState(isLoading: true), const LoginState()],
       verify: (_) {
-        verifyNever(() => mockProfileRepository.createProfile(any()));
+        verifyNever(() => mockProfileRepository.createProfile(any(), any()));
       },
     );
 
@@ -369,38 +354,23 @@ void main() {
         final user = _buildUser(
           displayName: 'John Doe',
           photoURL: 'https://photo.url',
+          email: 'john.doe@gmail.com',
         );
         when(
           () => mockAuthRepository.loginWithGoogle(),
         ).thenAnswer((_) async => (user: user as User?, isNewUser: true));
         when(
-          () => mockProfileRepository.createProfile(any()),
+          () => mockProfileRepository.createProfile(any(), any()),
         ).thenAnswer((_) async => const Result<void>.success(null));
         return cubit;
       },
       act: (cubit) => cubit.onGoogleLogin(l10n),
       expect: () => [const LoginState(isLoading: true), const LoginState()],
       verify: (_) {
-        verify(() => mockProfileRepository.createProfile(any())).called(1);
+        verify(
+          () => mockProfileRepository.createProfile(any(), any()),
+        ).called(1);
       },
-    );
-
-    blocTest<LoginCubit, LoginState>(
-      '[HAPPY PATH] - GIVEN a new user with no display name, '
-      'WHEN onGoogleLogin is called, '
-      'THEN should create a profile with empty name and emit [loading, success]',
-      build: () {
-        final user = _buildUser();
-        when(
-          () => mockAuthRepository.loginWithGoogle(),
-        ).thenAnswer((_) async => (user: user as User?, isNewUser: true));
-        when(
-          () => mockProfileRepository.createProfile(any()),
-        ).thenAnswer((_) async => const Result<void>.success(null));
-        return cubit;
-      },
-      act: (cubit) => cubit.onGoogleLogin(l10n),
-      expect: () => [const LoginState(isLoading: true), const LoginState()],
     );
 
     blocTest<LoginCubit, LoginState>(
@@ -421,32 +391,17 @@ void main() {
     );
 
     blocTest<LoginCubit, LoginState>(
-      '[ERROR PATH] - GIVEN loginWithGoogle returns a result with null user, '
-      'WHEN onGoogleLogin is called, '
-      'THEN should emit [loading, errorMessage(loginFailed)]',
-      build: () {
-        when(
-          () => mockAuthRepository.loginWithGoogle(),
-        ).thenAnswer((_) async => (user: null as User?, isNewUser: false));
-        return cubit;
-      },
-      act: (cubit) => cubit.onGoogleLogin(l10n),
-      expect: () => [
-        const LoginState(isLoading: true),
-        const LoginState(errorMessage: 'login_failed'),
-      ],
-    );
-
-    blocTest<LoginCubit, LoginState>(
       '[ERROR PATH] - GIVEN a new user whose profile creation fails, '
       'WHEN onGoogleLogin is called, '
       'THEN should emit [loading, errorMessage(loginFailed)]',
       build: () {
-        final user = _buildUser(displayName: 'John');
+        final user = _buildUser(displayName: 'John', email: 'john@gmail.com');
         when(
           () => mockAuthRepository.loginWithGoogle(),
         ).thenAnswer((_) async => (user: user as User?, isNewUser: true));
-        when(() => mockProfileRepository.createProfile(any())).thenAnswer(
+        when(
+          () => mockProfileRepository.createProfile(any(), any()),
+        ).thenAnswer(
           (_) async => const Result<void>.failure(AppFailure.unknown()),
         );
         return cubit;

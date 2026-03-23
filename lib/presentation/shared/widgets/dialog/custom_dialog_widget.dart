@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:safe_beacon/core/extensions/context_extensions.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
-class CustomDialog extends StatelessWidget {
+class CustomDialog extends StatefulWidget {
   const CustomDialog({
     super.key,
     required this.title,
@@ -12,6 +12,10 @@ class CustomDialog extends StatelessWidget {
     this.topButtonText,
     this.onTopButtonPressed,
     this.dismissible = true,
+    this.secondButtonText,
+    this.onSecondButtonPressed,
+    this.inputHint,
+    this.onInputButtonPressed,
   });
 
   final String title;
@@ -24,6 +28,12 @@ class CustomDialog extends StatelessWidget {
 
   final bool dismissible;
 
+  final String? secondButtonText;
+  final VoidCallback? onSecondButtonPressed;
+
+  final String? inputHint;
+  final ValueChanged<String>? onInputButtonPressed;
+
   static Future<void> show({
     required BuildContext context,
     required String title,
@@ -33,6 +43,10 @@ class CustomDialog extends StatelessWidget {
     String? topButtonText,
     VoidCallback? onTopButtonPressed,
     bool dismissible = true,
+    String? secondButtonText,
+    VoidCallback? onSecondButtonPressed,
+    String? inputHint,
+    ValueChanged<String>? onInputButtonPressed,
   }) {
     return showDialog(
       context: context,
@@ -45,17 +59,36 @@ class CustomDialog extends StatelessWidget {
         topButtonText: topButtonText,
         onTopButtonPressed: onTopButtonPressed,
         dismissible: dismissible,
+        secondButtonText: secondButtonText,
+        onSecondButtonPressed: onSecondButtonPressed,
+        inputHint: inputHint,
+        onInputButtonPressed: onInputButtonPressed,
       ),
     );
+  }
+
+  @override
+  State<CustomDialog> createState() => _CustomDialogState();
+}
+
+class _CustomDialogState extends State<CustomDialog> {
+  final TextEditingController _inputController = TextEditingController();
+
+  @override
+  void dispose() {
+    _inputController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = context.colorScheme;
     final textTheme = context.textTheme;
+    final hasInput = widget.inputHint != null;
+    final hasSecondButton = widget.secondButtonText != null;
 
     return PopScope(
-      canPop: dismissible,
+      canPop: widget.dismissible,
       child: Dialog(
         backgroundColor: colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -74,20 +107,20 @@ class CustomDialog extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Title + close button
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: Text(
-                        title,
+                        widget.title,
                         style: textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: colorScheme.onSurface,
                         ),
                       ),
                     ),
-
-                    if (dismissible)
+                    if (widget.dismissible)
                       IconButton(
                         onPressed: () => Navigator.of(context).pop(),
                         icon: Icon(Icons.close, color: colorScheme.onSurface),
@@ -99,15 +132,16 @@ class CustomDialog extends StatelessWidget {
 
                 const SizedBox(height: 16),
 
-                Flexible(child: SingleChildScrollView(child: content)),
+                Flexible(child: SingleChildScrollView(child: widget.content)),
 
                 const SizedBox(height: 24),
 
-                if (topButtonText != null) ...[
+                // Optional text button
+                if (widget.topButtonText != null) ...[
                   TextButton(
-                    onPressed: onTopButtonPressed,
+                    onPressed: widget.onTopButtonPressed,
                     child: Text(
-                      topButtonText!,
+                      widget.topButtonText!,
                       style: textTheme.labelLarge?.copyWith(
                         color: colorScheme.tertiary,
                         fontWeight: FontWeight.bold,
@@ -119,10 +153,26 @@ class CustomDialog extends StatelessWidget {
                   const SizedBox(height: 8),
                 ],
 
+                // Optional input field above the main button
+                if (hasInput) ...[
+                  InputField(
+                    hint: widget.inputHint!,
+                    onChanged: (v) => _inputController.text = v,
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
+                // Main button
                 CustomFilledButton(
-                  text: buttonText,
-                  onPressed:
-                      onButtonPressed ?? () => Navigator.of(context).pop(),
+                  text: widget.buttonText,
+                  onPressed: () {
+                    if (hasInput) {
+                      widget.onInputButtonPressed?.call(_inputController.text);
+                    } else {
+                      (widget.onButtonPressed ??
+                          () => Navigator.of(context).pop())();
+                    }
+                  },
                   backgroundColor: colorScheme.secondary,
                   foregroundColor: colorScheme.onSecondary,
                   colorText: colorScheme.onSecondary,
@@ -132,6 +182,25 @@ class CustomDialog extends StatelessWidget {
                     vertical: 12,
                   ),
                 ),
+
+                // Optional second button below the main one
+                if (hasSecondButton) ...[
+                  const SizedBox(height: 12),
+                  CustomFilledButton(
+                    text: widget.secondButtonText!,
+                    onPressed:
+                        widget.onSecondButtonPressed ??
+                        () => Navigator.of(context).pop(),
+                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimary,
+                    colorText: colorScheme.onPrimary,
+                    fontSizeText: textTheme.labelLarge!.fontSize!,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

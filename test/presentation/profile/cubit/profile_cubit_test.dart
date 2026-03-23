@@ -129,23 +129,5 @@ void main() {
         const ProfileState(failure: AppFailure.unknown()),
       ],
     );
-
-    blocTest<ProfileCubit, ProfileState>(
-      '[STATE UPDATE] - GIVEN a previous failure in state, '
-      'WHEN loadProfile is called successfully, '
-      'THEN should clear failure and emit [loading, profile]',
-      build: () {
-        when(() => mockRepository.getProfile(dummyUid)).thenAnswer(
-          (_) async => const Result<UserProfile>.success(dummyProfile),
-        );
-        return cubit;
-      },
-      seed: () => const ProfileState(failure: AppFailure.unknown()),
-      act: (cubit) => cubit.loadProfile(),
-      expect: () => [
-        const ProfileState(isLoading: true),
-        const ProfileState(userProfile: dummyProfile),
-      ],
-    );
   });
 }

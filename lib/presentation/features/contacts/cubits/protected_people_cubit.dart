@@ -1,0 +1,282 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:safe_beacon/core/extensions/string_extensions.dart';
+import 'package:safe_beacon/domain/common/app_failure.dart';
+import 'package:safe_beacon/domain/common/result.dart';
+import 'package:safe_beacon/domain/contacts/contact_repository.dart';
+import 'package:safe_beacon/domain/contacts/contact_request_repository.dart';
+import 'package:safe_beacon/domain/contacts/entities/contact_request_item.dart';
+import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
+
+part 'protected_people_state.dart';
+part 'protected_people_cubit.freezed.dart';
+
+class ProtectedPeopleCubit extends Cubit<ProtectedPeopleState> {
+  ProtectedPeopleCubit({
+    required String uid,
+    required UserProfileRepository userProfileRepository,
+    required ContactRequestRepository contactRequestRepository,
+    required ContactRepository contactRepository,
+  }) : _uid = uid,
+       _userProfileRepository = userProfileRepository,
+       _contactRequestRepository = contactRequestRepository,
+       _contactRepository = contactRepository,
+       super(const ProtectedPeopleState());
+
+  final String _uid;
+  final UserProfileRepository _userProfileRepository;
+  final ContactRequestRepository _contactRequestRepository;
+  final ContactRepository _contactRepository;
+
+  /// Loads the current user's username to display as a contact code.
+  Future<void> loadUserCode() async {
+    emit(state.copyWith(isLoading: true, failure: null));
+
+    final result = await _userProfileRepository.getProfile(_uid);
+
+    result.when(
+      success: (profile) =>
+          emit(state.copyWith(isLoading: false, username: profile.username)),
+      failure: (failure) =>
+          emit(state.copyWith(isLoading: false, failure: failure)),
+    );
+  }
+
+  /// Loads the list of people the current user is protecting.
+  Future<void> loadProtectedPeople() async {
+    emit(
+      state.copyWith(
+        isLoadingProtectedPeople: true,
+        protectedPeopleFailure: null,
+      ),
+    );
+
+    final result = await _contactRepository.getProtectedPeople(_uid);
+
+    await result.when(
+      success: (contacts) async {
+        final items = await Future.wait(
+          contacts.map((c) async {
+            String? photo;
+            String? name;
+            final profileResult = await _userProfileRepository.getProfile(
+              c.protectedPersonUid,
+            );
+            profileResult.when(
+              success: (profile) {
+                photo = profile.profilePhoto;
+                name = '${profile.name} ${profile.surname}'.capitalized();
+              },
+              failure: (_) {
+                photo = null;
+                name = null;
+              },
+            );
+            return ContactRequestItem(
+              requestId: c.id,
+              direction: ContactRequestDirection.received,
+              peerUid: c.protectedPersonUid,
+              peerUsername: name ?? c.protectedPersonUsername,
+              peerPhoto: photo,
+            );
+          }),
+        );
+        emit(
+          state.copyWith(
+            isLoadingProtectedPeople: false,
+            protectedPeople: items,
+          ),
+        );
+      },
+      failure: (failure) async => emit(
+        state.copyWith(
+          isLoadingProtectedPeople: false,
+          protectedPeopleFailure: failure,
+        ),
+      ),
+    );
+  }
+
+  /// Deletes a contact relationship identified by [contactId].
+  /// On success removes the item from the local list without reloading.
+  Future<void> deleteContact(String contactId) async {
+    emit(state.copyWith(isDeletingContact: true, deleteContactFailure: null));
+
+    final result = await _contactRepository.deleteContact(
+      contactId: contactId,
+      requesterUid: _uid,
+    );
+
+    result.when(
+      success: (_) {
+        final updated = state.protectedPeople
+            .where((p) => p.requestId != contactId)
+            .toList();
+        emit(
+          state.copyWith(isDeletingContact: false, protectedPeople: updated),
+        );
+      },
+      failure: (failure) => emit(
+        state.copyWith(isDeletingContact: false, deleteContactFailure: failure),
+      ),
+    );
+  }
+
+  /// Loads the list of contact requests received by the current user.
+  Future<void> loadReceivedRequests() async {
+    emit(
+      state.copyWith(
+        isLoadingReceivedRequests: true,
+        receivedRequestsFailure: null,
+      ),
+    );
+
+    final result = await _contactRequestRepository.getReceivedRequests(_uid);
+
+    await result.when(
+      success: (requests) async {
+        final items = await Future.wait(
+          requests.map((r) async {
+            String? photo;
+            String? name;
+            final profileResult = await _userProfileRepository.getProfile(
+              r.senderUid,
+            );
+            profileResult.when(
+              success: (profile) {
+                photo = profile.profilePhoto;
+                name = '${profile.name} ${profile.surname}'.capitalized();
+              },
+              failure: (_) {
+                photo = null;
+                name = null;
+              },
+            );
+            return ContactRequestItem(
+              requestId: r.id,
+              direction: ContactRequestDirection.received,
+              peerUid: r.senderUid,
+              peerUsername: name ?? r.senderUsername,
+              peerPhoto: photo,
+            );
+          }),
+        );
+        emit(
+          state.copyWith(
+            isLoadingReceivedRequests: false,
+            receivedRequests: items,
+          ),
+        );
+      },
+      failure: (failure) async => emit(
+        state.copyWith(
+          isLoadingReceivedRequests: false,
+          receivedRequestsFailure: failure,
+        ),
+      ),
+    );
+  }
+
+  /// Accepts a received contact request:
+  /// 1. Creates the contact relationship.
+  /// 2. Deletes the request on success.
+  /// 3. Removes the item from the local list of requests.
+  Future<void> acceptRequest(ContactRequestItem request) async {
+    emit(state.copyWith(isAcceptingRequest: true, acceptRequestFailure: null));
+
+    final currentUsername = state.username;
+    if (currentUsername == null) {
+      emit(
+        state.copyWith(
+          isAcceptingRequest: false,
+          acceptRequestFailure: const AppFailure.unknown(),
+        ),
+      );
+      return;
+    }
+
+    // Create the contact relationship.
+    // The sender of the request is the protected person,
+    // the current user (receiver) is the trusted contact.
+    final createResult = await _contactRepository.createContact(
+      protectedPersonUid: request.peerUid,
+      protectedPersonUsername: request.peerUsername,
+      trustedContactUid: _uid,
+      trustedContactUsername: currentUsername,
+    );
+
+    if (createResult.isFailure) {
+      emit(
+        state.copyWith(
+          isAcceptingRequest: false,
+          acceptRequestFailure: (createResult as Failure).failure,
+        ),
+      );
+      return;
+    }
+
+    // Delete the request after successful contact creation.
+    final deleteResult = await _contactRequestRepository.deleteRequest(
+      requestId: request.requestId,
+      requesterUid: _uid,
+    );
+
+    if (deleteResult.isFailure) {
+      // Contact was created but request deletion failed.
+      emit(
+        state.copyWith(
+          isAcceptingRequest: false,
+          acceptRequestFailure: (deleteResult as Failure).failure,
+        ),
+      );
+      return;
+    }
+
+    // Remove from local list on full success.
+    final updated = state.receivedRequests
+        .where((r) => r.requestId != request.requestId)
+        .toList();
+
+    emit(state.copyWith(isAcceptingRequest: false, receivedRequests: updated));
+    await loadProtectedPeople();
+  }
+
+  /// Deletes a received contact request identified by [requestId].
+  Future<void> deleteReceivedRequest(String requestId) async {
+    emit(state.copyWith(isDeletingRequest: true, deleteRequestFailure: null));
+
+    final result = await _contactRequestRepository.deleteRequest(
+      requestId: requestId,
+      requesterUid: _uid,
+    );
+
+    result.when(
+      success: (_) {
+        final updated = state.receivedRequests
+            .where((r) => r.requestId != requestId)
+            .toList();
+        emit(
+          state.copyWith(isDeletingRequest: false, receivedRequests: updated),
+        );
+      },
+      failure: (failure) => emit(
+        state.copyWith(isDeletingRequest: false, deleteRequestFailure: failure),
+      ),
+    );
+  }
+
+  /// Clears a previous delete request failure from the state.
+  void clearDeleteRequestFailure() {
+    emit(state.copyWith(deleteRequestFailure: null));
+  }
+
+  /// Clears a previous accept request failure from the state.
+  void clearAcceptRequestFailure() {
+    emit(state.copyWith(acceptRequestFailure: null));
+  }
+
+  /// Clears a previous delete contact failure from the state.
+  void clearDeleteContactFailure() {
+    emit(state.copyWith(deleteContactFailure: null));
+  }
+}

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:safe_beacon/presentation/features/auth/routes/auth_routes.dart';
 import 'package:safe_beacon/presentation/features/chat/routes/chat_routes.dart';
+import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
 import 'package:safe_beacon/presentation/features/control/routes/control_routes.dart';
 import 'package:safe_beacon/presentation/features/dashboard/dashboard_shell.dart';
 import 'package:safe_beacon/presentation/features/home/routes/home_routes.dart';
@@ -121,6 +122,8 @@ GoRouter buildAppRouter() {
       ...$appRoutes,
       $authRoute,
       $profileRoute,
+      $trustedContactsRoute,
+      $protectedPeopleRoute,
       ...mockRoutes,
     ],
   );

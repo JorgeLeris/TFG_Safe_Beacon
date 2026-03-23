@@ -117,6 +117,7 @@ class LoginCubit extends Cubit<LoginState> {
             surname: surname,
             profilePhoto: user.photoURL,
           ),
+          user.email ?? '',
         );
 
         if (profileResult.isFailure) {

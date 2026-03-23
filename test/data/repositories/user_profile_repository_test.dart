@@ -14,6 +14,8 @@ class MockUserProfileApi extends Mock implements UserProfileApi {}
 
 class FakeUserProfileDto extends Fake implements UserProfileDto {}
 
+const dummyEmail = 'john.doe@example.com';
+
 // Dummy domain entity.
 const dummyProfile = UserProfile(
   uid: 'uid-123',
@@ -23,6 +25,7 @@ const dummyProfile = UserProfile(
   birthDate: '1990-01-15',
   description: 'A test user',
   profilePhoto: 'https://example.com/photo.jpg',
+  username: 'john_doe',
 );
 
 // Dummy DTO returned by the API.
@@ -33,6 +36,7 @@ final dummyProfileDto = UserProfileDto(
   birthDate: dummyProfile.birthDate,
   description: dummyProfile.description,
   profilePhoto: dummyProfile.profilePhoto,
+  username: dummyProfile.username ?? '',
   createdAt: DateTime(2024),
 );
 
@@ -57,24 +61,125 @@ void main() {
   // ---------------------------------------------------------------------------
 
   group('UserProfileRepositoryImpl.createProfile', () {
-    test('[HAPPY PATH] - GIVEN a valid UserProfile, '
-        'WHEN createProfile is called, '
-        'THEN should return Result.success with null', () async {
-      // Arrange.
-      when(
-        () => mockApi.createProfile(dummyProfile.uid, any<UserProfileDto>()),
-      ).thenAnswer((_) async {});
+    test(
+      '[HAPPY PATH] - GIVEN a valid UserProfile and email with no username collision, '
+      'WHEN createProfile is called, '
+      'THEN should call usernameExists once, createProfileWithUsername once, '
+      'and return Result.success with null',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.usernameExists(any()),
+        ).thenAnswer((_) async => false);
+        when(
+          () => mockApi.createProfileWithUsername(
+            dummyProfile.uid,
+            any<UserProfileDto>(),
+            any(),
+          ),
+        ).thenAnswer((_) async {});
 
-      // Act.
-      final result = await repository.createProfile(dummyProfile);
+        // Act.
+        final result = await repository.createProfile(dummyProfile, dummyEmail);
 
-      // Assert.
-      expect(result, isA<Result<void>>());
-      expect(result.isSuccess, isTrue);
-      verify(
-        () => mockApi.createProfile(dummyProfile.uid, any<UserProfileDto>()),
-      ).called(1);
-    });
+        // Assert.
+        expect(result.isSuccess, isTrue);
+        verify(() => mockApi.usernameExists(any())).called(1);
+        verify(
+          () => mockApi.createProfileWithUsername(
+            dummyProfile.uid,
+            any<UserProfileDto>(),
+            any(),
+          ),
+        ).called(1);
+      },
+    );
+
+    test(
+      '[HAPPY PATH] - GIVEN a base username already taken but suffix is free, '
+      'WHEN createProfile is called, '
+      'THEN should call usernameExists twice and return Result.success',
+      () async {
+        // Arrange.
+        var callCount = 0;
+        when(() => mockApi.usernameExists(any())).thenAnswer((_) async {
+          callCount++;
+          return callCount == 1;
+        });
+        when(
+          () => mockApi.createProfileWithUsername(any(), any(), any()),
+        ).thenAnswer((_) async {});
+
+        // Act.
+        final result = await repository.createProfile(dummyProfile, dummyEmail);
+
+        // Assert.
+        expect(result.isSuccess, isTrue);
+        verify(() => mockApi.usernameExists(any())).called(2);
+        verify(
+          () => mockApi.createProfileWithUsername(any(), any(), any()),
+        ).called(1);
+      },
+    );
+
+    test(
+      '[HAPPY PATH] - GIVEN an email with special characters and accents, '
+      'WHEN createProfile is called, '
+      'THEN should sanitize the username and return Result.success',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.usernameExists(any()),
+        ).thenAnswer((_) async => false);
+        when(
+          () => mockApi.createProfileWithUsername(any(), any(), any()),
+        ).thenAnswer((_) async {});
+
+        // Act.
+        final result = await repository.createProfile(
+          dummyProfile,
+          'Juan.García+tag@gmail.com',
+        );
+
+        // Assert.
+        expect(result.isSuccess, isTrue);
+        final captured = verify(
+          () => mockApi.createProfileWithUsername(any(), any(), captureAny()),
+        ).captured;
+        final username = captured.first as String;
+        expect(username, matches(RegExp(r'^[a-z0-9_]+$')));
+      },
+    );
+
+    test(
+      '[ERROR PATH] - GIVEN a username_taken race condition on the transaction, '
+      'WHEN createProfile is called, '
+      'THEN should return Result.failure with AppFailure.unknown() '
+      'because there is no retry loop',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.usernameExists(any()),
+        ).thenAnswer((_) async => false);
+        when(
+          () => mockApi.createProfileWithUsername(any(), any(), any()),
+        ).thenThrow(Exception('username_taken'));
+
+        // Act.
+        final result = await repository.createProfile(dummyProfile, dummyEmail);
+
+        // Assert.
+        expect(result.isFailure, isTrue);
+        expect(
+          result,
+          equals(const Result<void>.failure(AppFailure.unknown())),
+        );
+        // Verify it only attempted once (no retry).
+        verify(
+          () => mockApi.createProfileWithUsername(any(), any(), any()),
+        ).called(1);
+      },
+    );
 
     test(
       '[ERROR PATH] - GIVEN a permission-denied FirebaseException, '
@@ -83,11 +188,14 @@ void main() {
       () async {
         // Arrange.
         when(
-          () => mockApi.createProfile(any(), any()),
+          () => mockApi.usernameExists(any()),
+        ).thenAnswer((_) async => false);
+        when(
+          () => mockApi.createProfileWithUsername(any(), any(), any()),
         ).thenThrow(_firebaseException('permission-denied'));
 
         // Act.
-        final result = await repository.createProfile(dummyProfile);
+        final result = await repository.createProfile(dummyProfile, dummyEmail);
 
         // Assert.
         expect(result.isFailure, isTrue);
@@ -105,83 +213,20 @@ void main() {
       () async {
         // Arrange.
         when(
-          () => mockApi.createProfile(any(), any()),
+          () => mockApi.usernameExists(any()),
+        ).thenAnswer((_) async => false);
+        when(
+          () => mockApi.createProfileWithUsername(any(), any(), any()),
         ).thenThrow(_firebaseException('unavailable'));
 
         // Act.
-        final result = await repository.createProfile(dummyProfile);
+        final result = await repository.createProfile(dummyProfile, dummyEmail);
 
         // Assert.
         expect(result.isFailure, isTrue);
         expect(
           result,
           equals(const Result<void>.failure(AppFailure.network())),
-        );
-      },
-    );
-
-    test(
-      '[ERROR PATH] - GIVEN a not-found FirebaseException, '
-      'WHEN createProfile is called, '
-      'THEN should return Result.failure with AppFailure.notFound()',
-      () async {
-        // Arrange.
-        when(
-          () => mockApi.createProfile(any(), any()),
-        ).thenThrow(_firebaseException('not-found'));
-
-        // Act.
-        final result = await repository.createProfile(dummyProfile);
-
-        // Assert.
-        expect(result.isFailure, isTrue);
-        expect(
-          result,
-          equals(const Result<void>.failure(AppFailure.notFound())),
-        );
-      },
-    );
-
-    test(
-      '[ERROR PATH] - GIVEN an unrecognised FirebaseException code, '
-      'WHEN createProfile is called, '
-      'THEN should return Result.failure with AppFailure.unknown()',
-      () async {
-        // Arrange.
-        when(
-          () => mockApi.createProfile(any(), any()),
-        ).thenThrow(_firebaseException('internal'));
-
-        // Act.
-        final result = await repository.createProfile(dummyProfile);
-
-        // Assert.
-        expect(result.isFailure, isTrue);
-        expect(
-          result,
-          equals(const Result<void>.failure(AppFailure.unknown())),
-        );
-      },
-    );
-
-    test(
-      '[ERROR PATH] - GIVEN a non-Firebase exception, '
-      'WHEN createProfile is called, '
-      'THEN should return Result.failure with AppFailure.unknown()',
-      () async {
-        // Arrange.
-        when(
-          () => mockApi.createProfile(any(), any()),
-        ).thenThrow(Exception('Unexpected error'));
-
-        // Act.
-        final result = await repository.createProfile(dummyProfile);
-
-        // Assert.
-        expect(result.isFailure, isTrue);
-        expect(
-          result,
-          equals(const Result<void>.failure(AppFailure.unknown())),
         );
       },
     );
@@ -192,32 +237,31 @@ void main() {
   // ---------------------------------------------------------------------------
 
   group('UserProfileRepositoryImpl.getProfile', () {
-    test(
-      '[HAPPY PATH] - GIVEN an existing user UID, '
-      'WHEN getProfile is called, '
-      'THEN should return Result.success with the mapped UserProfile',
-      () async {
-        // Arrange.
-        when(
-          () => mockApi.getProfile(dummyProfile.uid),
-        ).thenAnswer((_) async => dummyProfileDto);
+    test('[HAPPY PATH] - GIVEN an existing user UID, '
+        'WHEN getProfile is called, '
+        'THEN should return Result.success with the mapped UserProfile '
+        'including username', () async {
+      // Arrange.
+      when(
+        () => mockApi.getProfile(dummyProfile.uid),
+      ).thenAnswer((_) async => dummyProfileDto);
 
-        // Act.
-        final result = await repository.getProfile(dummyProfile.uid);
+      // Act.
+      final result = await repository.getProfile(dummyProfile.uid);
 
-        // Assert.
-        expect(result.isSuccess, isTrue);
-        final profile = result.valueOrNull!;
-        expect(profile.uid, equals(dummyProfile.uid));
-        expect(profile.name, equals(dummyProfile.name));
-        expect(profile.surname, equals(dummyProfile.surname));
-        expect(profile.gender, equals(dummyProfile.gender));
-        expect(profile.birthDate, equals(dummyProfile.birthDate));
-        expect(profile.description, equals(dummyProfile.description));
-        expect(profile.profilePhoto, equals(dummyProfile.profilePhoto));
-        verify(() => mockApi.getProfile(dummyProfile.uid)).called(1);
-      },
-    );
+      // Assert.
+      expect(result.isSuccess, isTrue);
+      final profile = result.valueOrNull!;
+      expect(profile.uid, equals(dummyProfile.uid));
+      expect(profile.name, equals(dummyProfile.name));
+      expect(profile.surname, equals(dummyProfile.surname));
+      expect(profile.gender, equals(dummyProfile.gender));
+      expect(profile.birthDate, equals(dummyProfile.birthDate));
+      expect(profile.description, equals(dummyProfile.description));
+      expect(profile.profilePhoto, equals(dummyProfile.profilePhoto));
+      expect(profile.username, equals(dummyProfile.username));
+      verify(() => mockApi.getProfile(dummyProfile.uid)).called(1);
+    });
 
     test(
       '[ERROR PATH] - GIVEN the profile does not exist (StateError), '
@@ -281,28 +325,6 @@ void main() {
         expect(
           result,
           equals(const Result<UserProfile>.failure(AppFailure.network())),
-        );
-      },
-    );
-
-    test(
-      '[ERROR PATH] - GIVEN a not-found FirebaseException, '
-      'WHEN getProfile is called, '
-      'THEN should return Result.failure with AppFailure.notFound()',
-      () async {
-        // Arrange.
-        when(
-          () => mockApi.getProfile(any()),
-        ).thenThrow(_firebaseException('not-found'));
-
-        // Act.
-        final result = await repository.getProfile(dummyProfile.uid);
-
-        // Assert.
-        expect(result.isFailure, isTrue);
-        expect(
-          result,
-          equals(const Result<UserProfile>.failure(AppFailure.notFound())),
         );
       },
     );

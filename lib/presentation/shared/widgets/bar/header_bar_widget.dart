@@ -1,9 +1,52 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
-class SectionHeader extends StatelessWidget {
-  const SectionHeader({super.key, required this.text});
+class SectionHeader extends StatefulWidget {
+  const SectionHeader({super.key, required this.text, this.onRefresh});
 
   final String text;
+  final Future<void> Function()? onRefresh;
+
+  @override
+  State<SectionHeader> createState() => _SectionHeaderState();
+}
+
+class _SectionHeaderState extends State<SectionHeader>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  bool _isRefreshing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleRefresh() async {
+    if (_isRefreshing) return;
+
+    setState(() => _isRefreshing = true);
+    unawaited(_controller.repeat());
+
+    await Future.wait([
+      widget.onRefresh?.call() ?? Future.value(),
+      Future.delayed(const Duration(milliseconds: 700)),
+    ]);
+
+    _controller.stop();
+    _controller.reset();
+    setState(() => _isRefreshing = false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,14 +56,36 @@ class SectionHeader extends StatelessWidget {
     return Container(
       width: double.infinity,
       color: colorScheme.primary,
-      padding: const EdgeInsets.symmetric(vertical: 12),
-      child: Text(
-        text,
-        textAlign: TextAlign.center,
-        style: textTheme.titleMedium?.copyWith(
-          color: colorScheme.onPrimary,
-          fontWeight: FontWeight.w700,
-        ),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Text(
+            widget.text,
+            textAlign: TextAlign.center,
+            style: textTheme.titleMedium?.copyWith(
+              color: colorScheme.onPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          if (widget.onRefresh != null)
+            Positioned(
+              right: 0,
+              child: GestureDetector(
+                onTap: _isRefreshing ? null : _handleRefresh,
+                child: RotationTransition(
+                  turns: _controller,
+                  child: Icon(
+                    Icons.refresh_rounded,
+                    color: colorScheme.onPrimary.withValues(
+                      alpha: _isRefreshing ? 0.5 : 1.0,
+                    ),
+                    size: 25,
+                  ),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
