@@ -96,7 +96,7 @@ class _PanicButtonState extends State<PanicButton>
   }
 
   /// Returns the color set for the current state.
-  _ButtonColors get _colors {
+  _ButtonColors _colors(bool isDark) {
     switch (widget.state) {
       case PanicButtonState.normal:
         return _ButtonColors(
@@ -107,18 +107,22 @@ class _PanicButtonState extends State<PanicButton>
           innerButtonCenter: const Color(0xFFFF1744),
           contentColor: Colors.white,
           shadowColor: const Color(0xFFFF1744).withValues(alpha: 0.5),
-          borderGlow: const Color(0xFFFF6D6D),
+          borderGlow: const Color(
+            0xFFFF6D6D,
+          ).withValues(alpha: isDark ? 0.2 : 1.0),
         );
       case PanicButtonState.disabled:
-        return const _ButtonColors(
-          outerRing: Color(0xFF9E9E9E),
+        return _ButtonColors(
+          outerRing: const Color(0xFF9E9E9E),
           outerRingGlow: Colors.transparent,
-          middleRing: Color(0xFF757575),
-          innerButton: Color(0xFF616161),
-          innerButtonCenter: Color(0xFF757575),
-          contentColor: Color(0xFFBDBDBD),
+          middleRing: const Color(0xFF757575),
+          innerButton: const Color(0xFF616161),
+          innerButtonCenter: const Color(0xFF757575),
+          contentColor: const Color(0xFFBDBDBD),
           shadowColor: Colors.transparent,
-          borderGlow: Color(0xFF9E9E9E),
+          borderGlow: const Color(
+            0xFF9E9E9E,
+          ).withValues(alpha: isDark ? 0.5 : 1.0),
         );
       case PanicButtonState.active:
         return _ButtonColors(
@@ -129,14 +133,17 @@ class _PanicButtonState extends State<PanicButton>
           innerButtonCenter: const Color(0xFFFF6D00),
           contentColor: Colors.white,
           shadowColor: const Color(0xFFFF6D00).withValues(alpha: 0.6),
-          borderGlow: const Color(0xFFFFAB40),
+          borderGlow: const Color(
+            0xFFFFAB40,
+          ).withValues(alpha: isDark ? 0.2 : 1.0),
         );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final colors = _colors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colors = _colors(isDark);
     final isDisabled = widget.state == PanicButtonState.disabled;
     final isActive = widget.state == PanicButtonState.active;
     final s = widget.size;
@@ -162,11 +169,17 @@ class _PanicButtonState extends State<PanicButton>
 
                 // Soft outer glow halo
                 Container(
-                  width: s * 1.25,
-                  height: s * 1.25,
+                  width: s * 1.4,
+                  height: s * 1.4,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: colors.outerRingGlow,
+                    gradient: RadialGradient(
+                      colors: [
+                        colors.outerRingGlow,
+                        colors.outerRingGlow.withValues(alpha: 0.0),
+                      ],
+                      stops: const [0.55, 1.0],
+                    ),
                   ),
                 ),
 
@@ -273,13 +286,13 @@ class _RingPainter extends CustomPainter {
     // Main border stroke
     final borderPaint = Paint()
       ..color = color
-      ..strokeWidth = 2.5
+      ..strokeWidth = 2.0
       ..style = PaintingStyle.stroke;
     canvas.drawCircle(center, radius - 2, borderPaint);
 
     // Decorative clock-style tick marks
     final tickPaint = Paint()
-      ..color = color.withValues(alpha: 0.6)
+      ..color = color.withValues(alpha: 0.5)
       ..strokeWidth = 1.5
       ..strokeCap = StrokeCap.round;
 
