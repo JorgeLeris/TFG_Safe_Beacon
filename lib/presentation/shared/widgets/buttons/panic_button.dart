@@ -81,8 +81,11 @@ class _PanicButtonState extends State<PanicButton>
       _pulseController.repeat(reverse: true);
       _ringController.repeat();
     } else {
-      _pulseController.stop();
-      _pulseController.reset();
+      _pulseController.animateTo(
+        0.0,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOut,
+      );
       _ringController.stop();
       _ringController.reset();
     }
@@ -286,7 +289,7 @@ class _RingPainter extends CustomPainter {
     // Main border stroke
     final borderPaint = Paint()
       ..color = color
-      ..strokeWidth = 2.0
+      ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
     canvas.drawCircle(center, radius - 2, borderPaint);
 
