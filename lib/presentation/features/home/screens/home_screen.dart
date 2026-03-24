@@ -14,7 +14,7 @@ class _HomeScreenState extends State<HomeScreen> {
   PanicButtonState _panicState = PanicButtonState.normal;
 
   void _handlePanicPressed() {
-    // TODO: Load first state with data from bd
+    // TODO: Load first state with data from bd (when loading, not permissions or not contacts state disabled)
     setState(() {
       if (_panicState == PanicButtonState.normal) {
         _panicState = PanicButtonState.active;
