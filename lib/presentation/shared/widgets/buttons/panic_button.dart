@@ -99,7 +99,7 @@ class _PanicButtonState extends State<PanicButton>
   }
 
   /// Returns the color set for the current state.
-  _ButtonColors _colors(bool isDark) {
+  _ButtonColors _colors() {
     switch (widget.state) {
       case PanicButtonState.normal:
         return _ButtonColors(
@@ -110,9 +110,7 @@ class _PanicButtonState extends State<PanicButton>
           innerButtonCenter: const Color(0xFFFF1744),
           contentColor: Colors.white,
           shadowColor: const Color(0xFFFF1744).withValues(alpha: 0.5),
-          borderGlow: const Color(
-            0xFFFF6D6D,
-          ).withValues(alpha: isDark ? 0.2 : 1.0),
+          borderGlow: const Color(0xFFFF6D6D).withValues(alpha: 0.2),
         );
       case PanicButtonState.disabled:
         return _ButtonColors(
@@ -123,9 +121,7 @@ class _PanicButtonState extends State<PanicButton>
           innerButtonCenter: const Color(0xFF757575),
           contentColor: const Color(0xFFBDBDBD),
           shadowColor: Colors.transparent,
-          borderGlow: const Color(
-            0xFF9E9E9E,
-          ).withValues(alpha: isDark ? 0.5 : 1.0),
+          borderGlow: const Color(0xFF9E9E9E).withValues(alpha: 0.5),
         );
       case PanicButtonState.active:
         return _ButtonColors(
@@ -136,17 +132,14 @@ class _PanicButtonState extends State<PanicButton>
           innerButtonCenter: const Color(0xFFFF6D00),
           contentColor: Colors.white,
           shadowColor: const Color(0xFFFF6D00).withValues(alpha: 0.6),
-          borderGlow: const Color(
-            0xFFFFAB40,
-          ).withValues(alpha: isDark ? 0.2 : 1.0),
+          borderGlow: const Color(0xFFFFAB40).withValues(alpha: 0.2),
         );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final colors = _colors(isDark);
+    final colors = _colors();
     final isDisabled = widget.state == PanicButtonState.disabled;
     final isActive = widget.state == PanicButtonState.active;
     final s = widget.size;
@@ -288,7 +281,7 @@ class _RingPainter extends CustomPainter {
 
     // Main border stroke
     final borderPaint = Paint()
-      ..color = color
+      ..color = color.withValues(alpha: 0.5)
       ..strokeWidth = 1.5
       ..style = PaintingStyle.stroke;
     canvas.drawCircle(center, radius - 2, borderPaint);
