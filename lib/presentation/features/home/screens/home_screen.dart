@@ -3,8 +3,28 @@ import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  PanicButtonState _panicState = PanicButtonState.normal;
+
+  void _handlePanicPressed() {
+    // TODO: Load first state with data from bd
+    setState(() {
+      if (_panicState == PanicButtonState.normal) {
+        _panicState = PanicButtonState.active;
+        // TODO: activate alarm and send notifications to trusted contacts
+      } else if (_panicState == PanicButtonState.active) {
+        _panicState = PanicButtonState.normal;
+        // TODO: deactivate alarm
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +38,7 @@ class HomeScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
         child: Column(
           children: [
+            // Contacts button
             SectionButton(
               icon: Icons.group_outlined,
               text: l10n.yourTrustedContacts,
@@ -25,6 +46,12 @@ class HomeScreen extends StatelessWidget {
               backgroundColor: colorScheme.secondary,
               contentColor: colorScheme.onSecondary,
             ),
+            const SizedBox(height: 20),
+
+            // Panic button
+            const Divider(),
+            PanicButton(state: _panicState, onPressed: _handlePanicPressed),
+            const Divider(),
           ],
         ),
       ),

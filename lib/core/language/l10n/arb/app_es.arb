@@ -122,5 +122,9 @@
   "deleteContactDescription": "Al eliminar a \"{username}\" de tus contactos de confianza, se perderá toda conexión con esta persona. Esta acción es permanente y no se puede deshacer.",
   "deleteContactErrorTitle": "Error al eliminar contacto",
   "sendRequestSuccessTitle": "Solicitud enviada",
-  "sendRequestSuccessDescription": "La solicitud ha sido enviada correctamente. Cuando el usuario la acepte, se establecerá la conexión."
+  "sendRequestSuccessDescription": "La solicitud ha sido enviada correctamente. Cuando el usuario la acepte, se establecerá la conexión.",
+  "deactivate": "Desactivar",
+  "sos": "SOS",
+  "emergency": "Emergencia",
+  "notAvailable": "No disponible"
 }

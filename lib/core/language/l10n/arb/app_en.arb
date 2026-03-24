@@ -122,5 +122,9 @@
   "deleteContactDescription": "By deleting \"{username}\" from your trusted contacts, all connection with this person will be lost. This action is permanent and cannot be undone.",
   "deleteContactErrorTitle": "Error deleting contact",
   "sendRequestSuccessTitle": "Request sent",
-  "sendRequestSuccessDescription": "The request has been sent successfully. When the user accepts it, the connection will be established."
+  "sendRequestSuccessDescription": "The request has been sent successfully. When the user accepts it, the connection will be established.",
+  "deactivate": "Deactivate",
+  "sos": "SOS",
+  "emergency": "Emergency",
+  "notAvailable": "Not available"
 }
