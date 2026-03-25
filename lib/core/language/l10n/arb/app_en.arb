@@ -126,5 +126,7 @@
   "deactivate": "Deactivate",
   "sos": "SOS",
   "emergency": "Emergency",
-  "notAvailable": "Not available"
+  "notAvailable": "Not available",
+  "panicButton": "Panic button",
+  "guardianMode": "Guardian mode"
 }

@@ -126,5 +126,7 @@
   "deactivate": "Désactiver",
   "sos": "SOS",
   "emergency": "Urgence",
-  "notAvailable": "Indisponible"
+  "notAvailable": "Indisponible",
+  "panicButton": "Bouton de panique",
+  "guardianMode": "Mode gardien"
 }

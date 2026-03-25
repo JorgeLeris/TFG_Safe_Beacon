@@ -52,6 +52,34 @@ class _HomeScreenState extends State<HomeScreen> {
             const Divider(),
             PanicButton(state: _panicState, onPressed: _handlePanicPressed),
             const Divider(),
+
+            const SizedBox(height: 20),
+
+            // Feature grid buttons
+            FeatureGridButtons(
+              items: [
+                FeatureGridItem(
+                  icon: Icons.crisis_alert_rounded,
+                  label: l10n.panicButton,
+                  onPressed: () {
+                    // TODO: navigate to panic button screen
+                  },
+                  backgroundColor: colorScheme.secondary,
+                  contentColor: colorScheme.onSecondary,
+                ),
+                FeatureGridItem(
+                  icon: Icons.location_on_outlined,
+                  label: l10n.guardianMode,
+                  onPressed: () {
+                    // TODO: navigate to guardian mode
+                  },
+                  backgroundColor: colorScheme.secondary,
+                  contentColor: colorScheme.onSecondary,
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 24),
           ],
         ),
       ),
