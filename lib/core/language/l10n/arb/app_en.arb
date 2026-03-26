@@ -140,5 +140,8 @@
   "deactivationPin": "Deactivation PIN",
   "deactivationPinDescription": "Add a PIN to deactivate the panic button and increase security.",
   "notAvailableYet": "Not available yet",
-  "futureUpdateContent": "This feature will be available in a future update."
+  "futureUpdateContent": "This feature will be available in a future update.",
+  "panicButtonCooldownTitle": "Wait a moment",
+  "panicButtonCooldownContent": "For your safety, the panic button can only be deactivated after 10 seconds. Just a little longer, please wait.",
+  "wait": "Wait"
 }

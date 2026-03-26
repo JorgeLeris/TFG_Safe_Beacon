@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
@@ -12,19 +14,67 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  // TODO: Load first state with data from bd (when loading, not permissions or not contacts state disabled)
   PanicButtonState _panicState = PanicButtonState.normal;
+  // TODO: Manage timer with db timestamp and actual time instead of in-memory timer
+  double _cooldownProgress = 1.0;
+  Timer? _cooldownTimer;
+  static const int _cooldownSeconds = 10;
+  int _elapsed = 0;
 
-  void _handlePanicPressed() {
-    // TODO: Load first state with data from bd (when loading, not permissions or not contacts state disabled)
-    setState(() {
-      if (_panicState == PanicButtonState.normal) {
-        _panicState = PanicButtonState.active;
-        // TODO: activate alarm and send notifications to trusted contacts
-      } else if (_panicState == PanicButtonState.active) {
-        _panicState = PanicButtonState.normal;
-        // TODO: deactivate alarm
+  @override
+  void dispose() {
+    _cooldownTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startCooldownTimer() {
+    _cooldownTimer?.cancel();
+    _elapsed = 0;
+
+    _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _elapsed++;
+
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+
+      setState(() {
+        _cooldownProgress = _elapsed / _cooldownSeconds;
+      });
+
+      if (_elapsed >= _cooldownSeconds) {
+        timer.cancel();
       }
     });
+  }
+
+  void _handlePanicPressed() {
+    if (_panicState == PanicButtonState.normal) {
+      setState(() {
+        _panicState = PanicButtonState.active;
+        _cooldownProgress = 0.0;
+        // TODO: activate alarm and send notifications to trusted contacts
+      });
+      _startCooldownTimer();
+    } else if (_panicState == PanicButtonState.active) {
+      if (_cooldownProgress < 1.0) {
+        final l10n = context.l10n;
+        CustomDialog.show(
+          context: context,
+          title: l10n.panicButtonCooldownTitle,
+          content: Text(l10n.panicButtonCooldownContent),
+          buttonText: l10n.accept,
+        );
+      } else {
+        setState(() {
+          _panicState = PanicButtonState.normal;
+          _cooldownProgress = 1.0;
+          // TODO: deactivate alarm
+        });
+      }
+    }
   }
 
   @override
@@ -51,7 +101,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // Panic button
             const Divider(),
-            PanicButton(state: _panicState, onPressed: _handlePanicPressed),
+            PanicButton(
+              state: _panicState,
+              onPressed: _handlePanicPressed,
+              cooldownProgress: _cooldownProgress,
+              secondsLeft: _cooldownSeconds - _elapsed,
+            ),
             const Divider(),
 
             const SizedBox(height: 20),
@@ -62,6 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 FeatureGridItem(
                   icon: Icons.crisis_alert_rounded,
                   label: l10n.panicButton,
+                  // TODO: update state of panic button when navigating back from panic button screen
                   onPressed: () => const PanicButtonRoute().push(context),
                   backgroundColor: colorScheme.secondary,
                   contentColor: colorScheme.onSecondary,

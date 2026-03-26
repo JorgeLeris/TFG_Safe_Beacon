@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
@@ -12,17 +14,65 @@ class PanicButtonScreen extends StatefulWidget {
 class _PanicButtonScreenState extends State<PanicButtonScreen> {
   // TODO: Load first state with data from bd (when loading, not permissions or not contacts state disabled)
   PanicButtonState _panicState = PanicButtonState.normal;
+  // TODO: Manage timer with db timestamp and actual time instead of in-memory timer
+  double _cooldownProgress = 1.0;
+  Timer? _cooldownTimer;
+  static const int _cooldownSeconds = 10;
+  int _elapsed = 0;
 
-  void _handlePanicPressed() {
-    setState(() {
-      if (_panicState == PanicButtonState.normal) {
-        _panicState = PanicButtonState.active;
-        // TODO: activate alarm and send notifications to trusted contacts
-      } else if (_panicState == PanicButtonState.active) {
-        _panicState = PanicButtonState.normal;
-        // TODO: deactivate alarm
+  @override
+  void dispose() {
+    _cooldownTimer?.cancel();
+    super.dispose();
+  }
+
+  void _startCooldownTimer() {
+    _cooldownTimer?.cancel();
+    _elapsed = 0;
+
+    _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _elapsed++;
+
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+
+      setState(() {
+        _cooldownProgress = _elapsed / _cooldownSeconds;
+      });
+
+      if (_elapsed >= _cooldownSeconds) {
+        timer.cancel();
       }
     });
+  }
+
+  void _handlePanicPressed() {
+    if (_panicState == PanicButtonState.normal) {
+      setState(() {
+        _panicState = PanicButtonState.active;
+        _cooldownProgress = 0.0;
+        // TODO: activate alarm and send notifications to trusted contacts
+      });
+      _startCooldownTimer();
+    } else if (_panicState == PanicButtonState.active) {
+      if (_cooldownProgress < 1.0) {
+        final l10n = context.l10n;
+        CustomDialog.show(
+          context: context,
+          title: l10n.panicButtonCooldownTitle,
+          content: Text(l10n.panicButtonCooldownContent),
+          buttonText: l10n.accept,
+        );
+      } else {
+        setState(() {
+          _panicState = PanicButtonState.normal;
+          _cooldownProgress = 1.0;
+          // TODO: deactivate alarm
+        });
+      }
+    }
   }
 
   void _showInfoDialog(BuildContext context, AppLocalizations l10n) {
@@ -91,6 +141,9 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
                     child: _PanicButtonCard(
                       state: _panicState,
                       onPanicPressed: _handlePanicPressed,
+                      cooldownProgress: _cooldownProgress,
+                      elapsed: _elapsed,
+                      cooldownSeconds: _cooldownSeconds,
                       l10n: l10n,
                       colorScheme: colorScheme,
                       textTheme: textTheme,
@@ -142,16 +195,22 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
 class _PanicButtonCard extends StatelessWidget {
   final PanicButtonState state;
   final VoidCallback onPanicPressed;
+  final double cooldownProgress;
   final AppLocalizations l10n;
   final ColorScheme colorScheme;
   final TextTheme textTheme;
+  final int elapsed;
+  final int cooldownSeconds;
 
   const _PanicButtonCard({
     required this.state,
     required this.onPanicPressed,
+    required this.cooldownProgress,
     required this.l10n,
     required this.colorScheme,
     required this.textTheme,
+    required this.elapsed,
+    required this.cooldownSeconds,
   });
 
   String get _statusLabel {
@@ -223,7 +282,12 @@ class _PanicButtonCard extends StatelessWidget {
 
             // Panic button widget centered
             Center(
-              child: PanicButton(state: state, onPressed: onPanicPressed),
+              child: PanicButton(
+                state: state,
+                onPressed: onPanicPressed,
+                cooldownProgress: cooldownProgress,
+                secondsLeft: cooldownSeconds - elapsed,
+              ),
             ),
           ],
         ),
