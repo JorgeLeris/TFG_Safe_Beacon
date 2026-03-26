@@ -138,63 +138,69 @@ class _ControlScreenState extends State<ControlScreen> {
 
     return Scaffold(
       appBar: const CustomAppBar(),
-      body: BlocBuilder<ControlCubit, ControlState>(
-        builder: (context, state) {
-          return Column(
-            children: [
-              SectionHeader(
-                text: l10n.headerControl,
-                onRefresh: () =>
-                    context.read<ControlCubit>().loadReceivedRequestsCount(),
-              ),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        behavior: HitTestBehavior.opaque,
+        child: BlocBuilder<ControlCubit, ControlState>(
+          builder: (context, state) {
+            return Column(
+              children: [
+                SectionHeader(
+                  text: l10n.headerControl,
+                  onRefresh: () =>
+                      context.read<ControlCubit>().loadReceivedRequestsCount(),
+                ),
 
-              // Section 1: contacts button
-              Container(
-                width: double.infinity,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.05)
-                    : colorScheme.surfaceContainerHigh.withValues(alpha: 0.30),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 16,
+                // Section 1: contacts button
+                Container(
+                  width: double.infinity,
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.05)
+                      : colorScheme.surfaceContainerHigh.withValues(
+                          alpha: 0.30,
+                        ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SectionButton(
+                        icon: Icons.group_outlined,
+                        text: l10n.yourProtectedPeople,
+                        onPressed: () {
+                          const ProtectedPeopleRoute().push(context).then((_) {
+                            if (context.mounted) {
+                              context
+                                  .read<ControlCubit>()
+                                  .loadReceivedRequestsCount();
+                            }
+                          });
+                        },
+                        backgroundColor: colorScheme.secondary,
+                        contentColor: colorScheme.onSecondary,
+                        notificationCount: state.receivedRequestsCount,
+                      ),
+                    ],
+                  ),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SectionButton(
-                      icon: Icons.group_outlined,
-                      text: l10n.yourProtectedPeople,
-                      onPressed: () {
-                        const ProtectedPeopleRoute().push(context).then((_) {
-                          if (context.mounted) {
-                            context
-                                .read<ControlCubit>()
-                                .loadReceivedRequestsCount();
-                          }
-                        });
-                      },
-                      backgroundColor: colorScheme.secondary,
-                      contentColor: colorScheme.onSecondary,
-                      notificationCount: state.receivedRequestsCount,
-                    ),
-                  ],
-                ),
-              ),
 
-              // Section 2: tabs
-              Expanded(
-                child: CustomTabView(
-                  tabs: [l10n.alerts, l10n.followUps, l10n.history],
-                  children: [
-                    _buildAlertsList(context, l10n),
-                    const Placeholder(),
-                    const Placeholder(),
-                  ],
+                // Section 2: tabs
+                Expanded(
+                  child: CustomTabView(
+                    tabs: [l10n.alerts, l10n.followUps, l10n.history],
+                    children: [
+                      _buildAlertsList(context, l10n),
+                      const Placeholder(),
+                      const Placeholder(),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }
