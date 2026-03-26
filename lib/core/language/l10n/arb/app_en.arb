@@ -128,5 +128,17 @@
   "emergency": "Emergency",
   "notAvailable": "Not available",
   "panicButton": "Panic button",
-  "guardianMode": "Guardian mode"
+  "guardianMode": "Guardian mode",
+  "panicButtonInfoContent": "This feature sends immediate alerts to your trusted contacts with your current location. Use it only in emergency situations.",
+  "addPanicButtonToDevice": "Add panic button to device",
+  "panicButtonStatusStandby": "Standby",
+  "panicButtonStatusActive": "Active",
+  "panicButtonStatusDisabled": "Disabled",
+  "customization": "Customization",
+  "featuresSettings": "Features settings",
+  "featuresSettingsDescription": "Enable and disable the panic button or access customization settings.",
+  "deactivationPin": "Deactivation PIN",
+  "deactivationPinDescription": "Add a PIN to deactivate the panic button and increase security.",
+  "notAvailableYet": "Not available yet",
+  "futureUpdateContent": "This feature will be available in a future update."
 }

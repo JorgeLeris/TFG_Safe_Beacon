@@ -127,6 +127,18 @@
   "sos": "SOS",
   "emergency": "Emergencia",
   "notAvailable": "No disponible",
-  "panicButton": "Botón de pánico",
-  "guardianMode": "Modo guardián"
+  "panicButton": "Botón del pánico",
+  "guardianMode": "Modo guardián",
+  "panicButtonInfoContent": "Esta función envía alertas inmediatas a tus contactos de confianza con tu ubicación actual. Utilízala únicamente en situaciones de emergencia.",
+  "addPanicButtonToDevice": "Añadir botón del pánico al dispositivo",
+  "panicButtonStatusStandby": "En espera",
+  "panicButtonStatusActive": "Activado",
+  "panicButtonStatusDisabled": "Deshabilitado",
+  "customization": "Personalización",
+  "featuresSettings": "Configuración de funcionalidades",
+  "featuresSettingsDescription": "Habilita y deshabilita el botón del pánico o accede a las configuraciones de personalización.",
+  "deactivationPin": "PIN de desactivación",
+  "deactivationPinDescription": "Añade un PIN para desactivar el botón del pánico y así aumentar la seguridad.",
+  "notAvailableYet": "No disponible todavía",
+  "futureUpdateContent": "Esta función estará disponible en una próxima actualización."
 }

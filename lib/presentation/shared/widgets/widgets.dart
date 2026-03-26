@@ -12,4 +12,5 @@ export 'package:safe_beacon/presentation/shared/widgets/inputs/input_field_widge
 export 'package:safe_beacon/presentation/shared/widgets/inputs/search_input_field_widget.dart';
 export 'package:safe_beacon/presentation/shared/widgets/others/copyable_code_field.dart';
 export 'package:safe_beacon/presentation/shared/widgets/others/empty_state_view.dart';
+export 'package:safe_beacon/presentation/shared/widgets/others/settings_option_list.dart';
 export 'package:safe_beacon/presentation/shared/widgets/others/user_list_item.dart';

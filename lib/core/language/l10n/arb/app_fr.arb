@@ -128,5 +128,17 @@
   "emergency": "Urgence",
   "notAvailable": "Indisponible",
   "panicButton": "Bouton de panique",
-  "guardianMode": "Mode gardien"
+  "guardianMode": "Mode gardien",
+  "panicButtonInfoContent": "Cette fonctionnalité envoie des alertes immédiates à vos contacts de confiance avec votre position actuelle. Utilisez-la uniquement en cas d'urgence.",
+  "addPanicButtonToDevice": "Ajouter le bouton de panique à l'appareil",
+  "panicButtonStatusStandby": "En attente",
+  "panicButtonStatusActive": "Activé",
+  "panicButtonStatusDisabled": "Désactivé",
+  "customization": "Personnalisation",
+  "featuresSettings": "Paramètres des fonctionnalités",
+  "featuresSettingsDescription": "Activez et désactivez le bouton de panique ou accédez aux paramètres de personnalisation.",
+  "deactivationPin": "PIN de désactivation",
+  "deactivationPinDescription": "Ajoutez un PIN pour désactiver le bouton de panique et ainsi augmenter la sécurité.",
+  "notAvailableYet": "Pas encore disponible",
+  "futureUpdateContent": "Cette fonctionnalité sera disponible dans une prochaine mise à jour."
 }
