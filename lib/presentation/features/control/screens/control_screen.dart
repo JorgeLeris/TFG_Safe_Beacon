@@ -13,11 +13,122 @@ class ControlScreen extends StatefulWidget {
 }
 
 class _ControlScreenState extends State<ControlScreen> {
+  final Key _alertsSearchKey = UniqueKey();
+  String _alertsQuery = '';
+
+  // ---------------------------------------------------------------------------
+  // TODO: replace _mockedAlerts with real data from cubit/bloc
+  // Mocked alerts data
+  // ---------------------------------------------------------------------------
+
+  final List<AlertItem> _mockedAlerts = [
+    AlertItem(
+      alertType: 'Alerta botón del pánico',
+      username: 'maria_garcia',
+      isActive: true,
+      dateTime: DateTime(2025, 6, 12, 14, 32),
+    ),
+    AlertItem(
+      alertType: 'Alerta botón del pánico',
+      username: 'carlos_lopez',
+      isActive: false,
+      dateTime: DateTime(2025, 6, 10, 9, 15),
+    ),
+    AlertItem(
+      alertType: 'Alerta botón del pánico',
+      username: 'ana_martinez',
+      isActive: true,
+      dateTime: DateTime(2025, 6, 11, 22, 48),
+    ),
+  ];
+
+  final bool mockedHasError = false;
+
+  // ---------------------------------------------------------------------------
+  // Lifecycle
+  // ---------------------------------------------------------------------------
+
   @override
   void initState() {
     super.initState();
     context.read<ControlCubit>().loadReceivedRequestsCount();
   }
+
+  // ---------------------------------------------------------------------------
+  // Tab — Alerts
+  // ---------------------------------------------------------------------------
+
+  Widget _buildAlertsList(BuildContext context, AppLocalizations l10n) {
+    final bool isEmpty = _mockedAlerts.isEmpty;
+
+    if (mockedHasError) {
+      return EmptyStateView(
+        type: EmptyStateType.error,
+        title: l10n.errorTitle,
+        description: l10n.errorDescription,
+      );
+    }
+
+    if (isEmpty) {
+      return EmptyStateView(
+        type: EmptyStateType.empty,
+        title: l10n.noAlertsTitle,
+        description: l10n.noAlertsDescription,
+      );
+    }
+
+    final filtered = _alertsQuery.isEmpty
+        ? _mockedAlerts
+        : _mockedAlerts
+              .where(
+                (a) => a.username.toLowerCase().contains(
+                  _alertsQuery.toLowerCase(),
+                ),
+              )
+              .toList();
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: Column(
+        children: [
+          SearchInputField(
+            key: _alertsSearchKey,
+            hint: l10n.searchContact,
+            onChanged: (q) => setState(() => _alertsQuery = q),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4),
+            child: Divider(height: 30),
+          ),
+          if (filtered.isEmpty)
+            EmptyStateView(
+              type: EmptyStateType.noResults,
+              title: l10n.noResultsTitle,
+              description: l10n.noResultsDescription,
+            )
+          else
+            ...filtered.map(
+              (alert) => Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: AlertListItem(
+                  alert: alert,
+                  onTap: () {
+                    // TODO: navigate to alert detail
+                  },
+                  onProfileTap: () {
+                    // TODO: navigate to user profile
+                  },
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Build
+  // ---------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -43,11 +154,9 @@ class _ControlScreenState extends State<ControlScreen> {
                 color: isDark
                     ? Colors.white.withValues(alpha: 0.05)
                     : colorScheme.surfaceContainerHigh.withValues(alpha: 0.30),
-                padding: const EdgeInsets.only(
-                  left: 24,
-                  right: 24,
-                  top: 16,
-                  bottom: 24,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +186,7 @@ class _ControlScreenState extends State<ControlScreen> {
                 child: CustomTabView(
                   tabs: [l10n.alerts, l10n.followUps, l10n.history],
                   children: [
-                    const Placeholder(),
+                    _buildAlertsList(context, l10n),
                     const Placeholder(),
                     const Placeholder(),
                   ],

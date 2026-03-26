@@ -143,5 +143,9 @@
   "futureUpdateContent": "Cette fonctionnalité sera disponible dans une prochaine mise à jour.",
   "panicButtonCooldownTitle": "Patientez un moment",
   "panicButtonCooldownContent": "Pour votre sécurité, le bouton de panique ne peut être désactivé qu'après 10 secondes. Encore un petit moment, veuillez patienter.",
-  "wait": "Attendez"
+  "wait": "Attendez",
+  "noAlertsTitle": "Pas encore d'alertes",
+  "noAlertsDescription": "Lorsqu'une alerte est déclenchée, elle apparaîtra ici pour que vous puissiez la consulter et effectuer un suivi.",
+  "activeAlert": "Alerte active",
+  "inactiveAlert": "Alerte désactivée"
 }
