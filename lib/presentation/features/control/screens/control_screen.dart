@@ -13,7 +13,7 @@ class ControlScreen extends StatefulWidget {
 }
 
 class _ControlScreenState extends State<ControlScreen> {
-  final Key _alertsSearchKey = UniqueKey();
+  Key _alertsSearchKey = UniqueKey();
   String _alertsQuery = '';
 
   // ---------------------------------------------------------------------------
@@ -52,6 +52,14 @@ class _ControlScreenState extends State<ControlScreen> {
   void initState() {
     super.initState();
     context.read<ControlCubit>().loadReceivedRequestsCount();
+  }
+
+  void _onTabChanged(int index) {
+    setState(() {
+      _alertsSearchKey = UniqueKey();
+      _alertsQuery = '';
+    });
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 
   // ---------------------------------------------------------------------------
@@ -190,6 +198,7 @@ class _ControlScreenState extends State<ControlScreen> {
                 Expanded(
                   child: CustomTabView(
                     tabs: [l10n.alerts, l10n.followUps, l10n.history],
+                    onTabChanged: _onTabChanged,
                     children: [
                       _buildAlertsList(context, l10n),
                       const Placeholder(),
