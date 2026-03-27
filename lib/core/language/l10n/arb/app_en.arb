@@ -147,5 +147,30 @@
   "noAlertsTitle": "No alerts yet",
   "noAlertsDescription": "When an alert is triggered, it will appear here for you to review and follow up.",
   "activeAlert": "Active alert",
-  "inactiveAlert": "Inactive alert"
+  "inactiveAlert": "Inactive alert",
+  "filterAlertsTitle": "Filter alerts",
+  "filterByStatus": "By status:",
+  "allMasculine": "All",
+  "disabledAlerts": "Disabled alerts",
+  "activeAlerts": "Active alerts",
+  "filterByFunctionality": "By functionality:",
+  "allFeminine": "All",
+  "clearFilters": "Clear filters",
+  "filter": "Filter",
+  "alertsReceivedCount": "Alerts received: {count}",
+  "@alertsReceivedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "alertOfFeature": "Alert of: {feature}",
+  "@alertOfFeature": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  }
 }

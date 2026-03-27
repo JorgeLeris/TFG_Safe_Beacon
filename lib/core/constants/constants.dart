@@ -11,4 +11,10 @@ abstract final class Constants {
 
   /// Regular expression for validating email addresses.
   static final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+
+  /// Panic Button alert type key.
+  static const String panicButtonAlertTypeKey = 'panic_button';
+
+  /// Guardian Mode alert type key.
+  static const String guardianModeAlertTypeKey = 'guardian_mode';
 }

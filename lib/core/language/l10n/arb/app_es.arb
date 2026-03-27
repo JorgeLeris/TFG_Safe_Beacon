@@ -147,5 +147,30 @@
   "noAlertsTitle": "Aún no hay alertas",
   "noAlertsDescription": "Cuando se active una alerta, aparecerá aquí para que puedas revisarla y hacer seguimiento.",
   "activeAlert": "Alerta activa",
-  "inactiveAlert": "Alerta desactivada"
+  "inactiveAlert": "Alerta desactivada",
+  "filterAlertsTitle": "Filtrar alertas",
+  "filterByStatus": "Por estado:",
+  "allMasculine": "Todos",
+  "disabledAlerts": "Alertas desactivadas",
+  "activeAlerts": "Alertas activas",
+  "filterByFunctionality": "Por funcionalidad:",
+  "allFeminine": "Todas",
+  "clearFilters": "Limpiar filtros",
+  "filter": "Filtrar",
+  "alertsReceivedCount": "Alertas recibidas: {count}",
+  "@alertsReceivedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "alertOfFeature": "Alerta del: {feature}",
+  "@alertOfFeature": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  }
 }

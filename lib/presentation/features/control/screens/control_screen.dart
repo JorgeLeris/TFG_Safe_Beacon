@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
 import 'package:safe_beacon/presentation/features/control/cubits/control_cubit.dart';
+import 'package:safe_beacon/presentation/features/control/widgets/alert_list_header.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class ControlScreen extends StatefulWidget {
@@ -16,26 +18,28 @@ class _ControlScreenState extends State<ControlScreen> {
   Key _alertsSearchKey = UniqueKey();
   String _alertsQuery = '';
 
+  // Current filters applied to the alerts list
+  AlertFilters _alertFilters = const AlertFilters();
+
   // ---------------------------------------------------------------------------
   // TODO: replace _mockedAlerts with real data from cubit/bloc
-  // Mocked alerts data
   // ---------------------------------------------------------------------------
 
   final List<AlertItem> _mockedAlerts = [
     AlertItem(
-      alertType: 'Alerta botón del pánico',
+      alertType: Constants.panicButtonAlertTypeKey,
       username: 'maria_garcia',
       isActive: true,
       dateTime: DateTime(2025, 6, 12, 14, 32),
     ),
     AlertItem(
-      alertType: 'Alerta botón del pánico',
+      alertType: Constants.panicButtonAlertTypeKey,
       username: 'carlos_lopez',
       isActive: false,
       dateTime: DateTime(2025, 6, 10, 9, 15),
     ),
     AlertItem(
-      alertType: 'Alerta botón del pánico',
+      alertType: Constants.panicButtonAlertTypeKey,
       username: 'ana_martinez',
       isActive: true,
       dateTime: DateTime(2025, 6, 11, 22, 48),
@@ -63,6 +67,52 @@ class _ControlScreenState extends State<ControlScreen> {
   }
 
   // ---------------------------------------------------------------------------
+  // Filter helpers
+  // ---------------------------------------------------------------------------
+
+  List<AlertItem> _applyFilters(List<AlertItem> alerts) {
+    return alerts.where((alert) {
+      // Status filter
+      final passesStatus = switch (_alertFilters.status) {
+        AlertStatusFilter.all => true,
+        AlertStatusFilter.active => alert.isActive,
+        AlertStatusFilter.inactive => !alert.isActive,
+      };
+
+      // Functionality filter
+      final passesFunctionality = switch (_alertFilters.functionality) {
+        AlertFunctionalityFilter.all => true,
+        AlertFunctionalityFilter.panicButton =>
+          alert.alertType == Constants.panicButtonAlertTypeKey,
+        AlertFunctionalityFilter.guardianMode =>
+          alert.alertType == Constants.guardianModeAlertTypeKey,
+      };
+
+      return passesStatus && passesFunctionality;
+    }).toList();
+  }
+
+  String _getAlertTypeLabel(String alertTypeKey, AppLocalizations l10n) {
+    return switch (alertTypeKey) {
+      Constants.panicButtonAlertTypeKey => l10n.alertOfFeature(
+        l10n.panicButton,
+      ),
+      Constants.guardianModeAlertTypeKey => l10n.alertOfFeature(
+        l10n.guardianMode,
+      ),
+      _ => alertTypeKey,
+    };
+  }
+
+  void _openFilterDialog() {
+    AlertFilterDialog.show(
+      context: context,
+      initialFilters: _alertFilters,
+      onApply: (filters) => setState(() => _alertFilters = filters),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
   // Tab — Alerts
   // ---------------------------------------------------------------------------
 
@@ -85,9 +135,11 @@ class _ControlScreenState extends State<ControlScreen> {
       );
     }
 
+    // Apply active filters, then the search query
+    final afterFilters = _applyFilters(_mockedAlerts);
     final filtered = _alertsQuery.isEmpty
-        ? _mockedAlerts
-        : _mockedAlerts
+        ? afterFilters
+        : afterFilters
               .where(
                 (a) => a.username.toLowerCase().contains(
                   _alertsQuery.toLowerCase(),
@@ -99,15 +151,27 @@ class _ControlScreenState extends State<ControlScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
         children: [
+          // Counter + filter button
+          AlertsListHeader(
+            alertCount: afterFilters.length,
+            activeFilterCount: _alertFilters.activeCount,
+            onFilterTap: _openFilterDialog,
+          ),
+
+          const SizedBox(height: 12),
+
+          // Search field
           SearchInputField(
             key: _alertsSearchKey,
             hint: l10n.searchContact,
             onChanged: (q) => setState(() => _alertsQuery = q),
           ),
+
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 4),
             child: Divider(height: 30),
           ),
+
           if (filtered.isEmpty)
             EmptyStateView(
               type: EmptyStateType.noResults,
@@ -119,7 +183,13 @@ class _ControlScreenState extends State<ControlScreen> {
               (alert) => Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: AlertListItem(
-                  alert: alert,
+                  alert: AlertItem(
+                    alertType: _getAlertTypeLabel(alert.alertType, l10n),
+                    username: alert.username,
+                    profilePhoto: alert.profilePhoto,
+                    isActive: alert.isActive,
+                    dateTime: alert.dateTime,
+                  ),
                   onTap: () {
                     // TODO: navigate to alert detail
                   },
