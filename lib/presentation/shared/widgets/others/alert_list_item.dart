@@ -86,7 +86,10 @@ class AlertListItem extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: colorScheme.primary),
+              border: Border.all(
+                color: colorScheme.onSurface.withValues(alpha: 0.15),
+                width: 1.25,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.15),
@@ -107,10 +110,15 @@ class AlertListItem extends StatelessWidget {
 
         // Content column
         Expanded(
-          child: Container(
-            decoration: BoxDecoration(
-              color: colorScheme.secondary,
+          child: Card(
+            elevation: 2,
+            color: colorScheme.surfaceContainerLowest,
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(14),
+              side: BorderSide(
+                color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                width: 0.75,
+              ),
             ),
             child: Material(
               color: Colors.transparent,
@@ -134,7 +142,7 @@ class AlertListItem extends StatelessWidget {
                             Text(
                               alert.alertType,
                               style: textTheme.bodySmall?.copyWith(
-                                color: colorScheme.onSecondary,
+                                color: colorScheme.onSurface,
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
@@ -145,7 +153,7 @@ class AlertListItem extends StatelessWidget {
                             Text(
                               alert.username.capitalized(),
                               style: textTheme.titleSmall?.copyWith(
-                                color: colorScheme.onSecondary,
+                                color: colorScheme.onSurface,
                                 fontWeight: FontWeight.w700,
                                 fontSize: 15,
                               ),
@@ -170,7 +178,7 @@ class AlertListItem extends StatelessWidget {
                                 Text(
                                   '•',
                                   style: TextStyle(
-                                    color: colorScheme.onSecondary,
+                                    color: colorScheme.onSurface,
                                     fontWeight: FontWeight.w400,
                                     fontSize: 12,
                                   ),
@@ -180,7 +188,7 @@ class AlertListItem extends StatelessWidget {
                                   child: Text(
                                     'Fecha: $dateStr',
                                     style: textTheme.bodySmall?.copyWith(
-                                      color: colorScheme.onSecondary,
+                                      color: colorScheme.onSurface,
                                       fontWeight: FontWeight.w400,
                                     ),
                                   ),
@@ -196,7 +204,7 @@ class AlertListItem extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 20, left: 8),
                         child: Icon(
                           Icons.arrow_forward_ios_rounded,
-                          color: colorScheme.onSecondary,
+                          color: colorScheme.tertiary,
                           size: 22,
                         ),
                       ),
