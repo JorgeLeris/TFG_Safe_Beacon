@@ -172,5 +172,60 @@
         "type": "String"
       }
     }
-  }
+  },
+  "alertDetailHeader": "Alerta de {username}",
+  "@alertDetailHeader": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "activeAlertOfUser": "Alerta activa de {username}",
+  "@activeAlertOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "inactiveAlertOfUser": "Alerta desactivada de {username}",
+  "@inactiveAlertOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "activationDate": "Fecha de activación de la alerta: {date}",
+  "@activationDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDataSection": "DATOS DE LA ALERTA",
+  "activationDateLabel": "Fecha de activación:",
+  "locationOnActivationSection": "UBICACIÓN EN LA ACTIVACIÓN",
+  "contactSection": "CONTACTAR",
+  "startChatWith": "Iniciar un chat con {username}",
+  "@startChatWith": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDetailsTitle": "Detalles de la alerta",
+  "alertGeneratorUser": "Usuario generador de la alerta",
+  "alertType": "Tipo de alerta",
+  "status": "Estado",
+  "activationDateDetail": "Fecha de activación",
+  "activationTimeDetail": "Hora de activación",
+  "batteryOnActivation": "Batería en la activación",
+  "deactivationDataTitle": "Datos desactivación",
+  "deactivationReason": "Motivo",
+  "timeActive": "Tiempo activa",
+  "mapPlaceholder": "Mapa no disponible"
 }

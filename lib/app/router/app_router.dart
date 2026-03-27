@@ -126,6 +126,7 @@ GoRouter buildAppRouter() {
       $trustedContactsRoute,
       $protectedPeopleRoute,
       $panicButtonRoute,
+      $alertDetailRoute,
       ...mockRoutes,
     ],
   );

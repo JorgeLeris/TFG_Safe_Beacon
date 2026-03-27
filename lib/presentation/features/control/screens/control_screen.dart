@@ -4,6 +4,7 @@ import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
 import 'package:safe_beacon/presentation/features/control/cubits/control_cubit.dart';
+import 'package:safe_beacon/presentation/features/control/routes/control_routes.dart';
 import 'package:safe_beacon/presentation/features/control/widgets/alert_list_header.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
@@ -205,7 +206,7 @@ class _ControlScreenState extends State<ControlScreen> {
                     dateTime: alert.dateTime,
                   ),
                   onTap: () {
-                    // TODO: navigate to alert detail
+                    const AlertDetailRoute().push(context);
                   },
                   onProfileTap: () {
                     // TODO: navigate to user profile

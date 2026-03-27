@@ -172,5 +172,60 @@
         "type": "String"
       }
     }
-  }
+  },
+  "alertDetailHeader": "Alert of {username}",
+  "@alertDetailHeader": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "activeAlertOfUser": "Active alert of {username}",
+  "@activeAlertOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "inactiveAlertOfUser": "Inactive alert of {username}",
+  "@inactiveAlertOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "activationDate": "Activation date of the alert: {date}",
+  "@activationDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDataSection": "ALERT DATA",
+  "activationDateLabel": "Activation date:",
+  "locationOnActivationSection": "LOCATION ON ACTIVATION",
+  "contactSection": "CONTACT",
+  "startChatWith": "Start a chat with {username}",
+  "@startChatWith": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDetailsTitle": "Alert details",
+  "alertGeneratorUser": "Alert generator user",
+  "alertType": "Alert type",
+  "status": "Status",
+  "activationDateDetail": "Activation date",
+  "activationTimeDetail": "Activation time",
+  "batteryOnActivation": "Battery on activation",
+  "deactivationDataTitle": "Deactivation data",
+  "deactivationReason": "Reason",
+  "timeActive": "Time active",
+  "mapPlaceholder": "Map not available"
 }
