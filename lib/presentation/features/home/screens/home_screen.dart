@@ -68,11 +68,23 @@ class _HomeScreenState extends State<HomeScreen> {
           buttonText: l10n.accept,
         );
       } else {
-        setState(() {
-          _panicState = PanicButtonState.normal;
-          _cooldownProgress = 1.0;
-          // TODO: deactivate alarm
-        });
+        final l10n = context.l10n;
+        CustomDialog.show(
+          context: context,
+          title: l10n.panicButtonDeactivateTitle,
+          content: Text(l10n.panicButtonDeactivateContent),
+          buttonText: l10n.panicButtonDeactivate,
+          onInputButtonPressed: (_) {
+            Navigator.of(context, rootNavigator: true).pop();
+            setState(() {
+              _panicState = PanicButtonState.normal;
+              _cooldownProgress = 1.0;
+              // TODO: deactivate alarm
+            });
+          },
+          secondButtonText: l10n.cancel,
+          inputHint: l10n.panicButtonDeactivateReasonHint,
+        );
       }
     }
   }
