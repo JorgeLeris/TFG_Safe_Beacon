@@ -17,6 +17,7 @@ class ControlScreen extends StatefulWidget {
 class _ControlScreenState extends State<ControlScreen> {
   Key _alertsSearchKey = UniqueKey();
   String _alertsQuery = '';
+  bool _isApplyingFilters = false;
 
   // Current filters applied to the alerts list
   AlertFilters _alertFilters = const AlertFilters();
@@ -104,11 +105,23 @@ class _ControlScreenState extends State<ControlScreen> {
     };
   }
 
+  void _applyFiltersWithLoading(AlertFilters filters) {
+    setState(() => _isApplyingFilters = true);
+
+    Future.delayed(const Duration(milliseconds: 700), () {
+      if (!mounted) return;
+      setState(() {
+        _alertFilters = filters;
+        _isApplyingFilters = false;
+      });
+    });
+  }
+
   void _openFilterDialog() {
     AlertFilterDialog.show(
       context: context,
       initialFilters: _alertFilters,
-      onApply: (filters) => setState(() => _alertFilters = filters),
+      onApply: _applyFiltersWithLoading,
     );
   }
 
@@ -117,6 +130,10 @@ class _ControlScreenState extends State<ControlScreen> {
   // ---------------------------------------------------------------------------
 
   Widget _buildAlertsList(BuildContext context, AppLocalizations l10n) {
+    if (_isApplyingFilters) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
     final bool isEmpty = _mockedAlerts.isEmpty;
 
     if (mockedHasError) {
