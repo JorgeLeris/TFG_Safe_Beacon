@@ -17,7 +17,6 @@ class ControlScreen extends StatefulWidget {
 class _ControlScreenState extends State<ControlScreen> {
   Key _alertsSearchKey = UniqueKey();
   String _alertsQuery = '';
-  bool _isApplyingFilters = false;
 
   // Current filters applied to the alerts list
   AlertFilters _alertFilters = const AlertFilters();
@@ -105,16 +104,10 @@ class _ControlScreenState extends State<ControlScreen> {
     };
   }
 
-  void _applyFiltersWithLoading(AlertFilters filters) {
-    setState(() => _isApplyingFilters = true);
-
-    Future.delayed(const Duration(milliseconds: 700), () {
-      if (!mounted) return;
-      setState(() {
-        _alertFilters = filters;
-        _isApplyingFilters = false;
-      });
-    });
+  Future<void> _applyFiltersWithLoading(AlertFilters filters) async {
+    await context.read<ControlCubit>().applyFiltersWithLoading();
+    if (!mounted) return;
+    setState(() => _alertFilters = filters);
   }
 
   void _openFilterDialog() {
@@ -129,8 +122,12 @@ class _ControlScreenState extends State<ControlScreen> {
   // Tab — Alerts
   // ---------------------------------------------------------------------------
 
-  Widget _buildAlertsList(BuildContext context, AppLocalizations l10n) {
-    if (_isApplyingFilters) {
+  Widget _buildAlertsList(
+    BuildContext context,
+    AppLocalizations l10n,
+    bool isApplyingFilters,
+  ) {
+    if (isApplyingFilters) {
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -287,7 +284,7 @@ class _ControlScreenState extends State<ControlScreen> {
                     tabs: [l10n.alerts, l10n.followUps, l10n.history],
                     onTabChanged: _onTabChanged,
                     children: [
-                      _buildAlertsList(context, l10n),
+                      _buildAlertsList(context, l10n, state.isApplyingFilters),
                       const Placeholder(),
                       const Placeholder(),
                     ],

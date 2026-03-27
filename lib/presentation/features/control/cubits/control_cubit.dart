@@ -18,6 +18,13 @@ class ControlCubit extends Cubit<ControlState> {
   final String _uid;
   final ContactRequestRepository _contactRequestRepository;
 
+  /// Simulates a short loading state while applying alert filters.
+  Future<void> applyFiltersWithLoading() async {
+    emit(state.copyWith(isApplyingFilters: true));
+    await Future.delayed(const Duration(milliseconds: 700));
+    emit(state.copyWith(isApplyingFilters: false));
+  }
+
   /// Loads the count of pending contact requests received by the current user.
   Future<void> loadReceivedRequestsCount() async {
     emit(state.copyWith(isLoadingCount: true, countFailure: null));

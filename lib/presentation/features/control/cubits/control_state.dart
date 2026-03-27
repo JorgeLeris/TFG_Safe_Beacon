@@ -4,6 +4,7 @@ part of 'control_cubit.dart';
 abstract class ControlState with _$ControlState {
   const factory ControlState({
     @Default(false) bool isLoadingCount,
+    @Default(false) bool isApplyingFilters,
     @Default(0) int receivedRequestsCount,
     AppFailure? countFailure,
   }) = _ControlState;
