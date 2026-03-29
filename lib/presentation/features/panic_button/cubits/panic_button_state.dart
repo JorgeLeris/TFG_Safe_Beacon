@@ -1,5 +1,17 @@
 part of 'panic_button_cubit.dart';
 
+/// Reason the panic button is in [PanicButtonState.disabled].
+enum DisabledReason {
+  /// User has no trusted contacts.
+  noTrustedContacts,
+
+  /// Location permission was denied but can still be requested via the OS dialog.
+  locationPermissionDenied,
+
+  /// Location permission was permanently denied; the user must open app settings.
+  locationPermissionDeniedForever,
+}
+
 @freezed
 abstract class PanicButtonCubitState with _$PanicButtonCubitState {
   const factory PanicButtonCubitState({
@@ -13,7 +25,10 @@ abstract class PanicButtonCubitState with _$PanicButtonCubitState {
     @Default(false) bool isDeactivating,
 
     /// Current logical state of the panic button.
-    @Default(PanicButtonState.normal) PanicButtonState buttonState,
+    @Default(PanicButtonState.loading) PanicButtonState buttonState,
+
+    /// Why the button is disabled, when [buttonState] is [PanicButtonState.disabled].
+    DisabledReason? disabledReason,
 
     /// When the current active alert was created.
     DateTime? activeAlertActivatedAt,
@@ -26,5 +41,8 @@ abstract class PanicButtonCubitState with _$PanicButtonCubitState {
 
     /// Failure from the last [deactivateAlert] call.
     AppFailure? deactivateFailure,
+
+    /// True if the user has denied location permission at least once in this session.
+    @Default(false) bool permissionRequestDenied,
   }) = _PanicButtonCubitState;
 }

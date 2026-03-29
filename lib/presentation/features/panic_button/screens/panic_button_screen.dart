@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/presentation/features/panic_button/cubits/panic_button_cubit.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
@@ -68,8 +69,7 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
   // MARK: - Cubit state transitions
   // ==============================================
 
-  /// Called by [BlocListener] after a loading/activation/deactivation operation
-  /// completes. Uses [listenWhen] so it only fires on those specific transitions.
+  /// Called by [BlocListener] when a notable state transition occurs.
   void _onCubitStateChanged(BuildContext context, PanicButtonCubitState state) {
     // If active: restore/start the cooldown timer from the saved activatedAt.
     if (state.buttonState == PanicButtonState.active &&
@@ -84,17 +84,60 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
       _resetTimer();
     }
 
-    // Show error feedback on activation/deactivation failures.
-    if (state.activateFailure != null || state.deactivateFailure != null) {
-      _showErrorSnackBar(context);
+    // Show error dialogs on activation/deactivation failures.
+    if (state.activateFailure != null) {
+      _showActivateErrorDialog(context);
+    } else if (state.deactivateFailure != null) {
+      _showDeactivateErrorDialog(context);
+    }
+
+    // Show informational dialog when the native permission request was denied.
+    if (state.permissionRequestDenied) {
+      _showPermissionDeniedAfterRequestDialog(context);
     }
   }
 
-  void _showErrorSnackBar(BuildContext context) {
+  void _showPermissionDeniedAfterRequestDialog(BuildContext context) {
     final l10n = context.l10n;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(l10n.errorDescription)));
+    CustomDialog.show(
+      context: context,
+      title: l10n.panicButtonPermissionDeniedTitle,
+      content: Text(l10n.panicButtonPermissionDeniedContent),
+      buttonText: l10n.panicButtonPermissionDeniedButton,
+      onButtonPressed: () {
+        Navigator.of(context, rootNavigator: true).pop();
+        context.read<PanicButtonCubit>().openLocationSettings();
+      },
+      secondButtonText: l10n.cancel,
+    );
+  }
+
+  void _showActivateErrorDialog(BuildContext context) {
+    final l10n = context.l10n;
+    final failure = context.read<PanicButtonCubit>().state.activateFailure;
+    final isConflict = failure is ConflictFailure;
+    CustomDialog.show(
+      context: context,
+      title: isConflict
+          ? l10n.panicButtonAlreadyActiveTitle
+          : l10n.panicButtonActivateErrorTitle,
+      content: Text(
+        isConflict
+            ? l10n.panicButtonAlreadyActiveContent
+            : l10n.panicButtonActivateErrorContent,
+      ),
+      buttonText: l10n.accept,
+    );
+  }
+
+  void _showDeactivateErrorDialog(BuildContext context) {
+    final l10n = context.l10n;
+    CustomDialog.show(
+      context: context,
+      title: l10n.panicButtonDeactivateErrorTitle,
+      content: Text(l10n.panicButtonDeactivateErrorContent),
+      buttonText: l10n.accept,
+    );
   }
 
   // ==============================================
@@ -105,31 +148,88 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
     final l10n = context.l10n;
     final cubit = context.read<PanicButtonCubit>();
 
-    if (state.buttonState == PanicButtonState.normal) {
-      cubit.activateAlert();
-    } else if (state.buttonState == PanicButtonState.active) {
-      if (_cooldownProgress < 1.0) {
+    switch (state.buttonState) {
+      case PanicButtonState.normal:
+        cubit.activateAlert();
+      case PanicButtonState.active:
+        if (_cooldownProgress < 1.0) {
+          CustomDialog.show(
+            context: context,
+            title: l10n.panicButtonCooldownTitle,
+            content: Text(l10n.panicButtonCooldownContent),
+            buttonText: l10n.accept,
+          );
+        } else {
+          CustomDialog.show(
+            context: context,
+            title: l10n.panicButtonDeactivateTitle,
+            content: Text(l10n.panicButtonDeactivateContent),
+            buttonText: l10n.panicButtonDeactivate,
+            onInputButtonPressed: (reason) {
+              Navigator.of(context, rootNavigator: true).pop();
+              cubit.deactivateAlert(reason: reason);
+            },
+            secondButtonText: l10n.cancel,
+            inputHint: l10n.panicButtonDeactivateReasonHint,
+          );
+        }
+      case PanicButtonState.disabled:
+        _handleDisabledTap(context, state, l10n, cubit);
+      case PanicButtonState.loading:
+        break;
+    }
+  }
+
+  void _handleDisabledTap(
+    BuildContext context,
+    PanicButtonCubitState state,
+    AppLocalizations l10n,
+    PanicButtonCubit cubit,
+  ) {
+    switch (state.disabledReason) {
+      case DisabledReason.noTrustedContacts:
         CustomDialog.show(
           context: context,
-          title: l10n.panicButtonCooldownTitle,
-          content: Text(l10n.panicButtonCooldownContent),
-          buttonText: l10n.accept,
-        );
-      } else {
-        CustomDialog.show(
-          context: context,
-          title: l10n.panicButtonDeactivateTitle,
-          content: Text(l10n.panicButtonDeactivateContent),
-          buttonText: l10n.panicButtonDeactivate,
-          onInputButtonPressed: (reason) {
+          title: l10n.panicButtonNoContactsTitle,
+          content: Text(l10n.panicButtonNoContactsContent),
+          buttonText: l10n.panicButtonNoContactsButton,
+          onButtonPressed: () {
             Navigator.of(context, rootNavigator: true).pop();
-            cubit.deactivateAlert(reason: reason);
+            cubit.loadAlertState();
+          },
+        );
+      case DisabledReason.locationPermissionDenied:
+        // Trigger the native OS permission dialog directly.
+        cubit.requestLocationPermission();
+      case DisabledReason.locationPermissionDeniedForever:
+        CustomDialog.show(
+          context: context,
+          title: l10n.panicButtonPermissionDeniedTitle,
+          content: Text(l10n.panicButtonPermissionDeniedContent),
+          buttonText: l10n.panicButtonPermissionDeniedButton,
+          onButtonPressed: () {
+            Navigator.of(context, rootNavigator: true).pop();
+            cubit.openLocationSettings();
           },
           secondButtonText: l10n.cancel,
-          inputHint: l10n.panicButtonDeactivateReasonHint,
         );
-      }
+      case null:
+        break;
     }
+  }
+
+  String? _disabledSubtitle(
+    PanicButtonCubitState state,
+    AppLocalizations l10n,
+  ) {
+    if (state.buttonState != PanicButtonState.disabled) return null;
+    return switch (state.disabledReason) {
+      DisabledReason.noTrustedContacts => l10n.panicButtonDisabledNoContacts,
+      DisabledReason.locationPermissionDenied ||
+      DisabledReason.locationPermissionDeniedForever =>
+        l10n.panicButtonDisabledNoPermission,
+      null => null,
+    };
   }
 
   void _showInfoDialog(BuildContext context, AppLocalizations l10n) {
@@ -160,7 +260,12 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
       listenWhen: (prev, curr) =>
           (prev.isLoading && !curr.isLoading) ||
           (prev.isActivating && !curr.isActivating) ||
-          (prev.isDeactivating && !curr.isDeactivating),
+          (prev.isDeactivating && !curr.isDeactivating) ||
+          (prev.activateFailure != curr.activateFailure &&
+              curr.activateFailure != null) ||
+          (prev.deactivateFailure != curr.deactivateFailure &&
+              curr.deactivateFailure != null) ||
+          (!prev.permissionRequestDenied && curr.permissionRequestDenied),
       listener: _onCubitStateChanged,
       builder: (context, state) {
         return Scaffold(
@@ -203,15 +308,10 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
                         child: _PanicButtonCard(
-                          state: state.isLoading
-                              ? PanicButtonState.disabled
-                              : state.buttonState,
-                          onPanicPressed:
-                              state.isLoading ||
-                                  state.isActivating ||
-                                  state.isDeactivating
-                              ? () {}
-                              : () => _handlePanicPressed(context, state),
+                          state: state.buttonState,
+                          disabledSubtitle: _disabledSubtitle(state, l10n),
+                          onPanicPressed: () =>
+                              _handlePanicPressed(context, state),
                           cooldownProgress: _cooldownProgress,
                           elapsed: _elapsed,
                           cooldownSeconds: _cooldownSeconds,
@@ -267,6 +367,7 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
 // Card showing panic button status and main action button
 class _PanicButtonCard extends StatelessWidget {
   final PanicButtonState state;
+  final String? disabledSubtitle;
   final VoidCallback onPanicPressed;
   final double cooldownProgress;
   final AppLocalizations l10n;
@@ -277,6 +378,7 @@ class _PanicButtonCard extends StatelessWidget {
 
   const _PanicButtonCard({
     required this.state,
+    this.disabledSubtitle,
     required this.onPanicPressed,
     required this.cooldownProgress,
     required this.l10n,
@@ -290,6 +392,8 @@ class _PanicButtonCard extends StatelessWidget {
     switch (state) {
       case PanicButtonState.normal:
         return l10n.panicButtonStatusStandby;
+      case PanicButtonState.loading:
+        return l10n.panicButtonStatusLoading;
       case PanicButtonState.active:
         return l10n.panicButtonStatusActive;
       case PanicButtonState.disabled:
@@ -301,6 +405,8 @@ class _PanicButtonCard extends StatelessWidget {
     switch (state) {
       case PanicButtonState.normal:
         return Icons.check_circle_outline_rounded;
+      case PanicButtonState.loading:
+        return Icons.hourglass_top_rounded;
       case PanicButtonState.active:
         return Icons.check_circle_rounded;
       case PanicButtonState.disabled:
@@ -312,10 +418,12 @@ class _PanicButtonCard extends StatelessWidget {
     switch (state) {
       case PanicButtonState.normal:
         return Colors.grey;
+      case PanicButtonState.loading:
+        return Colors.grey;
       case PanicButtonState.active:
         return Colors.green;
       case PanicButtonState.disabled:
-        return Colors.red;
+        return Colors.orange;
     }
   }
 
@@ -357,6 +465,7 @@ class _PanicButtonCard extends StatelessWidget {
             Center(
               child: PanicButton(
                 state: state,
+                disabledSubtitle: disabledSubtitle,
                 onPressed: onPanicPressed,
                 cooldownProgress: cooldownProgress,
                 secondsLeft: cooldownSeconds - elapsed,

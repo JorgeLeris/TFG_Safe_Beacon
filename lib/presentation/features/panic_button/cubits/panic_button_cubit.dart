@@ -7,6 +7,7 @@ import 'package:safe_beacon/domain/alerts/alert_repository.dart';
 import 'package:safe_beacon/domain/alerts/entities/alert.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/domain/common/result.dart';
+import 'package:safe_beacon/domain/contacts/contact_repository.dart';
 import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
@@ -18,49 +19,107 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
     required String uid,
     required AlertRepository alertRepository,
     required UserProfileRepository userProfileRepository,
+    required ContactRepository contactRepository,
   }) : _uid = uid,
        _alertRepository = alertRepository,
        _userProfileRepository = userProfileRepository,
+       _contactRepository = contactRepository,
        super(const PanicButtonCubitState());
 
   final String _uid;
   final AlertRepository _alertRepository;
   final UserProfileRepository _userProfileRepository;
+  final ContactRepository _contactRepository;
 
   /// Queries Firestore for an active alert and sets the initial button state.
+  ///
+  /// Also checks location permission. If permission is denied, the button will be disabled.
   Future<void> loadAlertState() async {
-    emit(state.copyWith(isLoading: true, failure: null));
+    emit(
+      state.copyWith(
+        isLoading: true,
+        buttonState: PanicButtonState.loading,
+        failure: null,
+        permissionRequestDenied: false,
+      ),
+    );
 
-    final result = await _alertRepository.getActiveAlert(_uid);
+    // Check location permission first.
+    final permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      emit(
+        state.copyWith(
+          isLoading: false,
+          buttonState: PanicButtonState.disabled,
+          disabledReason: DisabledReason.locationPermissionDenied,
+        ),
+      );
+      return;
+    }
+    if (permission == LocationPermission.deniedForever) {
+      emit(
+        state.copyWith(
+          isLoading: false,
+          buttonState: PanicButtonState.disabled,
+          disabledReason: DisabledReason.locationPermissionDeniedForever,
+        ),
+      );
+      return;
+    }
 
-    result.when(
-      success: (alert) {
-        if (alert != null) {
-          emit(
-            state.copyWith(
-              isLoading: false,
-              buttonState: PanicButtonState.active,
-              activeAlertActivatedAt: alert.activatedAt,
-            ),
-          );
-        } else {
-          emit(
-            state.copyWith(
-              isLoading: false,
-              buttonState: PanicButtonState.normal,
-              activeAlertActivatedAt: null,
-            ),
-          );
-        }
-      },
-      failure: (failure) =>
-          emit(state.copyWith(isLoading: false, failure: failure)),
+    final alertResult = await _alertRepository.getActiveAlert(_uid);
+
+    if (alertResult is Failure<Alert?>) {
+      emit(state.copyWith(isLoading: false, failure: alertResult.failure));
+      return;
+    }
+
+    final alert = (alertResult as Success<Alert?>).value;
+
+    if (alert != null) {
+      emit(
+        state.copyWith(
+          isLoading: false,
+          buttonState: PanicButtonState.active,
+          activeAlertActivatedAt: alert.activatedAt,
+          disabledReason: null,
+        ),
+      );
+      return;
+    }
+
+    // No active alert: check whether the user has trusted contacts.
+    // If not, the button must stay disabled to prevent a pointless activation.
+    final contactsResult = await _contactRepository.getTrustedContacts(_uid);
+    final hasContacts = contactsResult.when(
+      success: (list) => list.isNotEmpty,
+      failure: (_) => true,
+    );
+
+    emit(
+      state.copyWith(
+        isLoading: false,
+        buttonState: hasContacts
+            ? PanicButtonState.normal
+            : PanicButtonState.disabled,
+        disabledReason: hasContacts ? null : DisabledReason.noTrustedContacts,
+        activeAlertActivatedAt: null,
+      ),
     );
   }
 
   /// Creates a new panic alert for the current user.
+  ///
+  /// Emits [PanicButtonState.loading] while the operation is in flight.
+  /// Transitions to [PanicButtonState.disabled] with [DisabledReason.noTrustedContacts]
   Future<void> activateAlert() async {
-    emit(state.copyWith(isActivating: true, activateFailure: null));
+    emit(
+      state.copyWith(
+        isActivating: true,
+        activateFailure: null,
+        buttonState: PanicButtonState.loading,
+      ),
+    );
 
     // Resolve owner username before creating the alert.
     final profileResult = await _userProfileRepository.getProfile(_uid);
@@ -93,16 +152,45 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
           isActivating: false,
           buttonState: PanicButtonState.active,
           activeAlertActivatedAt: DateTime.now(),
+          disabledReason: null,
         ),
       ),
-      failure: (failure) =>
-          emit(state.copyWith(isActivating: false, activateFailure: failure)),
+      failure: (failure) {
+        // No trusted contacts.
+        if (failure is BusinessFailure &&
+            failure.message == 'no_trusted_contacts') {
+          emit(
+            state.copyWith(
+              isActivating: false,
+              buttonState: PanicButtonState.disabled,
+              disabledReason: DisabledReason.noTrustedContacts,
+              activateFailure: null,
+            ),
+          );
+          return;
+        }
+        emit(
+          state.copyWith(
+            isActivating: false,
+            buttonState: PanicButtonState.normal,
+            activateFailure: failure,
+          ),
+        );
+      },
     );
   }
 
   /// Deactivates the current active alert with an optional [reason].
+  ///
+  /// Emits [PanicButtonState.loading] while the operation is in flight.
   Future<void> deactivateAlert({String? reason}) async {
-    emit(state.copyWith(isDeactivating: true, deactivateFailure: null));
+    emit(
+      state.copyWith(
+        isDeactivating: true,
+        deactivateFailure: null,
+        buttonState: PanicButtonState.loading,
+      ),
+    );
 
     final result = await _alertRepository.deactivateAlert(
       ownerUid: _uid,
@@ -126,6 +214,27 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
   // ==============================================
   // MARK: - Private helpers
   // ==============================================
+
+  /// Triggers the native OS location permission dialog and re-runs [loadAlertState].
+  /// If the user denies the request, emits [permissionRequestDenied] so the UI
+  /// can show an informational dialog.
+  Future<void> requestLocationPermission() async {
+    final result = await Geolocator.requestPermission();
+    if (result == LocationPermission.denied ||
+        result == LocationPermission.deniedForever) {
+      emit(state.copyWith(permissionRequestDenied: true));
+    }
+    await loadAlertState();
+  }
+
+  /// Opens the app settings page so the user can manually re-enable location
+  /// permission. Called when the disabled reason is
+  /// [DisabledReason.locationPermissionDeniedForever].
+  Future<void> openLocationSettings() async {
+    await Geolocator.openAppSettings();
+    // Re-check after the user returns from Settings.
+    await loadAlertState();
+  }
 
   /// Requests location permission if needed and returns the current position.
   ///

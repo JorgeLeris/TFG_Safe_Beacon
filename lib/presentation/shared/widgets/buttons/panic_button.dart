@@ -8,10 +8,13 @@ enum PanicButtonState {
   /// Normal: ready to be triggered.
   normal,
 
-  /// Disabled: non-interactable.
+  /// Loading: operation in progress, non-interactable.
+  loading,
+
+  /// Disabled: requires user action (e.g. grant permissions, add contacts).
   disabled,
 
-  /// Active: showing the deactivate option.
+  /// Active: alert is live, showing the deactivate option.
   active,
 }
 
@@ -29,6 +32,9 @@ class PanicButton extends StatefulWidget {
   /// Remaining seconds in cooldown, shown when active and cooldownProgress < 1.0
   final int secondsLeft;
 
+  /// Short label shown inside the button when [state] is [PanicButtonState.disabled].
+  final String? disabledSubtitle;
+
   const PanicButton({
     super.key,
     required this.state,
@@ -36,6 +42,7 @@ class PanicButton extends StatefulWidget {
     this.size = 175,
     this.cooldownProgress = 1.0,
     this.secondsLeft = 0,
+    this.disabledSubtitle,
   });
 
   @override
@@ -99,6 +106,8 @@ class _PanicButtonState extends State<PanicButton>
     }
   }
 
+  bool get _isLoading => widget.state == PanicButtonState.loading;
+
   @override
   void dispose() {
     _pulseController.dispose();
@@ -119,6 +128,17 @@ class _PanicButtonState extends State<PanicButton>
           contentColor: Colors.white,
           shadowColor: const Color(0xFFFF1744).withValues(alpha: 0.5),
           borderGlow: const Color(0xFFFF6D6D).withValues(alpha: 0.2),
+        );
+      case PanicButtonState.loading:
+        return const _ButtonColors(
+          outerRing: Color(0xFF9E9E9E),
+          outerRingGlow: Colors.transparent,
+          middleRing: Color(0xFF757575),
+          innerButton: Color(0xFF616161),
+          innerButtonCenter: Color(0xFF757575),
+          contentColor: Color(0xFFBDBDBD),
+          shadowColor: Colors.transparent,
+          borderGlow: Colors.transparent,
         );
       case PanicButtonState.disabled:
         return _ButtonColors(
@@ -155,7 +175,7 @@ class _PanicButtonState extends State<PanicButton>
     final cooldownRemainingSeconds = isInCooldown ? widget.secondsLeft : 0;
 
     return GestureDetector(
-      onTap: isDisabled ? null : widget.onPressed,
+      onTap: _isLoading ? null : widget.onPressed,
       child: AnimatedBuilder(
         animation: Listenable.merge([_pulseAnimation, _ringAnimation]),
         builder: (context, child) {
@@ -205,6 +225,7 @@ class _PanicButtonState extends State<PanicButton>
                     colors: colors,
                     state: widget.state,
                     cooldownRemainingSeconds: cooldownRemainingSeconds,
+                    disabledSubtitle: widget.disabledSubtitle,
                   ),
                 ),
               ],
@@ -371,12 +392,14 @@ class _ButtonBody extends StatelessWidget {
   final _ButtonColors colors;
   final PanicButtonState state;
   final int cooldownRemainingSeconds;
+  final String? disabledSubtitle;
 
   const _ButtonBody({
     required this.size,
     required this.colors,
     required this.state,
     this.cooldownRemainingSeconds = 0,
+    this.disabledSubtitle,
   });
 
   @override
@@ -413,6 +436,7 @@ class _ButtonBody extends StatelessWidget {
           state: state,
           color: colors.contentColor,
           cooldownRemainingSeconds: cooldownRemainingSeconds,
+          disabledSubtitle: disabledSubtitle,
         ),
       ),
     );
@@ -423,16 +447,30 @@ class _ButtonContent extends StatelessWidget {
   final PanicButtonState state;
   final Color color;
   final int cooldownRemainingSeconds;
+  final String? disabledSubtitle;
 
   const _ButtonContent({
     required this.state,
     required this.color,
     this.cooldownRemainingSeconds = 0,
+    this.disabledSubtitle,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+
+    // Loading state
+    if (state == PanicButtonState.loading) {
+      return SizedBox(
+        width: 44,
+        height: 44,
+        child: CircularProgressIndicator(
+          strokeWidth: 3,
+          valueColor: AlwaysStoppedAnimation<Color>(color),
+        ),
+      );
+    }
 
     // Active state during cooldown
     if (state == PanicButtonState.active && cooldownRemainingSeconds > 0) {
@@ -522,7 +560,7 @@ class _ButtonContent extends StatelessWidget {
         const SizedBox(height: 6),
         Text(
           state == PanicButtonState.disabled
-              ? l10n.notAvailable.toUpperCase()
+              ? (disabledSubtitle ?? l10n.notAvailable).toUpperCase()
               : l10n.emergency.toUpperCase(),
           style: TextStyle(
             color: color.withValues(alpha: 0.85),
