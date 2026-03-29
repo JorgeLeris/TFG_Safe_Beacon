@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/presentation/features/panic_button/cubits/panic_button_cubit.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class PanicButtonScreen extends StatefulWidget {
@@ -12,13 +14,16 @@ class PanicButtonScreen extends StatefulWidget {
 }
 
 class _PanicButtonScreenState extends State<PanicButtonScreen> {
-  // TODO: Load first state with data from bd (when loading, not permissions or not contacts state disabled)
-  PanicButtonState _panicState = PanicButtonState.normal;
-  // TODO: Manage timer with db timestamp and actual time instead of in-memory timer
   double _cooldownProgress = 1.0;
   Timer? _cooldownTimer;
   static const int _cooldownSeconds = 10;
   int _elapsed = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<PanicButtonCubit>().loadAlertState();
+  }
 
   @override
   void dispose() {
@@ -26,39 +31,84 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
     super.dispose();
   }
 
-  void _startCooldownTimer() {
+  // ==============================================
+  // MARK: - Timer management
+  // ==============================================
+
+  /// Starts the cooldown timer from [alreadyElapsed] seconds.
+  void _startCooldownTimer({int alreadyElapsed = 0}) {
     _cooldownTimer?.cancel();
-    _elapsed = 0;
+    _elapsed = alreadyElapsed;
+    _cooldownProgress = (_elapsed / _cooldownSeconds).clamp(0.0, 1.0);
+
+    if (_elapsed >= _cooldownSeconds) return;
 
     _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       _elapsed++;
-
       if (!mounted) {
         timer.cancel();
         return;
       }
-
       setState(() {
-        _cooldownProgress = _elapsed / _cooldownSeconds;
+        _cooldownProgress = (_elapsed / _cooldownSeconds).clamp(0.0, 1.0);
       });
-
-      if (_elapsed >= _cooldownSeconds) {
-        timer.cancel();
-      }
+      if (_elapsed >= _cooldownSeconds) timer.cancel();
     });
   }
 
-  void _handlePanicPressed() {
-    if (_panicState == PanicButtonState.normal) {
-      setState(() {
-        _panicState = PanicButtonState.active;
-        _cooldownProgress = 0.0;
-        // TODO: activate alarm and send notifications to trusted contacts
-      });
-      _startCooldownTimer();
-    } else if (_panicState == PanicButtonState.active) {
+  void _resetTimer() {
+    _cooldownTimer?.cancel();
+    setState(() {
+      _elapsed = 0;
+      _cooldownProgress = 1.0;
+    });
+  }
+
+  // ==============================================
+  // MARK: - Cubit state transitions
+  // ==============================================
+
+  /// Called by [BlocListener] after a loading/activation/deactivation operation
+  /// completes. Uses [listenWhen] so it only fires on those specific transitions.
+  void _onCubitStateChanged(BuildContext context, PanicButtonCubitState state) {
+    // If active: restore/start the cooldown timer from the saved activatedAt.
+    if (state.buttonState == PanicButtonState.active &&
+        state.activeAlertActivatedAt != null) {
+      final alreadyElapsed = DateTime.now()
+          .difference(state.activeAlertActivatedAt!)
+          .inSeconds
+          .clamp(0, _cooldownSeconds);
+      setState(() {});
+      _startCooldownTimer(alreadyElapsed: alreadyElapsed);
+    } else if (state.buttonState == PanicButtonState.normal) {
+      _resetTimer();
+    }
+
+    // Show error feedback on activation/deactivation failures.
+    if (state.activateFailure != null || state.deactivateFailure != null) {
+      _showErrorSnackBar(context);
+    }
+  }
+
+  void _showErrorSnackBar(BuildContext context) {
+    final l10n = context.l10n;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.errorDescription)));
+  }
+
+  // ==============================================
+  // MARK: - Button interactions
+  // ==============================================
+
+  void _handlePanicPressed(BuildContext context, PanicButtonCubitState state) {
+    final l10n = context.l10n;
+    final cubit = context.read<PanicButtonCubit>();
+
+    if (state.buttonState == PanicButtonState.normal) {
+      cubit.activateAlert();
+    } else if (state.buttonState == PanicButtonState.active) {
       if (_cooldownProgress < 1.0) {
-        final l10n = context.l10n;
         CustomDialog.show(
           context: context,
           title: l10n.panicButtonCooldownTitle,
@@ -66,19 +116,14 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
           buttonText: l10n.accept,
         );
       } else {
-        final l10n = context.l10n;
         CustomDialog.show(
           context: context,
           title: l10n.panicButtonDeactivateTitle,
           content: Text(l10n.panicButtonDeactivateContent),
           buttonText: l10n.panicButtonDeactivate,
-          onInputButtonPressed: (_) {
+          onInputButtonPressed: (reason) {
             Navigator.of(context, rootNavigator: true).pop();
-            setState(() {
-              _panicState = PanicButtonState.normal;
-              _cooldownProgress = 1.0;
-              // TODO: deactivate alarm
-            });
+            cubit.deactivateAlert(reason: reason);
           },
           secondButtonText: l10n.cancel,
           inputHint: l10n.panicButtonDeactivateReasonHint,
@@ -111,92 +156,108 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Scaffold(
-      backgroundColor: colorScheme.surface,
-      appBar: const CustomAppBar(),
-      body: Column(
-        children: [
-          // Header with info
-          SectionHeader(
-            text: l10n.panicButton,
-            trailingIcon: Icons.info_outline_rounded,
-            onTrailingIconPressed: () => _showInfoDialog(context, l10n),
-          ),
+    return BlocConsumer<PanicButtonCubit, PanicButtonCubitState>(
+      listenWhen: (prev, curr) =>
+          (prev.isLoading && !curr.isLoading) ||
+          (prev.isActivating && !curr.isActivating) ||
+          (prev.isDeactivating && !curr.isDeactivating),
+      listener: _onCubitStateChanged,
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: colorScheme.surface,
+          appBar: const CustomAppBar(),
+          body: Column(
+            children: [
+              // Header with info
+              SectionHeader(
+                text: l10n.panicButton,
+                trailingIcon: Icons.info_outline_rounded,
+                onTrailingIconPressed: () => _showInfoDialog(context, l10n),
+              ),
 
-          // Scrollable content
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(top: 24, bottom: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // Add to device shortcut button
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: SectionButton(
-                      icon: Icons.add_rounded,
-                      text: l10n.addPanicButtonToDevice,
-                      onPressed: () {
-                        // TODO: add panic button shortcut to device
-                      },
-                      showArrow: false,
-                      backgroundColor: colorScheme.secondary,
-                      contentColor: colorScheme.onSecondary,
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Panic button status card
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: _PanicButtonCard(
-                      state: _panicState,
-                      onPanicPressed: _handlePanicPressed,
-                      cooldownProgress: _cooldownProgress,
-                      elapsed: _elapsed,
-                      cooldownSeconds: _cooldownSeconds,
-                      l10n: l10n,
-                      colorScheme: colorScheme,
-                      textTheme: textTheme,
-                    ),
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  // Customization options
-                  SettingsOptionsList(
-                    horizontalPadding: 24,
-                    sectionTitle: l10n.customization,
-                    options: [
-                      SettingsOption(
-                        icon: Icons.settings_outlined,
-                        title: l10n.featuresSettings,
-                        description: l10n.featuresSettingsDescription,
-                        onPressed: () {
-                          // TODO: navigate to features settings
-                          _showFutureDialog(context, l10n);
-                        },
+              // Scrollable content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.only(top: 24, bottom: 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      // Add to device shortcut button
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: SectionButton(
+                          icon: Icons.add_rounded,
+                          text: l10n.addPanicButtonToDevice,
+                          onPressed: () {
+                            // TODO: add panic button shortcut to device
+                          },
+                          showArrow: false,
+                          backgroundColor: colorScheme.secondary,
+                          contentColor: colorScheme.onSecondary,
+                        ),
                       ),
-                      SettingsOption(
-                        icon: Icons.lock_outline_rounded,
-                        title: l10n.deactivationPin,
-                        description: l10n.deactivationPinDescription,
-                        onPressed: () {
-                          // TODO: navigate to PIN setup
-                          _showFutureDialog(context, l10n);
-                        },
+
+                      const SizedBox(height: 20),
+
+                      // Panic button status card
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: _PanicButtonCard(
+                          state: state.isLoading
+                              ? PanicButtonState.disabled
+                              : state.buttonState,
+                          onPanicPressed:
+                              state.isLoading ||
+                                  state.isActivating ||
+                                  state.isDeactivating
+                              ? () {}
+                              : () => _handlePanicPressed(context, state),
+                          cooldownProgress: _cooldownProgress,
+                          elapsed: _elapsed,
+                          cooldownSeconds: _cooldownSeconds,
+                          l10n: l10n,
+                          colorScheme: colorScheme,
+                          textTheme: textTheme,
+                        ),
                       ),
+
+                      const SizedBox(height: 25),
+
+                      // Customization options
+                      SettingsOptionsList(
+                        horizontalPadding: 24,
+                        sectionTitle: l10n.customization,
+                        options: [
+                          SettingsOption(
+                            icon: Icons.settings_outlined,
+                            title: l10n.featuresSettings,
+                            description: l10n.featuresSettingsDescription,
+                            onPressed: () {
+                              // TODO: navigate to features settings
+                              _showFutureDialog(context, l10n);
+                            },
+                          ),
+                          SettingsOption(
+                            icon: Icons.lock_outline_rounded,
+                            title: l10n.deactivationPin,
+                            description: l10n.deactivationPinDescription,
+                            onPressed: () {
+                              // TODO: navigate to PIN setup
+                              _showFutureDialog(context, l10n);
+                            },
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 32),
                     ],
                   ),
-
-                  const SizedBox(height: 32),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safe_beacon/presentation/features/panic_button/providers/panic_button_provider.dart';
 import 'package:safe_beacon/presentation/features/panic_button/screens/panic_button_screen.dart';
 
 part 'panic_button_routes.g.dart';
@@ -13,5 +14,5 @@ class PanicButtonRoute extends GoRouteData with $PanicButtonRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
-      const PanicButtonScreen();
+      const PanicButtonProvider(child: PanicButtonScreen());
 }
