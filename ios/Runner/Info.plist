@@ -6,6 +6,10 @@
     <string>Esta app necesita acceso a tu galería para cambiar tu foto de perfil.</string>
     <key>NSFaceIDUsageDescription</key>
     <string>Se requiere autenticación para acceder a la app</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>SafeBeacon necesita acceder a tu ubicación para registrarla cuando actives una alerta de pánico y enviársela a tus contactos de confianza.</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>SafeBeacon necesita acceder a tu ubicación para registrarla cuando actives una alerta de pánico y enviársela a tus contactos de confianza.</string>
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>

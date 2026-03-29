@@ -1,5 +1,8 @@
+import 'package:battery_plus/battery_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:safe_beacon/app/monitoring/logging.dart';
 import 'package:safe_beacon/domain/alerts/alert_repository.dart';
 import 'package:safe_beacon/domain/alerts/entities/alert.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
@@ -69,15 +72,19 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
     );
     if (username == null) return;
 
-    // TODO: Get real GPS coordinates via geolocator package.
-    // TODO: Get real battery level via battery_plus package.
+    // Gather location and battery concurrently.
+    final (position, batteryLevel) = await (
+      _fetchPosition(),
+      _fetchBatteryLevel(),
+    ).wait;
+
     final result = await _alertRepository.createAlert(
       ownerUid: _uid,
       ownerUsername: username!,
       alertType: AlertType.panic,
-      latitude: 0.0,
-      longitude: 0.0,
-      batteryLevel: 0,
+      latitude: position?.latitude ?? 0.0,
+      longitude: position?.longitude ?? 0.0,
+      batteryLevel: batteryLevel,
     );
 
     result.when(
@@ -114,5 +121,57 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
         state.copyWith(isDeactivating: false, deactivateFailure: failure),
       ),
     );
+  }
+
+  // ==============================================
+  // MARK: - Private helpers
+  // ==============================================
+
+  /// Requests location permission if needed and returns the current position.
+  ///
+  /// Returns null if permission is denied or location
+  /// services are disabled, so the alert can still be created with (0, 0).
+  Future<Position?> _fetchPosition() async {
+    try {
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        appLogger.warning('Location services disabled, alert will use (0,0)');
+        return null;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        appLogger.warning(
+          'Location permission denied ($permission), alert will use (0,0)',
+        );
+        return null;
+      }
+
+      return await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 10),
+        ),
+      );
+    } catch (e, st) {
+      appLogger.warning('Failed to fetch location for alert', e, st);
+      return null;
+    }
+  }
+
+  /// Returns the current battery level as a percentage (0–100).
+  ///
+  /// Returns 0 if the level cannot be determined.
+  Future<int> _fetchBatteryLevel() async {
+    try {
+      return await Battery().batteryLevel;
+    } catch (e, st) {
+      appLogger.warning('Failed to fetch battery level for alert', e, st);
+      return 0;
+    }
   }
 }
