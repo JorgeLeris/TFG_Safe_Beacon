@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:safe_beacon/app/monitoring/logging.dart';
+import 'package:safe_beacon/data/sources/firebase/alerts/alert_api.dart';
 import 'package:safe_beacon/data/sources/firebase/contacts/contact_api.dart';
 import 'package:safe_beacon/data/sources/firebase/contacts/dto/contact_dto.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
@@ -9,9 +10,12 @@ import 'package:safe_beacon/domain/contacts/entities/contact.dart';
 
 /// Repository for managing [Contact] entities in Firestore.
 class ContactRepositoryImpl implements ContactRepository {
-  ContactRepositoryImpl({required ContactApi api}) : _api = api;
+  ContactRepositoryImpl({required ContactApi api, required AlertApi alertApi})
+    : _api = api,
+      _alertApi = alertApi;
 
   final ContactApi _api;
+  final AlertApi _alertApi;
 
   /// Creates a contact relationship between [protectedPersonUid] and [trustedContactUid].
   @override
@@ -90,6 +94,10 @@ class ContactRepositoryImpl implements ContactRepository {
   }
 
   /// Deletes the contact relationship identified by [contactId].
+  ///
+  /// Also removes the trusted contact from the [trustedContactUids] list on
+  /// all alerts belonging to the protected person, so the former trusted
+  /// contact loses access to those historical alerts.
   @override
   Future<Result<void>> deleteContact({
     required String contactId,
@@ -97,8 +105,26 @@ class ContactRepositoryImpl implements ContactRepository {
   }) async {
     appLogger.fine('Deleting contact $contactId by uid: $requesterUid');
     try {
+      // Fetch contact before deletion to obtain both parties for cascade.
+      final contact = await _api.getContactById(contactId);
+      if (contact == null) {
+        appLogger.warning('Contact $contactId not found, nothing to delete');
+        return const Result.failure(AppFailure.notFound('contact'));
+      }
+
       await _api.deleteContact(contactId);
       appLogger.info('Contact $contactId deleted successfully');
+
+      // Cascade: remove the trusted contact from all alerts of the protected person.
+      await _alertApi.removeContactFromAlerts(
+        ownerUid: contact.dto.protectedPersonUid,
+        trustedContactUid: contact.dto.trustedContactUid,
+      );
+      appLogger.fine(
+        'Cascade complete: removed ${contact.dto.trustedContactUid} '
+        'from alerts of ${contact.dto.protectedPersonUid}',
+      );
+
       return const Result.success(null);
     } on FirebaseException catch (e, st) {
       appLogger.severe('Firebase error deleting contact', e, st);

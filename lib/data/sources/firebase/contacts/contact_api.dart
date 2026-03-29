@@ -85,4 +85,17 @@ class ContactApi {
   Future<void> deleteContact(String contactId) async {
     await _contacts.doc(contactId).delete();
   }
+
+  // ==============================================
+  // MARK: - Helpers
+  // ==============================================
+
+  /// Returns the [ContactDto] for [contactId], or null if it does not exist.
+  Future<({String id, ContactDto dto})?> getContactById(
+    String contactId,
+  ) async {
+    final doc = await _contacts.doc(contactId).get();
+    if (!doc.exists) return null;
+    return (id: doc.id, dto: ContactDto.fromFirestore(doc.data()!));
+  }
 }
