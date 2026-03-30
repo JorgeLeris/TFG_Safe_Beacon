@@ -7,6 +7,8 @@ import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/presentation/features/panic_button/cubits/panic_button_cubit.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
+// TODO: manage disable case in feature configuration (also in home screen)
+
 class PanicButtonScreen extends StatefulWidget {
   const PanicButtonScreen({super.key});
 
