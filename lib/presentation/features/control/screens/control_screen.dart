@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:safe_beacon/core/constants/constants.dart';
+import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/domain/alerts/entities/alert.dart';
 import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
 import 'package:safe_beacon/presentation/features/control/cubits/control_cubit.dart';
 import 'package:safe_beacon/presentation/features/control/routes/control_routes.dart';
@@ -23,40 +24,15 @@ class _ControlScreenState extends State<ControlScreen> {
   AlertFilters _alertFilters = const AlertFilters();
 
   // ---------------------------------------------------------------------------
-  // TODO: replace _mockedAlerts with real data from cubit/bloc
-  // ---------------------------------------------------------------------------
-
-  final List<AlertItem> _mockedAlerts = [
-    AlertItem(
-      alertType: Constants.panicButtonAlertTypeKey,
-      username: 'maria_garcia',
-      isActive: true,
-      dateTime: DateTime(2025, 6, 12, 14, 32),
-    ),
-    AlertItem(
-      alertType: Constants.panicButtonAlertTypeKey,
-      username: 'carlos_lopez',
-      isActive: false,
-      dateTime: DateTime(2025, 6, 10, 9, 15),
-    ),
-    AlertItem(
-      alertType: Constants.panicButtonAlertTypeKey,
-      username: 'ana_martinez',
-      isActive: true,
-      dateTime: DateTime(2025, 6, 11, 22, 48),
-    ),
-  ];
-
-  final bool mockedHasError = false;
-
-  // ---------------------------------------------------------------------------
   // Lifecycle
   // ---------------------------------------------------------------------------
 
   @override
   void initState() {
     super.initState();
-    context.read<ControlCubit>().loadReceivedRequestsCount();
+    final cubit = context.read<ControlCubit>();
+    cubit.loadReceivedRequestsCount();
+    cubit.loadAlerts();
   }
 
   void _onTabChanged(int index) {
@@ -68,41 +44,45 @@ class _ControlScreenState extends State<ControlScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // Filter helpers
+  // Alert mapping helpers
   // ---------------------------------------------------------------------------
 
-  List<AlertItem> _applyFilters(List<AlertItem> alerts) {
+  /// Converts domain [AlertType] enum to a localised label.
+  String _alertTypeLabel(AlertType type, AppLocalizations l10n) {
+    return switch (type) {
+      AlertType.panic => l10n.alertOfFeature(l10n.panicButton),
+      AlertType.guardian => l10n.alertOfFeature(l10n.guardianMode),
+      _ => l10n.alertOfFeature(type.name),
+    };
+  }
+
+  /// Converts domain [AlertType] to the filter key used by [AlertFunctionalityFilter].
+  bool _matchesFunctionalityFilter(
+    AlertType type,
+    AlertFunctionalityFilter filter,
+  ) {
+    return switch (filter) {
+      AlertFunctionalityFilter.all => true,
+      AlertFunctionalityFilter.panicButton => type == AlertType.panic,
+      AlertFunctionalityFilter.guardianMode => type == AlertType.guardian,
+    };
+  }
+
+  List<Alert> _applyFilters(List<Alert> alerts) {
     return alerts.where((alert) {
-      // Status filter
       final passesStatus = switch (_alertFilters.status) {
         AlertStatusFilter.all => true,
-        AlertStatusFilter.active => alert.isActive,
-        AlertStatusFilter.inactive => !alert.isActive,
+        AlertStatusFilter.active => alert.status == AlertStatus.active,
+        AlertStatusFilter.inactive => alert.status == AlertStatus.deactivated,
       };
 
-      // Functionality filter
-      final passesFunctionality = switch (_alertFilters.functionality) {
-        AlertFunctionalityFilter.all => true,
-        AlertFunctionalityFilter.panicButton =>
-          alert.alertType == Constants.panicButtonAlertTypeKey,
-        AlertFunctionalityFilter.guardianMode =>
-          alert.alertType == Constants.guardianModeAlertTypeKey,
-      };
+      final passesFunctionality = _matchesFunctionalityFilter(
+        alert.alertType,
+        _alertFilters.functionality,
+      );
 
       return passesStatus && passesFunctionality;
     }).toList();
-  }
-
-  String _getAlertTypeLabel(String alertTypeKey, AppLocalizations l10n) {
-    return switch (alertTypeKey) {
-      Constants.panicButtonAlertTypeKey => l10n.alertOfFeature(
-        l10n.panicButton,
-      ),
-      Constants.guardianModeAlertTypeKey => l10n.alertOfFeature(
-        l10n.guardianMode,
-      ),
-      _ => alertTypeKey,
-    };
   }
 
   Future<void> _applyFiltersWithLoading(AlertFilters filters) async {
@@ -126,15 +106,13 @@ class _ControlScreenState extends State<ControlScreen> {
   Widget _buildAlertsList(
     BuildContext context,
     AppLocalizations l10n,
-    bool isApplyingFilters,
+    ControlState state,
   ) {
-    if (isApplyingFilters) {
+    if (state.isApplyingFilters || state.isLoadingAlerts) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final bool isEmpty = _mockedAlerts.isEmpty;
-
-    if (mockedHasError) {
+    if (state.alertsFailure != null) {
       return EmptyStateView(
         type: EmptyStateType.error,
         title: l10n.errorTitle,
@@ -142,7 +120,7 @@ class _ControlScreenState extends State<ControlScreen> {
       );
     }
 
-    if (isEmpty) {
+    if (state.alerts.isEmpty) {
       return EmptyStateView(
         type: EmptyStateType.empty,
         title: l10n.noAlertsTitle,
@@ -151,16 +129,16 @@ class _ControlScreenState extends State<ControlScreen> {
     }
 
     // Apply active filters, then the search query
-    final afterFilters = _applyFilters(_mockedAlerts);
+    final afterFilters = _applyFilters(state.alerts);
     final filtered = _alertsQuery.isEmpty
         ? afterFilters
-        : afterFilters
-              .where(
-                (a) => a.username.toLowerCase().contains(
-                  _alertsQuery.toLowerCase(),
-                ),
-              )
-              .toList();
+        : afterFilters.where((a) {
+            final displayName =
+                state.alertDisplayNames[a.ownerUid] ?? a.ownerUsername;
+            return displayName.toLowerCase().contains(
+              _alertsQuery.toLowerCase(),
+            );
+          }).toList();
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -194,16 +172,20 @@ class _ControlScreenState extends State<ControlScreen> {
               description: l10n.noResultsDescription,
             )
           else
-            ...filtered.map(
-              (alert) => Padding(
+            ...filtered.map((alert) {
+              final displayName =
+                  (state.alertDisplayNames[alert.ownerUid] ??
+                          alert.ownerUsername)
+                      .capitalized();
+              return Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: AlertListItem(
                   alert: AlertItem(
-                    alertType: _getAlertTypeLabel(alert.alertType, l10n),
-                    username: alert.username,
-                    profilePhoto: alert.profilePhoto,
-                    isActive: alert.isActive,
-                    dateTime: alert.dateTime,
+                    alertType: _alertTypeLabel(alert.alertType, l10n),
+                    username: displayName,
+                    profilePhoto: state.alertProfilePhotos[alert.ownerUid],
+                    isActive: alert.status == AlertStatus.active,
+                    dateTime: alert.activatedAt,
                   ),
                   onTap: () {
                     const AlertDetailRoute().push(context);
@@ -212,8 +194,8 @@ class _ControlScreenState extends State<ControlScreen> {
                     // TODO: navigate to user profile
                   },
                 ),
-              ),
-            ),
+              );
+            }),
         ],
       ),
     );
@@ -240,8 +222,12 @@ class _ControlScreenState extends State<ControlScreen> {
               children: [
                 SectionHeader(
                   text: l10n.headerControl,
-                  onRefresh: () =>
+                  onRefresh: () async {
+                    await Future.wait([
                       context.read<ControlCubit>().loadReceivedRequestsCount(),
+                      context.read<ControlCubit>().loadAlerts(),
+                    ]);
+                  },
                 ),
 
                 // Section 1: contacts button
@@ -285,7 +271,7 @@ class _ControlScreenState extends State<ControlScreen> {
                     tabs: [l10n.alerts, l10n.followUps, l10n.history],
                     onTabChanged: _onTabChanged,
                     children: [
-                      _buildAlertsList(context, l10n, state.isApplyingFilters),
+                      _buildAlertsList(context, l10n, state),
                       const Placeholder(),
                       const Placeholder(),
                     ],

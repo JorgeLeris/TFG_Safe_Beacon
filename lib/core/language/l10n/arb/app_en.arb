@@ -164,7 +164,7 @@
   "panicButtonDeactivate": "Deactivate",
   "wait": "Wait",
   "noAlertsTitle": "No alerts yet",
-  "noAlertsDescription": "When an alert is triggered, it will appear here for you to review and follow up.",
+  "noAlertsDescription": "When an alert from one of your protected people is triggered, it will appear here for you to review and follow up.",
   "activeAlert": "Active alert",
   "inactiveAlert": "Inactive alert",
   "filterAlertsTitle": "Filter alerts",

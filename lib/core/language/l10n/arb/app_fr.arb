@@ -164,7 +164,7 @@
   "panicButtonDeactivate": "Désactiver",
   "wait": "Attendez",
   "noAlertsTitle": "Pas encore d'alertes",
-  "noAlertsDescription": "Lorsqu'une alerte est déclenchée, elle apparaîtra ici pour que vous puissiez la consulter et effectuer un suivi.",
+  "noAlertsDescription": "Lorsqu'une alerte d'une de vos personnes protégées est déclenchée, elle apparaîtra ici pour que vous puissiez la consulter et effectuer un suivi.",
   "activeAlert": "Alerte active",
   "inactiveAlert": "Alerte désactivée",
   "filterAlertsTitle": "Filtrer les alertes",
