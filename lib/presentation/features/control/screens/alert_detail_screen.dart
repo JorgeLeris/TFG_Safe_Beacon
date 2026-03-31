@@ -1,55 +1,57 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/extensions/date_extensions.dart';
+import 'package:safe_beacon/core/extensions/duration_extensions.dart';
 import 'package:safe_beacon/core/extensions/string_extensions.dart';
+import 'package:safe_beacon/core/helpers/helpers.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/domain/alerts/entities/alert.dart';
+import 'package:safe_beacon/presentation/features/control/cubits/alert_detail_cubit.dart';
 import 'package:safe_beacon/presentation/features/control/widgets/alert_detail_dialog.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AlertDetailScreen extends StatelessWidget {
   const AlertDetailScreen({super.key});
 
   // ---------------------------------------------------------------------------
-  // TODO: replace mocked data with real data passed through route parameters
-  // ---------------------------------------------------------------------------
-
-  static const String _mockedUsername = 'maria_garcia';
-  static const String _mockedAlertType = Constants.panicButtonAlertTypeKey;
-  static const bool _mockedIsActive = true;
-  static final DateTime _mockedDateTime = DateTime(2025, 6, 12, 14, 32);
-  static const String _mockedBattery = '72%';
-  static const String _mockedDeactivationReason = 'Desactivación manual';
-  static const String _mockedTimeActive = '15 min';
-
-  // ---------------------------------------------------------------------------
-  // Helpers
-  // ---------------------------------------------------------------------------
-
-  String _getAlertTypeLabel(String alertTypeKey, AppLocalizations l10n) {
-    return switch (alertTypeKey) {
-      Constants.panicButtonAlertTypeKey => l10n.panicButton,
-      Constants.guardianModeAlertTypeKey => l10n.guardianMode,
-      _ => alertTypeKey,
-    };
-  }
-
-  // ---------------------------------------------------------------------------
   // Alert detail dialog
   // ---------------------------------------------------------------------------
 
-  void _showAlertDetailDialog(BuildContext context, AppLocalizations l10n) {
-    final typeLabel = _getAlertTypeLabel(_mockedAlertType, l10n);
+  void _showAlertDetailDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    Alert alert,
+    String displayName,
+  ) {
+    final typeLabel = AlertHelper.alertTypeLabelSimple(alert.alertType, l10n);
+    final isActive = alert.status == AlertStatus.active;
+    final battery = '${alert.batteryLevel}%';
+
+    String? timeActive;
+
+    if (!isActive) {
+      if (alert.deactivatedAt != null) {
+        final duration = alert.deactivatedAt!.difference(alert.activatedAt);
+        timeActive = duration.formatDuration();
+      }
+    }
 
     AlertDetailDialog.show(
       context: context,
-      username: _mockedUsername,
+      username: displayName.capitalized(),
       alertType: typeLabel,
-      isActive: _mockedIsActive,
-      date: _mockedDateTime.toStringDate(),
-      time: _mockedDateTime.toStringTime(),
-      battery: _mockedBattery,
-      deactivationReason: _mockedDeactivationReason,
-      timeActive: _mockedTimeActive,
+      isActive: isActive,
+      date: alert.activatedAt.toStringDate(),
+      time: alert.activatedAt.toStringTime(),
+      battery: battery,
+      deactivationReason: alert.cancellationReason,
+      deactivationDate: alert.deactivatedAt?.toStringDate(),
+      deactivationTime: alert.deactivatedAt?.toStringTime(),
+      timeActive: timeActive,
     );
   }
 
@@ -63,9 +65,12 @@ class AlertDetailScreen extends StatelessWidget {
     ColorScheme colorScheme,
     TextTheme textTheme,
     bool isDark,
+    Alert alert,
+    String displayName,
   ) {
+    final isActive = alert.status == AlertStatus.active;
     final dateStr =
-        '${_mockedDateTime.toStringDate()} - ${_mockedDateTime.toStringTime()}';
+        '${alert.activatedAt.toStringDate()} - ${alert.activatedAt.toStringTime()}';
 
     return Container(
       width: double.infinity,
@@ -77,19 +82,19 @@ class AlertDetailScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
-            _mockedIsActive
+            isActive
                 ? Icons.check_circle_outline_rounded
                 : Icons.cancel_outlined,
-            color: _mockedIsActive
+            color: isActive
                 ? (isDark ? const Color(0xFF66BB6A) : const Color(0xFF2E7D32))
                 : (isDark ? const Color(0xFFFF6B6B) : const Color(0xFFD32F2F)),
             size: 34,
           ),
           const SizedBox(height: 6),
           Text(
-            _mockedIsActive
-                ? l10n.activeAlertOfUser(_mockedUsername.capitalized())
-                : l10n.inactiveAlertOfUser(_mockedUsername.capitalized()),
+            isActive
+                ? l10n.activeAlertOfUser(displayName.capitalized())
+                : l10n.inactiveAlertOfUser(displayName.capitalized()),
             style: textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               fontSize: textTheme.titleMedium?.fontSize != null
@@ -118,7 +123,7 @@ class AlertDetailScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 24),
+        const SizedBox(height: 20),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
@@ -142,10 +147,12 @@ class AlertDetailScreen extends StatelessWidget {
     ColorScheme colorScheme,
     TextTheme textTheme,
     bool isDark,
+    Alert alert,
+    String displayName,
   ) {
-    final typeLabel = _getAlertTypeLabel(_mockedAlertType, l10n);
+    final isActive = alert.status == AlertStatus.active;
 
-    final statusColor = _mockedIsActive
+    final statusColor = isActive
         ? (isDark ? const Color(0xFF66BB6A) : const Color(0xFF2E7D32))
         : (isDark ? const Color(0xFFFF6B6B) : const Color(0xFFD32F2F));
 
@@ -165,7 +172,8 @@ class AlertDetailScreen extends StatelessWidget {
         ),
         elevation: 2,
         child: InkWell(
-          onTap: () => _showAlertDetailDialog(context, l10n),
+          onTap: () =>
+              _showAlertDetailDialog(context, l10n, alert, displayName),
           borderRadius: BorderRadius.circular(14),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -176,7 +184,10 @@ class AlertDetailScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        l10n.alertOfFeature(typeLabel),
+                        AlertHelper.alertTypeLabelComplete(
+                          alert.alertType,
+                          l10n,
+                        ),
                         style: textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w700,
                           color: colorScheme.onSurface,
@@ -210,9 +221,7 @@ class AlertDetailScreen extends StatelessWidget {
                             ),
                             const SizedBox(width: 5),
                             Text(
-                              _mockedIsActive
-                                  ? l10n.activeAlert
-                                  : l10n.inactiveAlert,
+                              isActive ? l10n.activeAlert : l10n.inactiveAlert,
                               style: textTheme.labelSmall?.copyWith(
                                 color: statusColor,
                                 fontWeight: FontWeight.w600,
@@ -230,7 +239,7 @@ class AlertDetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${_mockedDateTime.toStringDate()} - ${_mockedDateTime.toStringTime()}',
+                        '${alert.activatedAt.toStringDate()} - ${alert.activatedAt.toStringTime()}',
                         style: textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: colorScheme.onSurface,
@@ -252,6 +261,95 @@ class AlertDetailScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildMap(
+    Alert alert,
+    AppLocalizations l10n,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
+    final point = LatLng(alert.latitude, alert.longitude);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: colorScheme.outline.withValues(alpha: 0.5),
+              ),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14),
+              child: SizedBox(
+                height: 225,
+                width: double.infinity,
+                child: FlutterMap(
+                  options: MapOptions(
+                    initialCenter: point,
+                    initialZoom: 15,
+                    interactionOptions: const InteractionOptions(
+                      flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
+                    ),
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate: Constants.openStreetMapTileUrl,
+                      userAgentPackageName: Constants.bundleId,
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          point: point,
+                          width: 40,
+                          height: 40,
+                          alignment: Alignment.topCenter,
+                          child: const Icon(
+                            Icons.location_on,
+                            color: Colors.red,
+                            size: 40,
+                          ),
+                        ),
+                      ],
+                    ),
+                    RichAttributionWidget(
+                      attributions: [
+                        TextSourceAttribution(
+                          Constants.openStreetMapAttribution,
+                          onTap: () => launchUrl(
+                            Uri.parse(Constants.openStreetMapCopyrightUrl),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                final url = Uri.parse(
+                  Constants.googleMapsUrl(alert.latitude, alert.longitude),
+                );
+                launchUrl(url, mode: LaunchMode.externalApplication);
+              },
+              icon: Icon(Icons.map_outlined, color: colorScheme.tertiary),
+              label: Text(
+                l10n.openInGoogleMaps,
+                style: TextStyle(color: colorScheme.tertiary),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildMapPlaceholder(
     AppLocalizations l10n,
     ColorScheme colorScheme,
@@ -260,7 +358,7 @@ class AlertDetailScreen extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Container(
-        height: 200,
+        height: 225,
         width: double.infinity,
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest,
@@ -290,11 +388,15 @@ class AlertDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContactButton(AppLocalizations l10n, ColorScheme colorScheme) {
+  Widget _buildContactButton(
+    AppLocalizations l10n,
+    ColorScheme colorScheme,
+    String displayName,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: CustomFilledButton(
-        text: l10n.startChatWith(_mockedUsername.capitalized()),
+        text: l10n.startChatWith(displayName.capitalized()),
         icon: Icons.chat_outlined,
         onPressed: () {
           // TODO: navigate to chat with user
@@ -322,56 +424,97 @@ class AlertDetailScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: const CustomAppBar(),
-      body: Column(
-        children: [
-          SectionHeader(
-            text: l10n.alertDetailHeader(_mockedUsername.capitalized()),
-          ),
+      body: BlocBuilder<AlertDetailCubit, AlertDetailState>(
+        builder: (context, state) {
+          if (state.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-          // Section 1: Info section
-          _buildInfoSection(context, l10n, colorScheme, textTheme, isDark),
+          if (state.failure != null || state.alert == null) {
+            return Column(
+              children: [
+                SectionHeader(text: l10n.alertDetailHeader('-')),
+                Expanded(
+                  child: EmptyStateView(
+                    type: EmptyStateType.error,
+                    title: l10n.errorTitle,
+                    description: l10n.alertLoadError,
+                  ),
+                ),
+              ],
+            );
+          }
 
-          // Section 2: Scrollable content
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 32),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Alert data
-                  _buildSectionTitle(
-                    l10n.alertDataSection,
-                    textTheme,
-                    colorScheme,
-                  ),
-                  _buildAlertDataCard(
-                    context,
-                    l10n,
-                    colorScheme,
-                    textTheme,
-                    isDark,
-                  ),
+          final alert = state.alert!;
+          final displayName = state.displayName;
+          final hasCoordinates =
+              alert.latitude != 0.0 || alert.longitude != 0.0;
 
-                  // Location
-                  _buildSectionTitle(
-                    l10n.locationOnActivationSection,
-                    textTheme,
-                    colorScheme,
-                  ),
-                  _buildMapPlaceholder(l10n, colorScheme, textTheme),
-
-                  // Contact
-                  _buildSectionTitle(
-                    l10n.contactSection,
-                    textTheme,
-                    colorScheme,
-                  ),
-                  _buildContactButton(l10n, colorScheme),
-                ],
+          return Column(
+            children: [
+              SectionHeader(
+                text: l10n.alertDetailHeader(displayName.capitalized()),
               ),
-            ),
-          ),
-        ],
+
+              // Section 1: Info section
+              _buildInfoSection(
+                context,
+                l10n,
+                colorScheme,
+                textTheme,
+                isDark,
+                alert,
+                displayName,
+              ),
+
+              // Section 2: Scrollable content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.only(bottom: 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Alert data
+                      _buildSectionTitle(
+                        l10n.alertDataSection,
+                        textTheme,
+                        colorScheme,
+                      ),
+                      _buildAlertDataCard(
+                        context,
+                        l10n,
+                        colorScheme,
+                        textTheme,
+                        isDark,
+                        alert,
+                        displayName,
+                      ),
+
+                      // Location
+                      _buildSectionTitle(
+                        l10n.locationOnActivationSection,
+                        textTheme,
+                        colorScheme,
+                      ),
+                      if (hasCoordinates)
+                        _buildMap(alert, l10n, colorScheme, textTheme)
+                      else
+                        _buildMapPlaceholder(l10n, colorScheme, textTheme),
+
+                      // Contact
+                      _buildSectionTitle(
+                        l10n.contactSection,
+                        textTheme,
+                        colorScheme,
+                      ),
+                      _buildContactButton(l10n, colorScheme, displayName),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

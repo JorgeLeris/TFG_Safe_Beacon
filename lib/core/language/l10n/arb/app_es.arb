@@ -129,6 +129,7 @@
   "notAvailable": "No disponible",
   "panicButton": "Botón del pánico",
   "guardianMode": "Modo guardián",
+  "sensors": "Sensores",
   "panicButtonInfoContent": "Esta función envía alertas inmediatas a tus contactos de confianza con tu ubicación actual. Utilízala únicamente en situaciones de emergencia.",
   "addPanicButtonToDevice": "Añadir botón del pánico al dispositivo",
   "panicButtonStatusStandby": "En espera",
@@ -184,7 +185,7 @@
       }
     }
   },
-  "alertOfFeature": "Alerta del: {feature}",
+  "alertOfFeature": "Alerta - {feature}",
   "@alertOfFeature": {
     "placeholders": {
       "feature": {
@@ -246,5 +247,9 @@
   "deactivationDataTitle": "Datos desactivación",
   "deactivationReason": "Motivo",
   "timeActive": "Tiempo activa",
-  "mapPlaceholder": "Mapa no disponible"
+  "deactivationDateDetail": "Fecha de desactivación",
+  "deactivationTimeDetail": "Hora de desactivación",
+  "mapPlaceholder": "Mapa no disponible",
+  "openInGoogleMaps": "Abrir en Google Maps",
+  "alertLoadError": "No se pudo cargar la alerta"
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safe_beacon/presentation/features/control/providers/alert_detail_provider.dart';
 import 'package:safe_beacon/presentation/features/control/providers/control_provider.dart';
 import 'package:safe_beacon/presentation/features/control/screens/alert_detail_screen.dart';
 import 'package:safe_beacon/presentation/features/control/screens/control_screen.dart';
@@ -18,11 +19,13 @@ class ControlRoute extends GoRouteData with $ControlRoute {
       const ControlProvider(child: ControlScreen());
 }
 
-@TypedGoRoute<AlertDetailRoute>(path: '/alert-detail')
+@TypedGoRoute<AlertDetailRoute>(path: '/alert-detail/:alertId')
 class AlertDetailRoute extends GoRouteData with $AlertDetailRoute {
-  const AlertDetailRoute();
+  const AlertDetailRoute({required this.alertId});
+
+  final String alertId;
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
-      const AlertDetailScreen();
+      AlertDetailProvider(alertId: alertId, child: const AlertDetailScreen());
 }

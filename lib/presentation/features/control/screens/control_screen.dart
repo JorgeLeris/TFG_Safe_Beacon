@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safe_beacon/core/extensions/string_extensions.dart';
+import 'package:safe_beacon/core/helpers/helpers.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/alerts/entities/alert.dart';
 import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
@@ -47,15 +48,6 @@ class _ControlScreenState extends State<ControlScreen> {
   // ---------------------------------------------------------------------------
   // Alert mapping helpers
   // ---------------------------------------------------------------------------
-
-  /// Converts domain [AlertType] enum to a localised label.
-  String _alertTypeLabel(AlertType type, AppLocalizations l10n) {
-    return switch (type) {
-      AlertType.panic => l10n.alertOfFeature(l10n.panicButton),
-      AlertType.guardian => l10n.alertOfFeature(l10n.guardianMode),
-      _ => l10n.alertOfFeature(type.name),
-    };
-  }
 
   /// Converts domain [AlertType] to the filter key used by [AlertFunctionalityFilter].
   bool _matchesFunctionalityFilter(
@@ -182,14 +174,17 @@ class _ControlScreenState extends State<ControlScreen> {
                 padding: const EdgeInsets.only(bottom: 10),
                 child: AlertListItem(
                   alert: AlertItem(
-                    alertType: _alertTypeLabel(alert.alertType, l10n),
+                    alertType: AlertHelper.alertTypeLabelComplete(
+                      alert.alertType,
+                      l10n,
+                    ),
                     username: displayName,
                     profilePhoto: state.alertProfilePhotos[alert.ownerUid],
                     isActive: alert.status == AlertStatus.active,
                     dateTime: alert.activatedAt,
                   ),
                   onTap: () {
-                    const AlertDetailRoute().push(context);
+                    AlertDetailRoute(alertId: alert.id).push(context);
                   },
                   onProfileTap: () {
                     OtherProfileRoute(uid: alert.ownerUid).push(context);

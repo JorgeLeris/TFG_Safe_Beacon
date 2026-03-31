@@ -32,6 +32,9 @@ dependencies:
   local_auth_darwin: ^2.0.3
   geolocator: ^14.0.2
   battery_plus: ^7.0.0
+  flutter_map: ^8.2.2
+  latlong2: ^0.9.1
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

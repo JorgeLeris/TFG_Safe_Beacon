@@ -19,6 +19,8 @@ class AlertDetailDialog {
     required String time,
     required String battery,
     String? deactivationReason,
+    String? deactivationDate,
+    String? deactivationTime,
     String? timeActive,
   }) {
     final l10n = context.l10n;
@@ -87,6 +89,20 @@ class AlertDetailDialog {
           _DetailRow(
             label: l10n.deactivationReason,
             value: deactivationReason.orDash(),
+            textTheme: textTheme,
+            colorScheme: colorScheme,
+          ),
+          const SizedBox(height: 14),
+          _DetailRow(
+            label: l10n.deactivationDateDetail,
+            value: deactivationDate.orDash(),
+            textTheme: textTheme,
+            colorScheme: colorScheme,
+          ),
+          const SizedBox(height: 14),
+          _DetailRow(
+            label: l10n.deactivationTimeDetail,
+            value: deactivationTime.orDash(),
             textTheme: textTheme,
             colorScheme: colorScheme,
           ),
