@@ -7,6 +7,7 @@ import 'package:safe_beacon/presentation/features/contacts/routes/contacts_route
 import 'package:safe_beacon/presentation/features/control/cubits/control_cubit.dart';
 import 'package:safe_beacon/presentation/features/control/routes/control_routes.dart';
 import 'package:safe_beacon/presentation/features/control/widgets/alert_list_header.dart';
+import 'package:safe_beacon/presentation/features/profile/routes/profile_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class ControlScreen extends StatefulWidget {
@@ -191,7 +192,7 @@ class _ControlScreenState extends State<ControlScreen> {
                     const AlertDetailRoute().push(context);
                   },
                   onProfileTap: () {
-                    // TODO: navigate to user profile
+                    OtherProfileRoute(uid: alert.ownerUid).push(context);
                   },
                 ),
               );
