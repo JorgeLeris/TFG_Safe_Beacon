@@ -30,7 +30,7 @@ class ControlCubit extends Cubit<ControlState> {
   /// Simulates a short loading state while applying alert filters.
   Future<void> applyFiltersWithLoading() async {
     emit(state.copyWith(isApplyingFilters: true));
-    await Future.delayed(const Duration(milliseconds: 700));
+    await Future.delayed(const Duration(milliseconds: 500));
     emit(state.copyWith(isApplyingFilters: false));
   }
 
