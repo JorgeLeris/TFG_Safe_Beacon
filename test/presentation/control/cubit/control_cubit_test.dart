@@ -2,15 +2,22 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:safe_beacon/domain/alerts/alert_repository.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/domain/common/result.dart';
 import 'package:safe_beacon/domain/contacts/contact_request_repository.dart';
+import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
 import 'package:safe_beacon/presentation/features/control/cubits/control_cubit.dart';
 
 // MARK: - DUMMY DATA
 
 class MockContactRequestRepository extends Mock
     implements ContactRequestRepository {}
+
+class MockAlertRepository extends Mock implements AlertRepository {}
+
+class MockUserProfileRepository extends Mock
+    implements UserProfileRepository {}
 
 const _uid = 'uid_test';
 const _dummyFailure = AppFailure.unknown();
@@ -19,13 +26,19 @@ const _dummyFailure = AppFailure.unknown();
 
 void main() {
   late MockContactRequestRepository mockContactRequestRepository;
+  late MockAlertRepository mockAlertRepository;
+  late MockUserProfileRepository mockUserProfileRepository;
   late ControlCubit controlCubit;
 
   setUp(() {
     mockContactRequestRepository = MockContactRequestRepository();
+    mockAlertRepository = MockAlertRepository();
+    mockUserProfileRepository = MockUserProfileRepository();
     controlCubit = ControlCubit(
       uid: _uid,
       contactRequestRepository: mockContactRequestRepository,
+      alertRepository: mockAlertRepository,
+      userProfileRepository: mockUserProfileRepository,
     );
   });
 
