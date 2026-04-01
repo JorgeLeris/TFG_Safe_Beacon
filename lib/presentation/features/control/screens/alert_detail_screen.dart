@@ -302,14 +302,10 @@ class AlertDetailScreen extends StatelessWidget {
                       markers: [
                         Marker(
                           point: point,
-                          width: 40,
-                          height: 40,
+                          width: 25, // same as MapLocationPin size
+                          height: 35, // size * 1.4
                           alignment: Alignment.topCenter,
-                          child: const Icon(
-                            Icons.location_on,
-                            color: Colors.red,
-                            size: 40,
-                          ),
+                          child: const MapLocationPin(size: 25),
                         ),
                       ],
                     ),
