@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/extensions/date_extensions.dart';
 import 'package:safe_beacon/core/extensions/duration_extensions.dart';
 import 'package:safe_beacon/core/extensions/string_extensions.dart';
@@ -11,8 +8,8 @@ import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/alerts/entities/alert.dart';
 import 'package:safe_beacon/presentation/features/control/cubits/alert_detail_cubit.dart';
 import 'package:safe_beacon/presentation/features/control/widgets/alert_detail_dialog.dart';
+import 'package:safe_beacon/presentation/features/control/widgets/alert_map.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class AlertDetailScreen extends StatelessWidget {
   const AlertDetailScreen({super.key});
@@ -261,91 +258,6 @@ class AlertDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMap(
-    Alert alert,
-    AppLocalizations l10n,
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-  ) {
-    final point = LatLng(alert.latitude, alert.longitude);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: colorScheme.outline.withValues(alpha: 0.5),
-              ),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(14),
-              child: SizedBox(
-                height: 225,
-                width: double.infinity,
-                child: FlutterMap(
-                  options: MapOptions(
-                    initialCenter: point,
-                    initialZoom: 15,
-                    interactionOptions: const InteractionOptions(
-                      flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
-                    ),
-                  ),
-                  children: [
-                    TileLayer(
-                      urlTemplate: Constants.openStreetMapTileUrl,
-                      userAgentPackageName: Constants.bundleId,
-                    ),
-                    MarkerLayer(
-                      markers: [
-                        Marker(
-                          point: point,
-                          width: 25, // same as MapLocationPin size
-                          height: 35, // size * 1.4
-                          alignment: Alignment.topCenter,
-                          child: const MapLocationPin(size: 25),
-                        ),
-                      ],
-                    ),
-                    RichAttributionWidget(
-                      attributions: [
-                        TextSourceAttribution(
-                          Constants.openStreetMapAttribution,
-                          onTap: () => launchUrl(
-                            Uri.parse(Constants.openStreetMapCopyrightUrl),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () {
-                final url = Uri.parse(
-                  Constants.googleMapsUrl(alert.latitude, alert.longitude),
-                );
-                launchUrl(url, mode: LaunchMode.externalApplication);
-              },
-              icon: Icon(Icons.map_outlined, color: colorScheme.tertiary),
-              label: Text(
-                l10n.openInGoogleMaps,
-                style: TextStyle(color: colorScheme.tertiary),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildMapPlaceholder(
     AppLocalizations l10n,
     ColorScheme colorScheme,
@@ -493,7 +405,12 @@ class AlertDetailScreen extends StatelessWidget {
                         colorScheme,
                       ),
                       if (hasCoordinates)
-                        _buildMap(alert, l10n, colorScheme, textTheme)
+                        AlertMap(
+                          alert: alert,
+                          l10n: l10n,
+                          colorScheme: colorScheme,
+                          textTheme: textTheme,
+                        )
                       else
                         _buildMapPlaceholder(l10n, colorScheme, textTheme),
 
