@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -13,6 +14,7 @@ import 'package:safe_beacon/app/router/app_router.dart';
 import 'package:safe_beacon/core/language/language.dart';
 import 'package:safe_beacon/data/repositories/app_settings_repository.dart';
 import 'package:safe_beacon/firebase_options.dart';
+import 'package:safe_beacon/notification_service.dart';
 
 Future<void> mainCommon(Environment environment) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +24,11 @@ Future<void> mainCommon(Environment environment) async {
 
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Initialize notification service
+  final notificationService = NotificationService();
+  await notificationService.init();
+  FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
 
   // Build the app router with dependencies
   final router = buildAppRouter();
@@ -81,4 +88,12 @@ Future<Locale> _getInitialAppLocale(
   }
 
   return Locale.fromSubtags(languageCode: appLanguage);
+}
+
+// Necessary for background message handling, must be a top-level function — runs in a separate isolate
+// Terminated/Background: app is closed or in background
+Future<void> handleBackgroundMessage(RemoteMessage message) async {
+  appLogger.info(
+    'Background/terminated message received — running in separate isolate: ${message.messageId}',
+  );
 }
