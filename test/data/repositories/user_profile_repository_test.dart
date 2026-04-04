@@ -525,4 +525,196 @@ void main() {
       },
     );
   });
+
+  // ---------------------------------------------------------------------------
+  // saveFcmToken
+  // ---------------------------------------------------------------------------
+
+  group('UserProfileRepositoryImpl.saveFcmToken', () {
+    test(
+      '[HAPPY PATH] - GIVEN a valid uid and token, '
+      'WHEN saveFcmToken is called, '
+      'THEN should call api.saveFcmToken and return Result.success',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.saveFcmToken(dummyProfile.uid, 'fcm-token-abc'),
+        ).thenAnswer((_) async {});
+
+        // Act.
+        final result = await repository.saveFcmToken(
+          dummyProfile.uid,
+          'fcm-token-abc',
+        );
+
+        // Assert.
+        expect(result.isSuccess, isTrue);
+        verify(
+          () => mockApi.saveFcmToken(dummyProfile.uid, 'fcm-token-abc'),
+        ).called(1);
+      },
+    );
+
+    test(
+      '[ERROR PATH] - GIVEN a permission-denied FirebaseException, '
+      'WHEN saveFcmToken is called, '
+      'THEN should return Result.failure with AppFailure.forbidden()',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.saveFcmToken(any(), any()),
+        ).thenThrow(_firebaseException('permission-denied'));
+
+        // Act.
+        final result = await repository.saveFcmToken(dummyProfile.uid, 'tok');
+
+        // Assert.
+        expect(result.isFailure, isTrue);
+        expect(
+          result,
+          equals(const Result<void>.failure(AppFailure.forbidden())),
+        );
+      },
+    );
+
+    test(
+      '[ERROR PATH] - GIVEN an unavailable FirebaseException, '
+      'WHEN saveFcmToken is called, '
+      'THEN should return Result.failure with AppFailure.network()',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.saveFcmToken(any(), any()),
+        ).thenThrow(_firebaseException('unavailable'));
+
+        // Act.
+        final result = await repository.saveFcmToken(dummyProfile.uid, 'tok');
+
+        // Assert.
+        expect(result.isFailure, isTrue);
+        expect(
+          result,
+          equals(const Result<void>.failure(AppFailure.network())),
+        );
+      },
+    );
+
+    test(
+      '[ERROR PATH] - GIVEN a non-Firebase exception, '
+      'WHEN saveFcmToken is called, '
+      'THEN should return Result.failure with AppFailure.unknown()',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.saveFcmToken(any(), any()),
+        ).thenThrow(Exception('Unexpected'));
+
+        // Act.
+        final result = await repository.saveFcmToken(dummyProfile.uid, 'tok');
+
+        // Assert.
+        expect(result.isFailure, isTrue);
+        expect(
+          result,
+          equals(const Result<void>.failure(AppFailure.unknown())),
+        );
+      },
+    );
+  });
+
+  // ---------------------------------------------------------------------------
+  // clearFcmToken
+  // ---------------------------------------------------------------------------
+
+  group('UserProfileRepositoryImpl.clearFcmToken', () {
+    test(
+      '[HAPPY PATH] - GIVEN a valid uid and token, '
+      'WHEN clearFcmToken is called, '
+      'THEN should call api.clearFcmToken and return Result.success',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.clearFcmToken(dummyProfile.uid, 'fcm-token-abc'),
+        ).thenAnswer((_) async {});
+
+        // Act.
+        final result = await repository.clearFcmToken(
+          dummyProfile.uid,
+          'fcm-token-abc',
+        );
+
+        // Assert.
+        expect(result.isSuccess, isTrue);
+        verify(
+          () => mockApi.clearFcmToken(dummyProfile.uid, 'fcm-token-abc'),
+        ).called(1);
+      },
+    );
+
+    test(
+      '[ERROR PATH] - GIVEN a permission-denied FirebaseException, '
+      'WHEN clearFcmToken is called, '
+      'THEN should return Result.failure with AppFailure.forbidden()',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.clearFcmToken(any(), any()),
+        ).thenThrow(_firebaseException('permission-denied'));
+
+        // Act.
+        final result = await repository.clearFcmToken(dummyProfile.uid, 'tok');
+
+        // Assert.
+        expect(result.isFailure, isTrue);
+        expect(
+          result,
+          equals(const Result<void>.failure(AppFailure.forbidden())),
+        );
+      },
+    );
+
+    test(
+      '[ERROR PATH] - GIVEN an unavailable FirebaseException, '
+      'WHEN clearFcmToken is called, '
+      'THEN should return Result.failure with AppFailure.network()',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.clearFcmToken(any(), any()),
+        ).thenThrow(_firebaseException('unavailable'));
+
+        // Act.
+        final result = await repository.clearFcmToken(dummyProfile.uid, 'tok');
+
+        // Assert.
+        expect(result.isFailure, isTrue);
+        expect(
+          result,
+          equals(const Result<void>.failure(AppFailure.network())),
+        );
+      },
+    );
+
+    test(
+      '[ERROR PATH] - GIVEN a non-Firebase exception, '
+      'WHEN clearFcmToken is called, '
+      'THEN should return Result.failure with AppFailure.unknown()',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.clearFcmToken(any(), any()),
+        ).thenThrow(Exception('Unexpected'));
+
+        // Act.
+        final result = await repository.clearFcmToken(dummyProfile.uid, 'tok');
+
+        // Assert.
+        expect(result.isFailure, isTrue);
+        expect(
+          result,
+          equals(const Result<void>.failure(AppFailure.unknown())),
+        );
+      },
+    );
+  });
 }
