@@ -31,8 +31,10 @@ class ProfileProvider extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-            create: (context) =>
-                LogoutCubit(authRepository: context.read<AuthRepository>()),
+            create: (context) => LogoutCubit(
+              authRepository: context.read<AuthRepository>(),
+              userProfileRepository: context.read<UserProfileRepository>(),
+            ),
           ),
           BlocProvider(
             create: (context) => ProfileCubit(

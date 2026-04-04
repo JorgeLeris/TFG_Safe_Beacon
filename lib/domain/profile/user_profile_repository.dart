@@ -20,4 +20,10 @@ abstract class UserProfileRepository {
   /// The [profile] uid identifies the document to update. The caller must be
   /// the authenticated user who owns the profile.
   Future<Result<void>> updateProfile(UserProfile profile);
+
+  /// Stores [token] as the single FCM token for the user identified by [uid].
+  Future<Result<void>> saveFcmToken(String uid, String token);
+
+  /// Removes the FCM token field from the user identified by [uid].
+  Future<Result<void>> clearFcmToken(String uid, String token);
 }

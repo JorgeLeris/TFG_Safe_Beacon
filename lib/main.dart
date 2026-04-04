@@ -13,6 +13,8 @@ import 'package:safe_beacon/app/monitoring/logging.dart';
 import 'package:safe_beacon/app/router/app_router.dart';
 import 'package:safe_beacon/core/language/language.dart';
 import 'package:safe_beacon/data/repositories/app_settings_repository.dart';
+import 'package:safe_beacon/data/repositories/user_profile_repository_impl.dart';
+import 'package:safe_beacon/data/sources/firebase/profile/user_profile_api.dart';
 import 'package:safe_beacon/firebase_options.dart';
 import 'package:safe_beacon/notification_service.dart';
 
@@ -28,6 +30,12 @@ Future<void> mainCommon(Environment environment) async {
   // Initialize notification service
   final notificationService = NotificationService();
   await notificationService.init();
+  notificationService.listenToTokenRefresh((uid, token) async {
+    await UserProfileRepositoryImpl(api: UserProfileApi()).saveFcmToken(
+      uid,
+      token,
+    );
+  });
   FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
 
   // Build the app router with dependencies
