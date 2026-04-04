@@ -146,37 +146,64 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
       batteryLevel: batteryLevel,
     );
 
-    result.when(
-      success: (_) => emit(
-        state.copyWith(
-          isActivating: false,
-          buttonState: PanicButtonState.active,
-          activeAlertActivatedAt: DateTime.now(),
-          disabledReason: null,
-        ),
-      ),
-      failure: (failure) {
-        // No trusted contacts.
-        if (failure is BusinessFailure &&
-            failure.message == 'no_trusted_contacts') {
-          emit(
-            state.copyWith(
-              isActivating: false,
-              buttonState: PanicButtonState.disabled,
-              disabledReason: DisabledReason.noTrustedContacts,
-              activateFailure: null,
-            ),
-          );
-          return;
-        }
+    if (result.isFailure) {
+      final failure = (result as Failure<void>).failure;
+      // No trusted contacts.
+      if (failure is BusinessFailure &&
+          failure.message == 'no_trusted_contacts') {
         emit(
           state.copyWith(
             isActivating: false,
-            buttonState: PanicButtonState.normal,
-            activateFailure: failure,
+            buttonState: PanicButtonState.disabled,
+            disabledReason: DisabledReason.noTrustedContacts,
+            activateFailure: null,
           ),
         );
+        return;
+      }
+      emit(
+        state.copyWith(
+          isActivating: false,
+          buttonState: PanicButtonState.normal,
+          activateFailure: failure,
+        ),
+      );
+      return;
+    }
+
+    // Fetch the newly created alert to get the embedded trustedContactUids.
+    final activeAlertResult = await _alertRepository.getActiveAlert(_uid);
+    final trustedContactUids = activeAlertResult.when(
+      success: (alert) => alert?.trustedContactUids ?? <String>[],
+      failure: (_) => <String>[],
+    );
+
+    // Fetch FCM tokens of all trusted contacts (users without a token are excluded).
+    final tokensResult = await _userProfileRepository.getFcmTokensForUsers(
+      trustedContactUids,
+    );
+    tokensResult.when(
+      success: (tokens) {
+        print(
+          'Fetched ${tokens.length} FCM token(s)'
+        );
+        // TODO: send push notification to [tokens]
+        for (var token in tokens) {
+          print('Would send alert notification to token: $token');
+        }
       },
+      failure: (f) => appLogger.warning(
+        'Failed to fetch FCM tokens for alert notification — owner: $_uid — $f',
+      ),
+    );
+
+    emit(
+      state.copyWith(
+        isActivating: false,
+        buttonState: PanicButtonState.active,
+        activeAlertActivatedAt: DateTime.now(),
+        disabledReason: null,
+      ),
     );
   }
 

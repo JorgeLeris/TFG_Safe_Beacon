@@ -56,6 +56,22 @@ class UserProfileApi {
     });
   }
 
+  /// Returns the non-null FCM tokens of the users identified by [uids].
+  ///
+  /// Users without a token are silently excluded from the result.
+  Future<List<String>> getFcmTokens(List<String> uids) async {
+    if (uids.isEmpty) return [];
+
+    final snap = await _collection
+        .where(FieldPath.documentId, whereIn: uids)
+        .get();
+
+    return snap.docs
+        .map((doc) => doc.data()['fcmToken'] as String?)
+        .whereType<String>()
+        .toList();
+  }
+
   // =================================
   // MARK: - Username Reservation
   // =================================

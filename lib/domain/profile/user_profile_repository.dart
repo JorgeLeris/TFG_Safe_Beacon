@@ -26,4 +26,9 @@ abstract class UserProfileRepository {
 
   /// Removes the FCM token field from the user identified by [uid].
   Future<Result<void>> clearFcmToken(String uid, String token);
+
+  /// Returns the FCM tokens of the users identified by [uids].
+  ///
+  /// Only tokens that are present on the user document are included.
+  Future<Result<List<String>>> getFcmTokensForUsers(List<String> uids);
 }
