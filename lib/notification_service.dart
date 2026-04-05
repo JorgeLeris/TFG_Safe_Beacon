@@ -4,22 +4,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart' as http;
 import 'package:safe_beacon/app/monitoring/logging.dart';
 
 class NotificationService {
   final _firebaseMessaging = FirebaseMessaging.instance;
+  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   Future<void> init() async {
     await _firebaseMessaging.requestPermission();
-
-    // Foreground: app is open and visible — notification is NOT shown automatically
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      appLogger.info(
-        'Foreground message received — must handle display manually: ${message.messageId}',
-      );
-    });
 
     // Background: app is open but not visible — user tapped the notification
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
@@ -27,6 +22,47 @@ class NotificationService {
         'Background notification tapped — app brought to foreground: ${message.messageId}',
       );
     });
+
+    // Foreground: app is open and visible — notification is NOT shown automatically
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      appLogger.info(
+        'Foreground message received — must handle display manually: ${message.messageId}',
+      );
+      final RemoteNotification? notification = message.notification;
+      final AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+          id: notification.hashCode,
+          title: notification.title,
+          body: notification.body,
+          notificationDetails: const NotificationDetails(
+            android: AndroidNotificationDetails(
+              'safe_beacon_channel',
+              'Safe Beacon Notifications',
+              channelDescription: 'Channel for Safe Beacon app notifications',
+              importance: Importance.high,
+              priority: Priority.high,
+              icon: '@mipmap/ic_launcher',
+            ),
+          ),
+        );
+      }
+    });
+
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+
+    await flutterLocalNotificationsPlugin.initialize(
+      settings: initializationSettings,
+      onDidReceiveNotificationResponse: (details) {
+        appLogger.info('Notification tapped — details: ${details.payload}');
+      },
+    );
+
+    await createLocalNotificationChannel();
   }
 
   /// Listens for FCM token rotation and invokes [onRefresh] with the current
@@ -107,5 +143,22 @@ class NotificationService {
       appLogger.warning('Failed to send notification: ${response.body}');
       return false;
     }
+  }
+
+  // Creates a local notification channel for Android devices. This is required to
+  // display notifications when the app is in the foreground.
+  Future<void> createLocalNotificationChannel() async {
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'safe_beacon_channel',
+      'Safe Beacon Notifications',
+      description: 'Channel for Safe Beacon app notifications',
+      importance: Importance.high,
+    );
+
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
+        ?.createNotificationChannel(channel);
   }
 }
