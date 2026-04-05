@@ -13,7 +13,26 @@ class NotificationService {
   final _firebaseMessaging = FirebaseMessaging.instance;
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-  Future<void> init() async {
+  /// Alert ID extracted from the notification that launched the app from a
+  /// terminated state. Set in `main.dart` via [setPendingInitialAlertId] and
+  /// consumed once by the splash screen via [consumeInitialAlertId].
+  static String? _pendingInitialAlertId;
+
+  static void setPendingInitialAlertId(String alertId) {
+    _pendingInitialAlertId = alertId;
+  }
+
+  static String? consumeInitialAlertId() {
+    final id = _pendingInitialAlertId;
+    _pendingInitialAlertId = null;
+    return id;
+  }
+
+  /// Initialises the notification service.
+  ///
+  /// [onNotificationTap] is called with the `alertId` whenever the user taps a
+  /// notification while the app is in the foreground or background (but not terminated).
+  Future<void> init({void Function(String alertId)? onNotificationTap}) async {
     await _firebaseMessaging.requestPermission();
 
     // Background: app is open but not visible — user tapped the notification
@@ -21,6 +40,10 @@ class NotificationService {
       appLogger.info(
         'Background notification tapped — app brought to foreground: ${message.messageId}',
       );
+      final alertId = message.data['alertId'] as String?;
+      if (alertId != null && alertId.isNotEmpty && onNotificationTap != null) {
+        onNotificationTap(alertId);
+      }
     });
 
     // Foreground: app is open and visible — notification is NOT shown automatically
@@ -31,6 +54,7 @@ class NotificationService {
       final RemoteNotification? notification = message.notification;
       final AndroidNotification? android = message.notification?.android;
       if (notification != null && android != null) {
+        final alertId = message.data['alertId'] as String?;
         flutterLocalNotificationsPlugin.show(
           id: notification.hashCode,
           title: notification.title,
@@ -45,6 +69,7 @@ class NotificationService {
               icon: '@mipmap/ic_launcher',
             ),
           ),
+          payload: alertId,
         );
       }
     });
@@ -58,7 +83,13 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.initialize(
       settings: initializationSettings,
       onDidReceiveNotificationResponse: (details) {
-        appLogger.info('Notification tapped — details: ${details.payload}');
+        appLogger.info('Notification tapped — payload: ${details.payload}');
+        final alertId = details.payload;
+        if (alertId != null &&
+            alertId.isNotEmpty &&
+            onNotificationTap != null) {
+          onNotificationTap(alertId);
+        }
       },
     );
 

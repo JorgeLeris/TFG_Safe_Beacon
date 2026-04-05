@@ -31,19 +31,27 @@ Future<void> mainCommon(Environment environment) async {
   // Load environment variables
   await dotenv.load();
 
-  // Initialize notification service
-  final notificationService = NotificationService();
-  await notificationService.init();
-  notificationService.listenToTokenRefresh((uid, token) async {
-    await UserProfileRepositoryImpl(api: UserProfileApi()).saveFcmToken(
-      uid,
-      token,
-    );
-  });
-  FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+  // Check if the app was launched by tapping a notification (terminated state).
+  final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+  final initialAlertId = initialMessage?.data['alertId'] as String?;
+  if (initialAlertId != null && initialAlertId.isNotEmpty) {
+    NotificationService.setPendingInitialAlertId(initialAlertId);
+  }
 
   // Build the app router with dependencies
   final router = buildAppRouter();
+
+  // Initialize notification service
+  final notificationService = NotificationService();
+  await notificationService.init(
+    onNotificationTap: (alertId) => router.push('/alert-detail/$alertId'),
+  );
+  notificationService.listenToTokenRefresh((uid, token) async {
+    await UserProfileRepositoryImpl(
+      api: UserProfileApi(),
+    ).saveFcmToken(uid, token);
+  });
+  FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
 
   // Initialize global dependencies
   final appDeps = await AppDependencies.initialize(environment);

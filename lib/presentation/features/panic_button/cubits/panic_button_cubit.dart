@@ -181,11 +181,15 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
       return;
     }
 
-    // Fetch the newly created alert to get the embedded trustedContactUids.
+    // Fetch the newly created alert to get the embedded trustedContactUids and alertId.
     final activeAlertResult = await _alertRepository.getActiveAlert(_uid);
     final trustedContactUids = activeAlertResult.when(
       success: (alert) => alert?.trustedContactUids ?? <String>[],
       failure: (_) => <String>[],
+    );
+    final alertId = activeAlertResult.when(
+      success: (alert) => alert?.id,
+      failure: (_) => null,
     );
 
     // Fetch FCM tokens of all trusted contacts (users without a token are excluded).
@@ -201,6 +205,7 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
             deviceToken: token,
             title: l10n.notificationAlertTitle(name!),
             body: l10n.notificationAlertBody(name!),
+            data: alertId != null ? {'alertId': alertId} : null,
           );
         }
       },
