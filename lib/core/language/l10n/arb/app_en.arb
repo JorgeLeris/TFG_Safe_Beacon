@@ -251,5 +251,21 @@
   "deactivationTimeDetail": "Deactivation time",
   "mapPlaceholder": "Map not available",
   "openInGoogleMaps": "Open in Google Maps",
-  "alertLoadError": "Could not load the alert"
+  "alertLoadError": "Could not load the alert",
+  "notificationAlertTitle": "Alert from {username}",
+  "@notificationAlertTitle": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationAlertBody": "Your protected person {username}, has activated their panic button.",
+  "@notificationAlertBody": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  }
 }

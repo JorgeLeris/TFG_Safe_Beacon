@@ -251,5 +251,21 @@
   "deactivationTimeDetail": "Heure de désactivation",
   "mapPlaceholder": "Carte non disponible",
   "openInGoogleMaps": "Ouvrir dans Google Maps",
-  "alertLoadError": "Impossible de charger l'alerte"
+  "alertLoadError": "Impossible de charger l'alerte",
+  "notificationAlertTitle": "Alerte de {username}",
+  "@notificationAlertTitle": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationAlertBody": "Votre personne protégée {username}, a activé son bouton de panique.",
+  "@notificationAlertBody": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:safe_beacon/app/app.dart';
 import 'package:safe_beacon/app/config/app_dependencies.dart';
@@ -26,6 +27,9 @@ Future<void> mainCommon(Environment environment) async {
 
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+  // Load environment variables
+  await dotenv.load();
 
   // Initialize notification service
   final notificationService = NotificationService();

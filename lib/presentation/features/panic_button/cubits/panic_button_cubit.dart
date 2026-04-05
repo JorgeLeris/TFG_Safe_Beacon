@@ -3,12 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:safe_beacon/app/monitoring/logging.dart';
+import 'package:safe_beacon/core/extensions/string_extensions.dart';
+import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/alerts/alert_repository.dart';
 import 'package:safe_beacon/domain/alerts/entities/alert.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/domain/common/result.dart';
 import 'package:safe_beacon/domain/contacts/contact_repository.dart';
 import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
+import 'package:safe_beacon/notification_service.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 part 'panic_button_state.dart';
@@ -112,7 +115,7 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
   ///
   /// Emits [PanicButtonState.loading] while the operation is in flight.
   /// Transitions to [PanicButtonState.disabled] with [DisabledReason.noTrustedContacts]
-  Future<void> activateAlert() async {
+  Future<void> activateAlert(AppLocalizations l10n) async {
     emit(
       state.copyWith(
         isActivating: true,
@@ -124,8 +127,15 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
     // Resolve owner username before creating the alert.
     final profileResult = await _userProfileRepository.getProfile(_uid);
     String? username;
+    String? name;
     profileResult.when(
-      success: (profile) => username = profile.username ?? _uid,
+      success: (profile) {
+        username = profile.username ?? _uid;
+        name =
+            '${profile.name}'
+                    ' ${profile.surname ?? ''}'
+                .capitalized();
+      },
       failure: (failure) =>
           emit(state.copyWith(isActivating: false, activateFailure: failure)),
     );
@@ -184,12 +194,14 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
     );
     tokensResult.when(
       success: (tokens) {
-        print(
-          'Fetched ${tokens.length} FCM token(s)'
-        );
-        // TODO: send push notification to [tokens]
+        appLogger.info('Fetched ${tokens.length} FCM token(s)');
         for (var token in tokens) {
-          print('Would send alert notification to token: $token');
+          appLogger.info('Would send alert notification to token: $token');
+          NotificationService().sendPushNotification(
+            deviceToken: token,
+            title: l10n.notificationAlertTitle(name!),
+            body: l10n.notificationAlertBody(name!),
+          );
         }
       },
       failure: (f) => appLogger.warning(

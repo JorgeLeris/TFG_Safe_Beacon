@@ -152,7 +152,7 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
 
     switch (state.buttonState) {
       case PanicButtonState.normal:
-        cubit.activateAlert();
+        cubit.activateAlert(l10n);
       case PanicButtonState.active:
         if (_cooldownProgress < 1.0) {
           CustomDialog.show(
