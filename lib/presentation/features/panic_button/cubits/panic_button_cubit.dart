@@ -12,6 +12,7 @@ import 'package:safe_beacon/domain/common/result.dart';
 import 'package:safe_beacon/domain/contacts/contact_repository.dart';
 import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
 import 'package:safe_beacon/notification_service.dart';
+import 'package:safe_beacon/presentation/features/panic_button/widget/panic_widget_service.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 part 'panic_button_state.dart';
@@ -88,6 +89,7 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
           disabledReason: null,
         ),
       );
+      await PanicWidgetService.setAlertActive(isActive: true);
       return;
     }
 
@@ -109,6 +111,7 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
         activeAlertActivatedAt: null,
       ),
     );
+    await PanicWidgetService.setAlertActive(isActive: false);
   }
 
   /// Creates a new panic alert for the current user.
@@ -222,6 +225,7 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
         disabledReason: null,
       ),
     );
+    await PanicWidgetService.setAlertActive(isActive: true);
   }
 
   /// Deactivates the current active alert with an optional [reason].
@@ -241,15 +245,18 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
       cancellationReason: (reason?.trim().isNotEmpty == true) ? reason : null,
     );
 
-    result.when(
-      success: (_) => emit(
-        state.copyWith(
-          isDeactivating: false,
-          buttonState: PanicButtonState.normal,
-          activeAlertActivatedAt: null,
-        ),
-      ),
-      failure: (failure) => emit(
+    await result.when(
+      success: (_) async {
+        emit(
+          state.copyWith(
+            isDeactivating: false,
+            buttonState: PanicButtonState.normal,
+            activeAlertActivatedAt: null,
+          ),
+        );
+        await PanicWidgetService.setAlertActive(isActive: false);
+      },
+      failure: (failure) async => emit(
         state.copyWith(isDeactivating: false, deactivateFailure: failure),
       ),
     );

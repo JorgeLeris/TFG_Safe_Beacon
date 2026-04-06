@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Panic button widget strings -->
+    <string name="widget_sos_label">SOS</string>
+    <string name="widget_app_name">SafeBeacon</string>
+    <string name="widget_standby_subtitle">Botón del pánico</string>
+    <string name="widget_activate_btn">ACTIVAR ALERTA</string>
+    <string name="widget_active_title">ALERTA ACTIVA</string>
+    <string name="widget_active_subtitle">SOS enviado a tus contactos</string>
+    <string name="widget_open_app_btn">ABRIR SAFEBEACON</string>
+    <string name="widget_description">Activa tu botón del pánico desde la pantalla de inicio.</string>
+</resources>

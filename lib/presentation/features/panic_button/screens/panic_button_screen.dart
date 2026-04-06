@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/presentation/features/panic_button/cubits/panic_button_cubit.dart';
+import 'package:safe_beacon/presentation/features/panic_button/widget/panic_widget_service.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 // TODO: manage disable case in feature configuration (also in home screen)
@@ -234,8 +236,42 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
     };
   }
 
-  void _showInfoDialog(BuildContext context, AppLocalizations l10n) {
-    CustomDialog.show(
+  // ==============================================
+  // MARK: - "Add to device" action
+  // ==============================================
+
+  /// Handles the "Add panic button to device" button.
+  Future<void> _handleAddToDevice(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) async {
+    if (Platform.isAndroid) {
+      try {
+        await PanicWidgetService.requestPinWidget();
+      } catch (_) {
+        if (!context.mounted) return;
+        unawaited(
+          CustomDialog.show(
+            context: context,
+            title: l10n.addWidgetTitle,
+            content: Text(l10n.addWidgetAndroidNotSupported),
+            buttonText: l10n.accept,
+          ),
+        );
+      }
+    } else {
+      unawaited(
+        CustomDialog.show(
+          context: context,
+          title: l10n.addWidgetTitle,
+          content: Text(l10n.addWidgetInstructions),
+          buttonText: l10n.accept,
+        ),
+      );
+    }
+  }
+
+  void _showInfoDialog(BuildContext context, AppLocalizations l10n) {    CustomDialog.show(
       context: context,
       title: l10n.panicButton,
       content: Text(l10n.panicButtonInfoContent),
@@ -295,9 +331,7 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
                         child: SectionButton(
                           icon: Icons.add_rounded,
                           text: l10n.addPanicButtonToDevice,
-                          onPressed: () {
-                            // TODO: add panic button shortcut to device
-                          },
+                          onPressed: () => _handleAddToDevice(context, l10n),
                           showArrow: false,
                           backgroundColor: colorScheme.secondary,
                           contentColor: colorScheme.onSecondary,

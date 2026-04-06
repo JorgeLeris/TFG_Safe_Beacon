@@ -18,6 +18,7 @@ import 'package:safe_beacon/data/repositories/user_profile_repository_impl.dart'
 import 'package:safe_beacon/data/sources/firebase/profile/user_profile_api.dart';
 import 'package:safe_beacon/firebase_options.dart';
 import 'package:safe_beacon/notification_service.dart';
+import 'package:safe_beacon/presentation/features/panic_button/widget/panic_widget_service.dart';
 
 Future<void> mainCommon(Environment environment) async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,6 +31,9 @@ Future<void> mainCommon(Environment environment) async {
 
   // Load environment variables
   await dotenv.load();
+
+  // Initialize home-screen widget service.
+  await PanicWidgetService.init();
 
   // Check if the app was launched by tapping a notification (terminated state).
   final initialMessage = await FirebaseMessaging.instance.getInitialMessage();

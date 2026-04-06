@@ -267,5 +267,12 @@
         "type": "String"
       }
     }
-  }
+  },
+  "addWidgetTitle": "Ajouter le widget à l'appareil",
+  "addWidgetInstructions": "Pour ajouter le widget sur iOS :\n1. Maintenez appuyé l'écran d'accueil jusqu'à ce que les icônes commencent à bouger.\n2. Appuyez sur le bouton '+' dans le coin supérieur gauche.\n3. Recherchez 'SafeBeacon' et sélectionnez le widget du bouton de panique.\n4. Placez-le où vous le souhaitez.",
+  "addWidgetAndroidNotSupported": "Votre lanceur ne prend pas en charge l'ajout de widgets directement. Allez sur l'écran d'accueil, appuyez longuement sur une zone vide et cherchez le widget SafeBeacon.",
+  "widgetSosLabel": "SOS",
+  "widgetActivateLabel": "Activer le bouton de panique",
+  "widgetActiveTitle": "ALERTE ACTIVE",
+  "widgetOpenApp": "Ouvrir SafeBeacon"
 }
