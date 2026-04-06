@@ -271,7 +271,8 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
     }
   }
 
-  void _showInfoDialog(BuildContext context, AppLocalizations l10n) {    CustomDialog.show(
+  void _showInfoDialog(BuildContext context, AppLocalizations l10n) {
+    CustomDialog.show(
       context: context,
       title: l10n.panicButton,
       content: Text(l10n.panicButtonInfoContent),
@@ -369,7 +370,6 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
                             title: l10n.featuresSettings,
                             description: l10n.featuresSettingsDescription,
                             onPressed: () {
-                              // TODO: navigate to features settings
                               _showFutureDialog(context, l10n);
                             },
                           ),
@@ -378,7 +378,6 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
                             title: l10n.deactivationPin,
                             description: l10n.deactivationPinDescription,
                             onPressed: () {
-                              // TODO: navigate to PIN setup
                               _showFutureDialog(context, l10n);
                             },
                           ),

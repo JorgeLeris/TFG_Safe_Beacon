@@ -9,6 +9,8 @@ import 'package:googleapis_auth/auth_io.dart';
 import 'package:http/http.dart' as http;
 import 'package:safe_beacon/app/monitoring/logging.dart';
 
+// TODO: add iOS configurations when adding iOS support for notifications (currently Android-only).
+
 class NotificationService {
   final _firebaseMessaging = FirebaseMessaging.instance;
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -53,6 +55,7 @@ class NotificationService {
       );
       final RemoteNotification? notification = message.notification;
       final AndroidNotification? android = message.notification?.android;
+      // TODO: handle iOS (in this case always android is going to be null)
       if (notification != null && android != null) {
         final alertId = message.data['alertId'] as String?;
         flutterLocalNotificationsPlugin.show(
@@ -77,8 +80,14 @@ class NotificationService {
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings();
+
     const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
+        InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: initializationSettingsIOS,
+        );
 
     await flutterLocalNotificationsPlugin.initialize(
       settings: initializationSettings,
