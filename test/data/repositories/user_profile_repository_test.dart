@@ -717,4 +717,107 @@ void main() {
       },
     );
   });
+
+  // ---------------------------------------------------------------------------
+  // getFcmTokensForUsers
+  // ---------------------------------------------------------------------------
+
+  group('UserProfileRepositoryImpl.getFcmTokensForUsers', () {
+    test('[HAPPY PATH] - GIVEN a list of valid uids with FCM tokens, '
+        'WHEN getFcmTokensForUsers is called, '
+        'THEN should return Result.success with the list of tokens', () async {
+      // Arrange.
+      final uids = ['uid-1', 'uid-2'];
+      final tokens = ['token-1', 'token-2'];
+      when(() => mockApi.getFcmTokens(uids)).thenAnswer((_) async => tokens);
+
+      // Act.
+      final result = await repository.getFcmTokensForUsers(uids);
+
+      // Assert.
+      expect(result.isSuccess, isTrue);
+      expect(result.valueOrNull, equals(tokens));
+      verify(() => mockApi.getFcmTokens(uids)).called(1);
+    });
+
+    test('[HAPPY PATH] - GIVEN a list of uids where no user has an FCM token, '
+        'WHEN getFcmTokensForUsers is called, '
+        'THEN should return Result.success with an empty list', () async {
+      // Arrange.
+      when(() => mockApi.getFcmTokens(any())).thenAnswer((_) async => []);
+
+      // Act.
+      final result = await repository.getFcmTokensForUsers(['uid-1']);
+
+      // Assert.
+      expect(result.isSuccess, isTrue);
+      expect(result.valueOrNull, isEmpty);
+    });
+
+    test(
+      '[ERROR PATH] - GIVEN a permission-denied FirebaseException, '
+      'WHEN getFcmTokensForUsers is called, '
+      'THEN should return Result.failure with AppFailure.forbidden()',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.getFcmTokens(any()),
+        ).thenThrow(_firebaseException('permission-denied'));
+
+        // Act.
+        final result = await repository.getFcmTokensForUsers(['uid-1']);
+
+        // Assert.
+        expect(result.isFailure, isTrue);
+        expect(
+          result,
+          equals(const Result<List<String>>.failure(AppFailure.forbidden())),
+        );
+      },
+    );
+
+    test(
+      '[ERROR PATH] - GIVEN an unavailable FirebaseException, '
+      'WHEN getFcmTokensForUsers is called, '
+      'THEN should return Result.failure with AppFailure.network()',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.getFcmTokens(any()),
+        ).thenThrow(_firebaseException('unavailable'));
+
+        // Act.
+        final result = await repository.getFcmTokensForUsers(['uid-1']);
+
+        // Assert.
+        expect(result.isFailure, isTrue);
+        expect(
+          result,
+          equals(const Result<List<String>>.failure(AppFailure.network())),
+        );
+      },
+    );
+
+    test(
+      '[ERROR PATH] - GIVEN a non-Firebase exception, '
+      'WHEN getFcmTokensForUsers is called, '
+      'THEN should return Result.failure with AppFailure.unknown()',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.getFcmTokens(any()),
+        ).thenThrow(Exception('Unexpected'));
+
+        // Act.
+        final result = await repository.getFcmTokensForUsers(['uid-1']);
+
+        // Assert.
+        expect(result.isFailure, isTrue);
+        expect(
+          result,
+          equals(const Result<List<String>>.failure(AppFailure.unknown())),
+        );
+      },
+    );
+  });
 }
