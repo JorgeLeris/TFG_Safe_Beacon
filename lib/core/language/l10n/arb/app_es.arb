@@ -2,7 +2,277 @@
   "@@locale": "es",
   "appTitle": "safe_beacon",
   "tabHome": "Inicio",
-  "tabSearch": "Buscar",
-  "tabAlerts": "Avisos",
-  "tabProfile": "Perfil"
+  "tabControl": "Panel",
+  "tabChat": "Chat",
+  "tabSettings": "Ajustes",
+  "tabProfile": "Perfil",
+  "appName": "SafeBeacon",
+  "email": "Correo electrónico",
+  "password": "Contraseña",
+  "forgotPassword": "¿Has olvidado tu contraseña?",
+  "login": "Iniciar sesión",
+  "dontHaveAccount": "¿No tienes cuenta? ",
+  "register": "Regístrate aquí",
+  "continueWith": "O continuar con",
+  "loginGoogle": "Continuar con Google",
+  "confirmPassword": "Confirmar contraseña",
+  "next": "Siguiente",
+  "haveAccount": "¿Ya tienes cuenta? ",
+  "loginHere": "Iniciar sesión aquí",
+  "name": "Nombre",
+  "surname": "Apellidos",
+  "birthDate": "Fecha de nacimiento",
+  "gender": "Género",
+  "male": "Masculino",
+  "female": "Femenino",
+  "other": "Otro",
+  "descriptionObservation": "Descripción / Observaciones",
+  "back": "Atrás",
+  "createAccount": "Crear cuenta",
+  "edit": "Editar",
+  "editProfile": "Editar perfil",
+  "logout": "Cerrar sesión",
+  "save": "Guardar",
+  "finishRegistration": "Finalizar registro",
+  "initChatWith": "Iniciar chat con ",
+  "emailRequired": "El correo es obligatorio",
+  "emailInvalid": "Introduce un correo válido",
+  "passwordRequired": "La contraseña es obligatoria",
+  "passwordInvalid": "Mínimo 6 caracteres",
+  "confirmPasswordRequired": "La confirmación de contraseña es obligatoria",
+  "passwordsDoNotMatch": "Las contraseñas no coinciden",
+  "nameRequired": "El nombre es obligatorio",
+  "surnameRequired": "Los apellidos son obligatorios",
+  "birthDateRequired": "La fecha de nacimiento es obligatoria",
+  "genderRequired": "El género es obligatorio",
+  "registrationFailed": "Error al registrarse. Inténtalo de nuevo.",
+  "loginFailed": "Error al iniciar sesión. Verifica tus credenciales.",
+  "loginErrorTitle": "Error al iniciar sesión",
+  "loginUserNotFound": "Usuario no encontrado. Verifica tus credenciales.",
+  "loginInvalidPassword": "Credenciales inválidas. Verifica tu contraseña.",
+  "loginInvalidCredentials": "Credenciales inválidas. Verifica tu correo y contraseña.",
+  "loginUserDisabled": "Usuario deshabilitado. Contacta con soporte.",
+  "loginTooManyRequests": "Demasiados intentos. Inténtalo más tarde.",
+  "accept": "Aceptar",
+  "registerErrorTitle": "Error al registrarse",
+  "registerEmailAlreadyInUse": "El correo ya está en uso. Usa otro correo o inicia sesión.",
+  "registerWeakPassword": "Contraseña débil.",
+  "logoutFailed": "Error al cerrar sesión. Inténtalo de nuevo.",
+  "logoutErrorTitle": "Error al cerrar sesión",
+  "networkError": "Error de red. Verifica tu conexión.",
+  "genericError": "Ocurrió un error. Inténtalo de nuevo.",
+  "profileNotFound": "Perfil no encontrado.",
+  "verifyAccountTitle": "Verifica tu cuenta",
+  "verifyAccountMessage": "Antes de continuar, verifica tu correo electrónico. Te hemos enviado un mensaje con un enlace de verificación. Si no lo encuentras revisa tu bandeja de spam.",
+  "resendVerificationEmail": "Reenviar correo de verificación",
+  "continueButton": "Continuar",
+  "authFailedTitle": "Fallo de autenticación",
+  "emailNotVerifiedError": "Aún no has verificado tu correo electrónico. Te hemos enviado un mensaje con un enlace de verificación, si no lo encuentras revisa tu bandeja de spam.",
+  "passwordResetTitle": "Cambio de contraseña",
+  "passwordResetMessage": "Si lo deseas podemos enviar un correo electrónico con las instrucciones para cambiar tu contraseña. Revisa tu bandeja de entrada o la de spam y sigue los pasos indicados.",
+  "biometricReason": "Autentícate para acceder a la app",
+  "biometricSignInTitle": "Autenticación requerida",
+  "cancel": "Cancelar",
+  "biometricFallbackTitle": "Usar contraseña",
+  "loading": "Cargando...",
+  "yourTrustedContacts": "Tus contactos de confianza",
+  "trustedContacts": "Contactos de confianza",
+  "yourUserCode": "Tu código de usuario:",
+  "addTrustedContact": "Añadir contacto de confianza",
+  "pendingRequests": "Solicitudes pendientes",
+  "searchContact": "Buscar usuario",
+  "errorTitle": "¡Ups! Algo salió mal",
+  "errorDescription": "Lo sentimos, no podemos procesar su solicitud en este momento. Inténtelo de nuevo más tarde.",
+  "noTrustedContactsTitle": "Sin contactos de confianza",
+  "noTrustedContactsDescription": "Aún no has añadido ningún contacto de confianza.",
+  "noResultsTitle": "No se encontraron resultados",
+  "noResultsDescription": "Lo sentimos, no se encontraron resultados para esta búsqueda.",
+  "noPendingRequestsTitle": "Sin solicitudes pendientes",
+  "noPendingRequestsDescription": "No tienes solicitudes de contacto pendientes.",
+  "headerControl": "Panel de control",
+  "yourProtectedPeople": "Tus personas protegidas",
+  "alerts": "Alertas",
+  "followUps": "Seguimientos",
+  "history": "Histórico",
+  "noProtectedPeopleTitle": "Sin personas protegidas",
+  "noProtectedPeopleDescription": "Aún no has añadido ninguna persona protegida.",
+  "protectedPeople": "Personas protegidas",
+  "requestsReceived": "Solicitudes recibidas",
+  "sendRequest": "Enviar solicitud",
+  "sendRequestDescription": "Introduce el código de usuario de la persona que deseas añadir como contacto de confianza. Si no dispones de este código, deberás pedírselo para poder continuar.",
+  "userCode": "Código de usuario",
+  "send": "Enviar",
+  "sendRequestErrorTitle": "Error al enviar solicitud",
+  "userCodeNotFound": "No se ha encontrado ningún usuario con ese código. Comprueba que el código es correcto e inténtalo de nuevo.",
+  "requestAlreadyExists": "Ya existe una solicitud activa con este usuario.",
+  "selfRequestError": "No puedes enviarte una solicitud a ti mismo.",
+  "cancelRequest": "Cancelar solicitud",
+  "cancelRequestDescription": "Al eliminar esta solicitud, se cancelará la invitación enviada a \"{username}\" y no se establecerá ninguna conexión. Podrás enviar una nueva solicitud más adelante si lo deseas.",
+  "cancelRequestErrorTitle": "Error al cancelar solicitud",
+  "declineRequest": "Rechazar solicitud",
+  "declineRequestDescription": "Al rechazar esta solicitud, se eliminará la invitación recibida por \"{username}\" para ser su contacto de confianza y no se establecerá ninguna conexión.",
+  "declineRequestErrorTitle": "Error al rechazar solicitud",
+  "noReceivedRequestsTitle": "Sin solicitudes recibidas",
+  "noReceivedRequestsDescription": "Cuando alguien te envíe una solicitud de contacto aparecerá aquí.",
+  "acceptRequest": "Aceptar solicitud",
+  "acceptRequestDescription": "Al aceptar esta solicitud, se establecerá la conexión y pasarás a ser contacto de confianza de \"{username}\".",
+  "acceptRequestErrorTitle": "Error al aceptar solicitud",
+  "contactAlreadyExists": "Ya existe una conexión con este usuario.",
+  "deleteContact": "Eliminar contacto",
+  "deleteContactDescription": "Al eliminar a \"{username}\" de tus contactos de confianza, se perderá toda conexión con esta persona. Esta acción es permanente y no se puede deshacer.",
+  "deleteContactErrorTitle": "Error al eliminar contacto",
+  "sendRequestSuccessTitle": "Solicitud enviada",
+  "sendRequestSuccessDescription": "La solicitud ha sido enviada correctamente. Cuando el usuario la acepte, se establecerá la conexión.",
+  "deactivate": "Desactivar",
+  "sos": "SOS",
+  "emergency": "Emergencia",
+  "notAvailable": "No disponible",
+  "panicButton": "Botón del pánico",
+  "guardianMode": "Modo guardián",
+  "sensors": "Sensores",
+  "panicButtonInfoContent": "Esta función envía alertas inmediatas a tus contactos de confianza con tu ubicación actual. Utilízala únicamente en situaciones de emergencia.",
+  "addPanicButtonToDevice": "Añadir botón del pánico al dispositivo",
+  "panicButtonStatusStandby": "En espera",
+  "panicButtonStatusActive": "Activado",
+  "panicButtonStatusDisabled": "Deshabilitado",
+  "panicButtonStatusLoading": "Cargando...",
+  "panicButtonNoContactsTitle": "Sin contactos de confianza",
+  "panicButtonNoContactsContent": "Para poder activar una alerta, necesitas tener al menos un contacto de confianza. Ve a la sección de contactos para añadir uno.",
+  "panicButtonDisabledNoContacts": "Sin contactos",
+  "panicButtonDisabledNoPermission": "Sin permiso",
+  "panicButtonNoContactsButton": "Comprobar",
+  "panicButtonPermissionDeniedTitle": "Permiso de ubicación requerido",
+  "panicButtonPermissionDeniedContent": "SafeBeacon necesita acceso a tu ubicación para registrarla junto a la alerta. Pulsa el botón para ir a los ajustes y conceder el permiso.",
+  "panicButtonPermissionDeniedButton": "Abrir ajustes",
+  "panicButtonAlreadyActiveTitle": "Alerta ya activa",
+  "panicButtonAlreadyActiveContent": "Ya tienes una alerta activa en este momento. Solo puedes tener una alerta activa a la vez.",
+  "panicButtonActivateErrorTitle": "Error al activar la alerta",
+  "panicButtonActivateErrorContent": "No se ha podido activar la alerta. Por favor, comprueba tu conexión e inténtalo de nuevo.",
+  "panicButtonDeactivateErrorTitle": "Error al desactivar la alerta",
+  "panicButtonDeactivateErrorContent": "No se ha podido desactivar la alerta. Por favor, comprueba tu conexión e inténtalo de nuevo.",
+  "customization": "Personalización",
+  "featuresSettings": "Configuración de funcionalidades",
+  "featuresSettingsDescription": "Habilita y deshabilita el botón del pánico o accede a las configuraciones de personalización.",
+  "deactivationPin": "PIN de desactivación",
+  "deactivationPinDescription": "Añade un PIN para desactivar el botón del pánico y así aumentar la seguridad.",
+  "notAvailableYet": "No disponible todavía",
+  "futureUpdateContent": "Esta función estará disponible en una próxima actualización.",
+  "panicButtonCooldownTitle": "Espera un momento",
+  "panicButtonCooldownContent": "Por tu seguridad, el botón de pánico solo puede desactivarse después de 10 segundos. Falta muy poco, espera un momento.",
+  "panicButtonDeactivateTitle": "Desactivar alerta",
+  "panicButtonDeactivateContent": "Si la situación ya está bajo control, puedes desactivar el botón de pánico. Además, puedes añadir de forma opcional un motivo a la desactivación.",
+  "panicButtonDeactivateReasonHint": "Motivo",
+  "panicButtonDeactivate": "Desactivar",
+  "wait": "Espera",
+  "noAlertsTitle": "Aún no hay alertas",
+  "noAlertsDescription": "Cuando se active una alerta de una de tus personas protegidas, aparecerá aquí para que puedas revisarla y hacer seguimiento.",
+  "activeAlert": "Alerta activa",
+  "inactiveAlert": "Alerta desactivada",
+  "filterAlertsTitle": "Filtrar alertas",
+  "filterByStatus": "Por estado:",
+  "allMasculine": "Todos",
+  "disabledAlerts": "Alertas desactivadas",
+  "activeAlerts": "Alertas activas",
+  "filterByFunctionality": "Por funcionalidad:",
+  "allFeminine": "Todas",
+  "clearFilters": "Limpiar filtros",
+  "filter": "Filtrar",
+  "alertsReceivedCount": "Alertas recibidas: {count}",
+  "@alertsReceivedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "alertOfFeature": "Alerta - {feature}",
+  "@alertOfFeature": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDetailHeader": "Alerta de {username}",
+  "@alertDetailHeader": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "activeAlertOfUser": "Alerta activa de {username}",
+  "@activeAlertOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "inactiveAlertOfUser": "Alerta desactivada de {username}",
+  "@inactiveAlertOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "activationDate": "Fecha de activación de la alerta: {date}",
+  "@activationDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDataSection": "DATOS DE LA ALERTA",
+  "activationDateLabel": "Fecha de activación:",
+  "locationOnActivationSection": "UBICACIÓN EN LA ACTIVACIÓN",
+  "contactSection": "CONTACTAR",
+  "startChatWith": "Iniciar un chat con {username}",
+  "@startChatWith": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDetailsTitle": "Detalles de la alerta",
+  "alertGeneratorUser": "Usuario generador de la alerta",
+  "alertType": "Tipo de alerta",
+  "status": "Estado",
+  "activationDateDetail": "Fecha de activación",
+  "activationTimeDetail": "Hora de activación",
+  "batteryOnActivation": "Batería en la activación",
+  "deactivationDataTitle": "Datos desactivación",
+  "deactivationReason": "Motivo",
+  "timeActive": "Tiempo activa",
+  "deactivationDateDetail": "Fecha de desactivación",
+  "deactivationTimeDetail": "Hora de desactivación",
+  "mapPlaceholder": "Mapa no disponible",
+  "openInGoogleMaps": "Abrir en Google Maps",
+  "alertLoadError": "No se pudo cargar la alerta",
+  "notificationAlertTitle": "Alerta de {username}",
+  "@notificationAlertTitle": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationAlertBody": "Tu persona protegida {username}, ha activado su botón de pánico.",
+  "@notificationAlertBody": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "addWidgetTitle": "Añadir widget al dispositivo",
+  "addWidgetInstructions": "Para añadir el widget en iOS:\n1. Mantén pulsada la pantalla de inicio hasta que los iconos empiecen a moverse.\n2. Pulsa el botón '+' en la esquina superior izquierda.\n3. Busca 'SafeBeacon' y selecciona el widget del botón del pánico.\n4. Colócalo donde desees.",
+  "addWidgetAndroidNotSupported": "Tu lanzador no admite añadir widgets directamente. Ve a la pantalla de inicio, mantén pulsada una zona vacía y busca el widget de SafeBeacon.",
+  "widgetSosLabel": "SOS",
+  "widgetActivateLabel": "Activar botón del pánico",
+  "widgetActiveTitle": "ALERTA ACTIVA",
+  "widgetOpenApp": "Abrir SafeBeacon"
 }

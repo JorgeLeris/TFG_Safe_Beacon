@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:safe_beacon/app/monitoring/logging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // DEVELOPMENT, MAINTENANCE AND DEMO PURPOSES
 // Access with: flutter run --dart-define=MOCK=true

@@ -15,12 +15,32 @@ dependencies:
   flutter_bloc: ^9.1.1
   go_router: ^17.0.1
   dio: ^5.9.0
+  http: ^1.6.0
+  googleapis_auth: ^2.0.0
+  flutter_dotenv: ^6.0.0
   retrofit: ^4.9.2
   freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
   shared_preferences: ^2.5.4
   logging: ^1.3.0
   intl: ^0.20.2
+  firebase_core: ^4.4.0
+  firebase_auth: ^6.2.0
+  firebase_messaging: ^16.1.3
+  flutter_local_notifications: ^21.0.0
+  google_sign_in: 6.3.0
+  cloud_firestore: ^6.1.2
+  flutter_svg: ^2.2.3
+  image_picker: ^1.2.1
+  local_auth: ^3.0.1
+  local_auth_android: ^2.0.5
+  local_auth_darwin: ^2.0.3
+  geolocator: ^14.0.2
+  battery_plus: ^7.0.0
+  flutter_map: ^8.2.2
+  latlong2: ^0.9.1
+  url_launcher: ^6.3.2
+  home_widget: ^0.7.0
 
 dev_dependencies:
   flutter_test:
@@ -42,7 +62,10 @@ flutter:
   assets:
     - assets/icons/
     - assets/images/
-    # TODO(Team): Remove mocks from pubspec for production build
+    # TODO: Remove secrets from assets for production build and use secure storage instead
+    - .env
+    - secrets/tfg-safe-beacon-79fc5abcaca7.json
+    # TODO: Remove mocks from pubspec for production build
     - assets/mocks/mock_index.json
     - assets/mocks/
 
@@ -54,24 +77,27 @@ flavorizr:
     dev:
       app:
         name: "SafeBeacon Dev"
-        icon: "assets/images/app-icon-dev.png"
       android:
         applicationId: "com.jlerisla.safebeacon.safebeacon.dev"
+        icon: "assets/images/app-icon-android.png"
       ios:
         bundleId: "com.jlerisla.safebeacon.safebeacon.dev"
+        icon: "assets/images/app-icon-ios.png"
     pre:
       app:
         name: "SafeBeacon Pre"
-        icon: "assets/images/app-icon-pre.png"
       android:
         applicationId: "com.jlerisla.safebeacon.safebeacon.pre"
+        icon: "assets/images/app-icon-android.png"
       ios:
         bundleId: "com.jlerisla.safebeacon.safebeacon.pre"
+        icon: "assets/images/app-icon-ios.png"
     prod:
       app:
         name: "SafeBeacon"
-        icon: "assets/images/app-icon-prod.png"
       android:
         applicationId: "com.jlerisla.safebeacon.safebeacon"
+        icon: "assets/images/app-icon-android.png"
       ios:
         bundleId: "com.jlerisla.safebeacon.safebeacon"
+        icon: "assets/images/app-icon-ios.png"

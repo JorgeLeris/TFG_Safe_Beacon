@@ -2,7 +2,277 @@
   "@@locale": "en",
   "appTitle": "safe_beacon",
   "tabHome": "Home",
-  "tabSearch": "Search",
-  "tabAlerts": "Alerts",
-  "tabProfile": "Profile"
+  "tabControl": "Dashboard",
+  "tabChat": "Chat",
+  "tabSettings": "Settings",
+  "tabProfile": "Profile",
+  "appName": "SafeBeacon",
+  "email": "Email",
+  "password": "Password",
+  "forgotPassword": "Have you forgotten your password?",
+  "login": "Log in",
+  "dontHaveAccount": "Don't have an account? ",
+  "register": "Sign up here",
+  "continueWith": "Or continue with",
+  "loginGoogle": "Continue with Google",
+  "confirmPassword": "Confirm password",
+  "next": "Next",
+  "haveAccount": "Already have an account? ",
+  "loginHere": "Log in here",
+  "name": "Name",
+  "surname": "Surname",
+  "birthDate": "Birth Date",
+  "gender": "Gender",
+  "male": "Male",
+  "female": "Female",
+  "other": "Other",
+  "descriptionObservation": "Description / Observations",
+  "back": "Back",
+  "createAccount": "Create Account",
+  "edit": "Edit",
+  "editProfile": "Edit Profile",
+  "logout": "Logout",
+  "save": "Save",
+  "finishRegistration": "Finish Registration",
+  "initChatWith": "Initiate chat with ",
+  "emailRequired": "Email is required",
+  "emailInvalid": "Please enter a valid email",
+  "passwordRequired": "Password is required",
+  "passwordInvalid": "Minimum 6 characters",
+  "confirmPasswordRequired": "Confirm password is required",
+  "passwordsDoNotMatch": "Passwords do not match",
+  "nameRequired": "Name is required",
+  "surnameRequired": "Surname is required",
+  "birthDateRequired": "Birth date is required",
+  "genderRequired": "Gender is required",
+  "registrationFailed": "Error occurred while registering. Please try again.",
+  "loginFailed": "Error occurred while logging in. Please verify your credentials.",
+  "loginErrorTitle": "Error logging in",
+  "loginUserNotFound": "User not found. Please verify your credentials.",
+  "loginInvalidPassword": "Invalid credentials. Please verify your password.",
+  "loginInvalidCredentials": "Invalid credentials. Please verify your email and password.",
+  "loginUserDisabled": "User disabled. Please contact support.",
+  "loginTooManyRequests": "Too many attempts. Please try again later.",
+  "accept": "Accept",
+  "registerErrorTitle": "Error registering",
+  "registerEmailAlreadyInUse": "Email is already in use. Please use another email or log in.",
+  "registerWeakPassword": "Password is too weak.",
+  "logoutFailed": "Error occurred while logging out. Please try again.",
+  "logoutErrorTitle": "Error logging out",
+  "networkError": "Network error. Please check your connection.",
+  "genericError": "An error occurred. Please try again.",
+  "profileNotFound": "Profile not found.",
+  "verifyAccountTitle": "Verify your account",
+  "verifyAccountMessage": "Before continuing, please check your email. We have sent you a message with a verification link. If you can't find it, check your spam folder.",
+  "resendVerificationEmail": "Resend verification email",
+  "continueButton": "Continue",
+  "authFailedTitle": "Authentication failure",
+  "emailNotVerifiedError": "You haven't verified your email address yet. We've sent you a message with a verification link, ff you can't find it, check your spam folder.",
+  "passwordResetTitle": "Password change",
+  "passwordResetMessage": "If you wish, we can send you an email with instructions on how to change your password. Check your inbox or spam folder and follow the instructions.",
+  "biometricReason": "Log in to access the app",
+  "biometricSignInTitle": "Authentication required",
+  "cancel": "Cancel",
+  "biometricFallbackTitle": "Use password",
+  "loading": "Loading...",
+  "yourTrustedContacts": "Your trusted contacts",
+  "trustedContacts": "Trusted contacts",
+  "yourUserCode": "Your user code:",
+  "addTrustedContact": "Add trusted contact",
+  "pendingRequests": "Pending requests",
+  "searchContact": "Search user",
+  "errorTitle": "Oops! Something went wrong",
+  "errorDescription": "Sorry, we couldn't process your request at this time. Please try again later.",
+  "noTrustedContactsTitle": "No trusted contacts",
+  "noTrustedContactsDescription": "You haven't added any trusted contacts yet.",
+  "noResultsTitle": "No results found",
+  "noResultsDescription": "Sorry, no results were found for this search.",
+  "noPendingRequestsTitle": "No pending requests",
+  "noPendingRequestsDescription": "You don't have any pending contact requests.",
+  "headerControl": "Control panel",
+  "yourProtectedPeople": "Your protected people",
+  "alerts": "Alerts",
+  "followUps": "Follow-ups",
+  "history": "History",
+  "noProtectedPeopleTitle": "No protected people",
+  "noProtectedPeopleDescription": "You haven't added any protected people yet.",
+  "protectedPeople": "Protected people",
+  "requestsReceived": "Requests received",
+  "sendRequest": "Send request",
+  "sendRequestDescription": "Enter the user code of the person you want to add as a trusted contact. If you don't have this code, you will need to ask for it to continue.",
+  "userCode": "User code",
+  "send": "Send",
+  "sendRequestErrorTitle": "Error sending request",
+  "userCodeNotFound": "No user found with that code. Please check the code and try again.",
+  "requestAlreadyExists": "There is already an active request with this user.",
+  "selfRequestError": "You cannot send a request to yourself.",
+  "cancelRequest": "Cancel request",
+  "cancelRequestDescription": "By deleting this request, the invitation sent to \"{username}\" will be canceled and no connection will be established. You can send a new request later if you wish.",
+  "cancelRequestErrorTitle": "Error canceling request",
+  "declineRequest": "Decline request",
+  "declineRequestDescription": "By declining this request, the invitation received from \"{username}\" to be your trusted contact will be removed and no connection will be established.",
+  "declineRequestErrorTitle": "Error declining request",
+  "noReceivedRequestsTitle": "No received requests",
+  "noReceivedRequestsDescription": "When someone sends you a contact request, it will appear here.",
+  "acceptRequest": "Accept request",
+  "acceptRequestDescription": "By accepting this request, the connection will be established and you will become a trusted contact of \"{username}\".",
+  "acceptRequestErrorTitle": "Error accepting request",
+  "contactAlreadyExists": "A connection with this user already exists.",
+  "deleteContact": "Delete contact",
+  "deleteContactDescription": "By deleting \"{username}\" from your trusted contacts, all connection with this person will be lost. This action is permanent and cannot be undone.",
+  "deleteContactErrorTitle": "Error deleting contact",
+  "sendRequestSuccessTitle": "Request sent",
+  "sendRequestSuccessDescription": "The request has been sent successfully. When the user accepts it, the connection will be established.",
+  "deactivate": "Deactivate",
+  "sos": "SOS",
+  "emergency": "Emergency",
+  "notAvailable": "Not available",
+  "panicButton": "Panic button",
+  "guardianMode": "Guardian mode",
+  "sensors": "Sensors",
+  "panicButtonInfoContent": "This feature sends immediate alerts to your trusted contacts with your current location. Use it only in emergency situations.",
+  "addPanicButtonToDevice": "Add panic button to device",
+  "panicButtonStatusStandby": "Standby",
+  "panicButtonStatusActive": "Active",
+  "panicButtonStatusDisabled": "Disabled",
+  "panicButtonStatusLoading": "Loading...",
+  "panicButtonNoContactsTitle": "No trusted contacts",
+  "panicButtonNoContactsContent": "To activate an alert, you need at least one trusted contact. Go to the contacts section to add one.",
+  "panicButtonDisabledNoContacts": "No contacts",
+  "panicButtonDisabledNoPermission": "No permission",
+  "panicButtonNoContactsButton": "Check",
+  "panicButtonPermissionDeniedTitle": "Location permission required",
+  "panicButtonPermissionDeniedContent": "SafeBeacon needs access to your location to record it with the alert. Tap the button to go to settings and grant permission.",
+  "panicButtonPermissionDeniedButton": "Open settings",
+  "panicButtonAlreadyActiveTitle": "Alert already active",
+  "panicButtonAlreadyActiveContent": "You already have an active alert at this moment. You can only have one active alert at a time.",
+  "panicButtonActivateErrorTitle": "Error activating alert",
+  "panicButtonActivateErrorContent": "The alert could not be activated. Please check your connection and try again.",
+  "panicButtonDeactivateErrorTitle": "Error deactivating alert",
+  "panicButtonDeactivateErrorContent": "The alert could not be deactivated. Please check your connection and try again.",
+  "customization": "Customization",
+  "featuresSettings": "Features settings",
+  "featuresSettingsDescription": "Enable and disable the panic button or access customization settings.",
+  "deactivationPin": "Deactivation PIN",
+  "deactivationPinDescription": "Add a PIN to deactivate the panic button and increase security.",
+  "notAvailableYet": "Not available yet",
+  "futureUpdateContent": "This feature will be available in a future update.",
+  "panicButtonCooldownTitle": "Wait a moment",
+  "panicButtonCooldownContent": "For your safety, the panic button can only be deactivated after 10 seconds. Just a little longer, please wait.",
+  "panicButtonDeactivateTitle": "Deactivate alert",
+  "panicButtonDeactivateContent": "If the situation is already under control, you can deactivate the panic button. You can also optionally add a reason for the deactivation.",
+  "panicButtonDeactivateReasonHint": "Reason",
+  "panicButtonDeactivate": "Deactivate",
+  "wait": "Wait",
+  "noAlertsTitle": "No alerts yet",
+  "noAlertsDescription": "When an alert from one of your protected people is triggered, it will appear here for you to review and follow up.",
+  "activeAlert": "Active alert",
+  "inactiveAlert": "Inactive alert",
+  "filterAlertsTitle": "Filter alerts",
+  "filterByStatus": "By status:",
+  "allMasculine": "All",
+  "disabledAlerts": "Disabled alerts",
+  "activeAlerts": "Active alerts",
+  "filterByFunctionality": "By functionality:",
+  "allFeminine": "All",
+  "clearFilters": "Clear filters",
+  "filter": "Filter",
+  "alertsReceivedCount": "Alerts received: {count}",
+  "@alertsReceivedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "alertOfFeature": "Alert - {feature}",
+  "@alertOfFeature": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDetailHeader": "Alert of {username}",
+  "@alertDetailHeader": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "activeAlertOfUser": "Active alert of {username}",
+  "@activeAlertOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "inactiveAlertOfUser": "Inactive alert of {username}",
+  "@inactiveAlertOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "activationDate": "Activation date of the alert: {date}",
+  "@activationDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDataSection": "ALERT DATA",
+  "activationDateLabel": "Activation date:",
+  "locationOnActivationSection": "LOCATION ON ACTIVATION",
+  "contactSection": "CONTACT",
+  "startChatWith": "Start a chat with {username}",
+  "@startChatWith": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDetailsTitle": "Alert details",
+  "alertGeneratorUser": "Alert generator user",
+  "alertType": "Alert type",
+  "status": "Status",
+  "activationDateDetail": "Activation date",
+  "activationTimeDetail": "Activation time",
+  "batteryOnActivation": "Battery on activation",
+  "deactivationDataTitle": "Deactivation data",
+  "deactivationReason": "Reason",
+  "timeActive": "Time active",
+  "deactivationDateDetail": "Deactivation date",
+  "deactivationTimeDetail": "Deactivation time",
+  "mapPlaceholder": "Map not available",
+  "openInGoogleMaps": "Open in Google Maps",
+  "alertLoadError": "Could not load the alert",
+  "notificationAlertTitle": "Alert from {username}",
+  "@notificationAlertTitle": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationAlertBody": "Your protected person {username}, has activated their panic button.",
+  "@notificationAlertBody": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "addWidgetTitle": "Add widget to device",
+  "addWidgetInstructions": "To add the widget on iOS:\n1. Long-press the home screen until icons start to wiggle.\n2. Tap the '+' button in the top-left corner.\n3. Search for 'SafeBeacon' and select the panic button widget.\n4. Place it wherever you like.",
+  "addWidgetAndroidNotSupported": "Your launcher does not support adding widgets directly. Go to the home screen, long-press an empty area, and look for the SafeBeacon widget.",
+  "widgetSosLabel": "SOS",
+  "widgetActivateLabel": "Activate panic button",
+  "widgetActiveTitle": "ALERT ACTIVE",
+  "widgetOpenApp": "Open SafeBeacon"
 }

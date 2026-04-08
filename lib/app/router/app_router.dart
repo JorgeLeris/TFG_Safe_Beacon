@@ -1,12 +1,17 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
+import 'package:safe_beacon/presentation/features/auth/routes/auth_routes.dart';
+import 'package:safe_beacon/presentation/features/chat/routes/chat_routes.dart';
+import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
+import 'package:safe_beacon/presentation/features/control/routes/control_routes.dart';
 import 'package:safe_beacon/presentation/features/dashboard/dashboard_shell.dart';
 import 'package:safe_beacon/presentation/features/home/routes/home_routes.dart';
-import 'package:safe_beacon/presentation/features/search/routes/search_routes.dart';
-import 'package:safe_beacon/presentation/features/notifications/routes/notifications_routes.dart';
+import 'package:safe_beacon/presentation/features/panic_button/routes/panic_button_routes.dart';
 import 'package:safe_beacon/presentation/features/profile/routes/profile_routes.dart';
+import 'package:safe_beacon/presentation/features/settings/routes/settings_routes.dart';
 import 'package:safe_beacon/presentation/shared/routes/mock_routes.dart';
+import 'package:safe_beacon/presentation/shared/screens/splash_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -18,19 +23,23 @@ part 'app_router.g.dart';
 /// Structure:
 /// - DashboardShell (bottom navigation)
 ///   - Home branch
-///   - Search branch
-///   - Notifications branch
+///   - Control branch
+///   - Chat branch
+///   - Settings branch
 ///   - Profile branch
 @TypedStatefulShellRoute<DashboardShellRoute>(
   branches: [
     TypedStatefulShellBranch<HomeBranch>(
       routes: [TypedGoRoute<HomeRoute>(path: '/home')],
     ),
-    TypedStatefulShellBranch<SearchBranch>(
-      routes: [TypedGoRoute<SearchRoute>(path: '/search')],
+    TypedStatefulShellBranch<ControlBranch>(
+      routes: [TypedGoRoute<ControlRoute>(path: '/control')],
     ),
-    TypedStatefulShellBranch<NotificationsBranch>(
-      routes: [TypedGoRoute<NotificationsRoute>(path: '/notifications')],
+    TypedStatefulShellBranch<ChatBranch>(
+      routes: [TypedGoRoute<ChatRoute>(path: '/chat')],
+    ),
+    TypedStatefulShellBranch<SettingsBranch>(
+      routes: [TypedGoRoute<SettingsRoute>(path: '/settings')],
     ),
     TypedStatefulShellBranch<ProfileBranch>(
       routes: [TypedGoRoute<ProfileRoute>(path: '/profile')],
@@ -56,16 +65,22 @@ class HomeBranch extends StatefulShellBranchData {
   static const String $initialLocation = '/home';
 }
 
-/// Search branch - Search functionality
-class SearchBranch extends StatefulShellBranchData {
-  const SearchBranch();
-  static const String $initialLocation = '/search';
+/// Control branch - Control functionality
+class ControlBranch extends StatefulShellBranchData {
+  const ControlBranch();
+  static const String $initialLocation = '/control';
 }
 
-/// Notifications branch - User notifications
-class NotificationsBranch extends StatefulShellBranchData {
-  const NotificationsBranch();
-  static const String $initialLocation = '/notifications';
+/// Chat branch - User chat
+class ChatBranch extends StatefulShellBranchData {
+  const ChatBranch();
+  static const String $initialLocation = '/chat';
+}
+
+/// Settings branch - User settings
+class SettingsBranch extends StatefulShellBranchData {
+  const SettingsBranch();
+  static const String $initialLocation = '/settings';
 }
 
 /// Profile branch - User profile and settings
@@ -89,7 +104,37 @@ GoRouter buildAppRouter() {
       : <RouteBase>[];
 
   return GoRouter(
-    routes: [...$appRoutes, ...mockRoutes],
-    initialLocation: HomeBranch.$initialLocation,
+    initialLocation: '/',
+    redirect: (context, state) {
+      final isSplash = state.matchedLocation == '/';
+      if (isSplash) return null;
+
+      final user = FirebaseAuth.instance.currentUser;
+      final isOnAuth = state.matchedLocation.startsWith('/auth');
+
+      if (user == null && !isOnAuth) return '/auth';
+      if (user != null && user.emailVerified && isOnAuth) return '/home';
+
+      return null;
+    },
+    refreshListenable: _AuthStateListenable(),
+    routes: [
+      GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+      ...$appRoutes,
+      $authRoute,
+      $profileRoute,
+      $trustedContactsRoute,
+      $protectedPeopleRoute,
+      $panicButtonRoute,
+      $alertDetailRoute,
+      ...mockRoutes,
+    ],
   );
+}
+
+/// Listenable that notifies when the authentication state changes
+class _AuthStateListenable extends ChangeNotifier {
+  _AuthStateListenable() {
+    FirebaseAuth.instance.idTokenChanges().listen((_) => notifyListeners());
+  }
 }
