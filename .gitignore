@@ -56,6 +56,7 @@ app.*.map.json
 # Environment variables
 *.env
 assets/*.env
+secrets/*
 
 # Generated localization files
 /lib/core/language/generated/l10n/

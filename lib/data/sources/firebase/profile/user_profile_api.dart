@@ -40,6 +40,39 @@ class UserProfileApi {
   }
 
   // =================================
+  // MARK: - FCM Token Management
+  // =================================
+
+  /// Stores [token] as the single FCM token for the user document,
+  /// overwriting any previously saved token.
+  Future<void> saveFcmToken(String uid, String token) async {
+    await _collection.doc(uid).update({'fcmToken': token});
+  }
+
+  /// Removes the FCM token field from the user document.
+  Future<void> clearFcmToken(String uid, String token) async {
+    await _collection.doc(uid).update({
+      'fcmToken': FieldValue.delete(),
+    });
+  }
+
+  /// Returns the non-null FCM tokens of the users identified by [uids].
+  ///
+  /// Users without a token are silently excluded from the result.
+  Future<List<String>> getFcmTokens(List<String> uids) async {
+    if (uids.isEmpty) return [];
+
+    final snap = await _collection
+        .where(FieldPath.documentId, whereIn: uids)
+        .get();
+
+    return snap.docs
+        .map((doc) => doc.data()['fcmToken'] as String?)
+        .whereType<String>()
+        .toList();
+  }
+
+  // =================================
   // MARK: - Username Reservation
   // =================================
 

@@ -3,11 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/auth/auth_repository.dart';
+import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
 import 'package:safe_beacon/presentation/features/profile/cubits/logout_cubit.dart';
 
 // MARK: - DUMMY DATA
 
 class MockAuthRepository extends Mock implements AuthRepository {}
+
+class MockUserProfileRepository extends Mock implements UserProfileRepository {}
 
 class MockAppLocalizations extends Mock implements AppLocalizations {}
 
@@ -21,13 +24,18 @@ MockAppLocalizations _buildL10n() {
 
 void main() {
   late MockAuthRepository mockAuthRepository;
+  late MockUserProfileRepository mockUserProfileRepository;
   late MockAppLocalizations l10n;
   late LogoutCubit cubit;
 
   setUp(() {
     mockAuthRepository = MockAuthRepository();
+    mockUserProfileRepository = MockUserProfileRepository();
     l10n = _buildL10n();
-    cubit = LogoutCubit(authRepository: mockAuthRepository);
+    cubit = LogoutCubit(
+      authRepository: mockAuthRepository,
+      userProfileRepository: mockUserProfileRepository,
+    );
   });
 
   tearDown(() => cubit.close());

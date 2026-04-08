@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:safe_beacon/app/monitoring/logging.dart';
 import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/auth/auth_repository.dart';
@@ -63,12 +65,17 @@ class LoginCubit extends Cubit<LoginState> {
         return;
       }
 
-      emit(state.copyWith(isLoading: false));
+      await _saveFcmToken(user.uid);
+      if (!isClosed) emit(state.copyWith(isLoading: false));
     } on FirebaseAuthException catch (e) {
-      final message = _mapFirebaseError(e.code, l10n);
-      emit(state.copyWith(isLoading: false, errorMessage: message));
+      if (!isClosed) {
+        final message = _mapFirebaseError(e.code, l10n);
+        emit(state.copyWith(isLoading: false, errorMessage: message));
+      }
     } catch (e) {
-      emit(state.copyWith(isLoading: false, errorMessage: l10n.loginFailed));
+      if (!isClosed) {
+        emit(state.copyWith(isLoading: false, errorMessage: l10n.loginFailed));
+      }
     }
   }
 
@@ -130,14 +137,17 @@ class LoginCubit extends Cubit<LoginState> {
         }
       }
 
-      if (!isClosed) {
-        emit(state.copyWith(isLoading: false));
-      }
+      await _saveFcmToken(user.uid);
+      if (!isClosed) emit(state.copyWith(isLoading: false));
     } on FirebaseAuthException catch (e) {
-      final message = _mapFirebaseError(e.code, l10n);
-      emit(state.copyWith(isLoading: false, errorMessage: message));
+      if (!isClosed) {
+        final message = _mapFirebaseError(e.code, l10n);
+        emit(state.copyWith(isLoading: false, errorMessage: message));
+      }
     } catch (e) {
-      emit(state.copyWith(isLoading: false, errorMessage: l10n.loginFailed));
+      if (!isClosed) {
+        emit(state.copyWith(isLoading: false, errorMessage: l10n.loginFailed));
+      }
     }
   }
 
@@ -170,6 +180,23 @@ class LoginCubit extends Cubit<LoginState> {
     emit(
       state.copyWith(errorMessage: null, emailError: null, passwordError: null),
     );
+  }
+
+  Future<void> _saveFcmToken(String uid) async {
+    try {
+      final token = await FirebaseMessaging.instance.getToken();
+      if (token != null) {
+        final result = await _userProfileRepository.saveFcmToken(uid, token);
+        result.when(
+          success: (_) => appLogger.info('FCM token saved for uid: $uid'),
+          failure: (f) => appLogger.warning(
+            'FCM token save failed for uid: $uid — $f',
+          ),
+        );
+      }
+    } catch (e) {
+      appLogger.warning('FCM token save error for uid: $uid — $e');
+    }
   }
 
   // MARK: Validation fields

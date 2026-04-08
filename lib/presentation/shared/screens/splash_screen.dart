@@ -4,7 +4,9 @@ import 'package:local_auth/local_auth.dart';
 import 'package:local_auth_android/local_auth_android.dart';
 import 'package:local_auth_darwin/local_auth_darwin.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/notification_service.dart';
 import 'package:safe_beacon/presentation/features/auth/routes/auth_routes.dart';
+import 'package:safe_beacon/presentation/features/control/routes/control_routes.dart';
 import 'package:safe_beacon/presentation/features/home/routes/home_routes.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -31,12 +33,19 @@ class _SplashScreenState extends State<SplashScreen> {
       return;
     }
 
+    final pendingAlertId = NotificationService.consumeInitialAlertId();
+
     final localAuth = LocalAuthentication();
     final canCheckBiometrics = await localAuth.canCheckBiometrics;
     final isDeviceSupported = await localAuth.isDeviceSupported();
 
     if (!canCheckBiometrics && !isDeviceSupported) {
-      if (mounted) const HomeRoute().go(context);
+      if (mounted) {
+        const HomeRoute().go(context);
+        if (pendingAlertId != null && pendingAlertId.isNotEmpty) {
+          await AlertDetailRoute(alertId: pendingAlertId).push(context);
+        }
+      }
       return;
     }
 
@@ -59,6 +68,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
       if (authenticated) {
         const HomeRoute().go(context);
+        if (pendingAlertId != null && pendingAlertId.isNotEmpty) {
+          await AlertDetailRoute(alertId: pendingAlertId).push(context);
+        }
       } else {
         await FirebaseAuth.instance.signOut();
         if (mounted) const AuthRoute().go(context);

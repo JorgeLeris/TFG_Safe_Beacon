@@ -130,6 +130,7 @@ class _CustomDialogState extends State<CustomDialog> {
                   ],
                 ),
 
+                const Divider(),
                 const SizedBox(height: 16),
 
                 Flexible(child: SingleChildScrollView(child: widget.content)),

@@ -11,4 +11,28 @@ abstract final class Constants {
 
   /// Regular expression for validating email addresses.
   static final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+
+  /// Panic Button alert type key.
+  static const String panicButtonAlertTypeKey = 'panic_button';
+
+  /// Guardian Mode alert type key.
+  static const String guardianModeAlertTypeKey = 'guardian_mode';
+
+  /// OpenStreetMap tile URL.
+  static const String openStreetMapTileUrl =
+      'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+  /// URL for OpenStreetMap copyright information.
+  static const String openStreetMapCopyrightUrl =
+      'https://openstreetmap.org/copyright';
+
+  /// User agent for OpenStreetMap tile requests.
+  static const String openStreetMapAttribution = 'OpenStreetMap contributors';
+
+  /// Bundle ID of the application.
+  static const String bundleId = 'com.jlerisla.safebeacon';
+
+  /// Returns the Google Maps search URL for the given coordinates.
+  static String googleMapsUrl(double latitude, double longitude) =>
+      'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
 }

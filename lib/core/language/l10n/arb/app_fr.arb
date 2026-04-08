@@ -122,5 +122,157 @@
   "deleteContactDescription": "En supprimant \"{username}\" de vos contacts de confiance, toute connexion avec cette personne sera perdue. Cette action est permanente et ne peut pas être annulée.",
   "deleteContactErrorTitle": "Erreur lors de la suppression du contact",
   "sendRequestSuccessTitle": "Demande envoyée",
-  "sendRequestSuccessDescription": "La demande a été envoyée avec succès. Lorsque l'utilisateur l'acceptera, la connexion sera établie."
+  "sendRequestSuccessDescription": "La demande a été envoyée avec succès. Lorsque l'utilisateur l'acceptera, la connexion sera établie.",
+  "deactivate": "Désactiver",
+  "sos": "SOS",
+  "emergency": "Urgence",
+  "notAvailable": "Indisponible",
+  "panicButton": "Bouton de panique",
+  "guardianMode": "Mode gardien",
+  "sensors": "Capteurs",
+  "panicButtonInfoContent": "Cette fonctionnalité envoie des alertes immédiates à vos contacts de confiance avec votre position actuelle. Utilisez-la uniquement en cas d'urgence.",
+  "addPanicButtonToDevice": "Ajouter le bouton de panique à l'appareil",
+  "panicButtonStatusStandby": "En attente",
+  "panicButtonStatusActive": "Activé",
+  "panicButtonStatusDisabled": "Désactivé",
+  "panicButtonStatusLoading": "Chargement...",
+  "panicButtonNoContactsTitle": "Aucun contact de confiance",
+  "panicButtonNoContactsContent": "Pour activer une alerte, vous avez besoin d'au moins un contact de confiance. Rendez-vous dans la section contacts pour en ajouter un.",
+  "panicButtonDisabledNoContacts": "Sans contacts",
+  "panicButtonDisabledNoPermission": "Sans permission",
+  "panicButtonNoContactsButton": "Vérifier",
+  "panicButtonPermissionDeniedTitle": "Permission de localisation requise",
+  "panicButtonPermissionDeniedContent": "SafeBeacon a besoin d'accéder à votre localisation pour l'enregistrer avec l'alerte. Appuyez sur le bouton pour accéder aux paramètres et accorder la permission.",
+  "panicButtonPermissionDeniedButton": "Ouvrir les paramètres",
+  "panicButtonAlreadyActiveTitle": "Alerte déjà active",
+  "panicButtonAlreadyActiveContent": "Vous avez déjà une alerte active en ce moment. Vous ne pouvez avoir qu'une seule alerte active à la fois.",
+  "panicButtonActivateErrorTitle": "Erreur lors de l'activation de l'alerte",
+  "panicButtonActivateErrorContent": "L'alerte n'a pas pu être activée. Veuillez vérifier votre connexion et réessayer.",
+  "panicButtonDeactivateErrorTitle": "Erreur lors de la désactivation de l'alerte",
+  "panicButtonDeactivateErrorContent": "L'alerte n'a pas pu être désactivée. Veuillez vérifier votre connexion et réessayer.",
+  "customization": "Personnalisation",
+  "featuresSettings": "Paramètres des fonctionnalités",
+  "featuresSettingsDescription": "Activez et désactivez le bouton de panique ou accédez aux paramètres de personnalisation.",
+  "deactivationPin": "PIN de désactivation",
+  "deactivationPinDescription": "Ajoutez un PIN pour désactiver le bouton de panique et ainsi augmenter la sécurité.",
+  "notAvailableYet": "Pas encore disponible",
+  "futureUpdateContent": "Cette fonctionnalité sera disponible dans une prochaine mise à jour.",
+  "panicButtonCooldownTitle": "Patientez un moment",
+  "panicButtonCooldownContent": "Pour votre sécurité, le bouton de panique ne peut être désactivé qu'après 10 secondes. Encore un petit moment, veuillez patienter.",
+  "panicButtonDeactivateTitle": "ésactiver l'alerte",
+  "panicButtonDeactivateContent": "Si la situation est déjà sous contrôle, vous pouvez désactiver le bouton de panique. Vous pouvez également ajouter un motif facultatif à la désactivation.",
+  "panicButtonDeactivateReasonHint": "Motif",
+  "panicButtonDeactivate": "Désactiver",
+  "wait": "Attendez",
+  "noAlertsTitle": "Pas encore d'alertes",
+  "noAlertsDescription": "Lorsqu'une alerte d'une de vos personnes protégées est déclenchée, elle apparaîtra ici pour que vous puissiez la consulter et effectuer un suivi.",
+  "activeAlert": "Alerte active",
+  "inactiveAlert": "Alerte désactivée",
+  "filterAlertsTitle": "Filtrer les alertes",
+  "filterByStatus": "Par statut :",
+  "allMasculine": "Tous",
+  "disabledAlerts": "Alertes désactivées",
+  "activeAlerts": "Alertes actives",
+  "filterByFunctionality": "Par fonctionnalité :",
+  "allFeminine": "Toutes",
+  "clearFilters": "Effacer les filtres",
+  "filter": "Filtrer",
+  "alertsReceivedCount": "Alertes reçues : {count}",
+  "@alertsReceivedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "alertOfFeature": "Alerte - {feature}",
+  "@alertOfFeature": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDetailHeader": "Alerte de {username}",
+  "@alertDetailHeader": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "activeAlertOfUser": "Alerte active de {username}",
+  "@activeAlertOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "inactiveAlertOfUser": "Alerte désactivée de {username}",
+  "@inactiveAlertOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "activationDate": "Date d'activation de l'alerte: {date}",
+  "@activationDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDataSection": "DONNÉES DE L'ALERTE",
+  "activationDateLabel": "Date d'activation :",
+  "locationOnActivationSection": "EMPLACEMENT LORS DE L'ACTIVATION",
+  "contactSection": "CONTACTER",
+  "startChatWith": "Démarrer une conversation avec {username}",
+  "@startChatWith": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDetailsTitle": "Détails de l'alerte",
+  "alertGeneratorUser": "Utilisateur générateur de l'alerte",
+  "alertType": "Type d'alerte",
+  "status": "Statut",
+  "activationDateDetail": "Date d'activation",
+  "activationTimeDetail": "Heure d'activation",
+  "batteryOnActivation": "Batterie lors de l'activation",
+  "deactivationDataTitle": "Données de désactivation",
+  "deactivationReason": "Raison",
+  "timeActive": "Temps actif",
+  "deactivationDateDetail": "Date de désactivation",
+  "deactivationTimeDetail": "Heure de désactivation",
+  "mapPlaceholder": "Carte non disponible",
+  "openInGoogleMaps": "Ouvrir dans Google Maps",
+  "alertLoadError": "Impossible de charger l'alerte",
+  "notificationAlertTitle": "Alerte de {username}",
+  "@notificationAlertTitle": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationAlertBody": "Votre personne protégée {username}, a activé son bouton de panique.",
+  "@notificationAlertBody": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "addWidgetTitle": "Ajouter le widget à l'appareil",
+  "addWidgetInstructions": "Pour ajouter le widget sur iOS :\n1. Maintenez appuyé l'écran d'accueil jusqu'à ce que les icônes commencent à bouger.\n2. Appuyez sur le bouton '+' dans le coin supérieur gauche.\n3. Recherchez 'SafeBeacon' et sélectionnez le widget du bouton de panique.\n4. Placez-le où vous le souhaitez.",
+  "addWidgetAndroidNotSupported": "Votre lanceur ne prend pas en charge l'ajout de widgets directement. Allez sur l'écran d'accueil, appuyez longuement sur une zone vide et cherchez le widget SafeBeacon.",
+  "widgetSosLabel": "SOS",
+  "widgetActivateLabel": "Activer le bouton de panique",
+  "widgetActiveTitle": "ALERTE ACTIVE",
+  "widgetOpenApp": "Ouvrir SafeBeacon"
 }

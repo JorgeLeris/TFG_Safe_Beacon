@@ -158,6 +158,57 @@ class UserProfileRepositoryImpl implements UserProfileRepository {
     }
   }
 
+  /// Stores [token] as the single FCM token for the user identified by [uid].
+  @override
+  Future<Result<void>> saveFcmToken(String uid, String token) async {
+    appLogger.fine('Saving FCM token for uid: $uid');
+    try {
+      await _api.saveFcmToken(uid, token);
+      appLogger.info('FCM token saved for uid: $uid');
+      return const Result.success(null);
+    } on FirebaseException catch (e, st) {
+      appLogger.severe('Firebase error saving FCM token', e, st);
+      return Result.failure(_mapFirebaseError(e));
+    } catch (e, st) {
+      appLogger.severe('Unexpected error saving FCM token', e, st);
+      return const Result.failure(AppFailure.unknown());
+    }
+  }
+
+  /// Removes the FCM token field from the user identified by [uid].
+  @override
+  Future<Result<void>> clearFcmToken(String uid, String token) async {
+    appLogger.fine('Clearing FCM token for uid: $uid');
+    try {
+      await _api.clearFcmToken(uid, token);
+      appLogger.info('FCM token cleared for uid: $uid');
+      return const Result.success(null);
+    } on FirebaseException catch (e, st) {
+      appLogger.severe('Firebase error clearing FCM token', e, st);
+      return Result.failure(_mapFirebaseError(e));
+    } catch (e, st) {
+      appLogger.severe('Unexpected error clearing FCM token', e, st);
+      return const Result.failure(AppFailure.unknown());
+    }
+  }
+  /// Returns the FCM tokens for a list of user [uids].
+  @override
+  Future<Result<List<String>>> getFcmTokensForUsers(List<String> uids) async {
+    appLogger.fine('Fetching FCM tokens for ${uids.length} uids');
+    try {
+      final tokens = await _api.getFcmTokens(uids);
+      appLogger.info(
+        'Fetched ${tokens.length} FCM token(s) out of ${uids.length} user(s)',
+      );
+      return Result.success(tokens);
+    } on FirebaseException catch (e, st) {
+      appLogger.severe('Firebase error fetching FCM tokens', e, st);
+      return Result.failure(_mapFirebaseError(e));
+    } catch (e, st) {
+      appLogger.severe('Unexpected error fetching FCM tokens', e, st);
+      return const Result.failure(AppFailure.unknown());
+    }
+  }
   Future<String> _resolveUsername(String email) async {
     final base = UsernameGenerator.fromEmail(email);
 

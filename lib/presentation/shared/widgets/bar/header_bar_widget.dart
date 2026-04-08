@@ -3,10 +3,19 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class SectionHeader extends StatefulWidget {
-  const SectionHeader({super.key, required this.text, this.onRefresh});
+  const SectionHeader({
+    super.key,
+    required this.text,
+    this.onRefresh,
+    this.trailingIcon,
+    this.onTrailingIconPressed,
+  });
 
   final String text;
   final Future<void> Function()? onRefresh;
+
+  final IconData? trailingIcon;
+  final VoidCallback? onTrailingIconPressed;
 
   @override
   State<SectionHeader> createState() => _SectionHeaderState();
@@ -53,6 +62,34 @@ class _SectionHeaderState extends State<SectionHeader>
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    // Determine which trailing widget to show (refresh takes priority)
+    Widget? trailing;
+
+    if (widget.onRefresh != null) {
+      trailing = GestureDetector(
+        onTap: _isRefreshing ? null : _handleRefresh,
+        child: RotationTransition(
+          turns: _controller,
+          child: Icon(
+            Icons.refresh_rounded,
+            color: colorScheme.onPrimary.withValues(
+              alpha: _isRefreshing ? 0.5 : 1.0,
+            ),
+            size: 25,
+          ),
+        ),
+      );
+    } else if (widget.trailingIcon != null) {
+      trailing = GestureDetector(
+        onTap: widget.onTrailingIconPressed,
+        child: Icon(
+          widget.trailingIcon,
+          color: colorScheme.onPrimary,
+          size: 25,
+        ),
+      );
+    }
+
     return Container(
       width: double.infinity,
       color: colorScheme.primary,
@@ -68,23 +105,7 @@ class _SectionHeaderState extends State<SectionHeader>
               fontWeight: FontWeight.w700,
             ),
           ),
-          if (widget.onRefresh != null)
-            Positioned(
-              right: 0,
-              child: GestureDetector(
-                onTap: _isRefreshing ? null : _handleRefresh,
-                child: RotationTransition(
-                  turns: _controller,
-                  child: Icon(
-                    Icons.refresh_rounded,
-                    color: colorScheme.onPrimary.withValues(
-                      alpha: _isRefreshing ? 0.5 : 1.0,
-                    ),
-                    size: 25,
-                  ),
-                ),
-              ),
-            ),
+          if (trailing != null) Positioned(right: 0, child: trailing),
         ],
       ),
     );

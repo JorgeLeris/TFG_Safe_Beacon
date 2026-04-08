@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:safe_beacon/data/repositories/contact_repository_impl.dart';
+import 'package:safe_beacon/data/sources/firebase/alerts/alert_api.dart';
 import 'package:safe_beacon/data/sources/firebase/contacts/contact_api.dart';
 import 'package:safe_beacon/data/sources/firebase/contacts/dto/contact_dto.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
@@ -12,6 +13,8 @@ import 'package:safe_beacon/domain/contacts/entities/contact.dart';
 // MARK: - DUMMY DATA & MOCKS
 
 class MockContactApi extends Mock implements ContactApi {}
+
+class MockAlertApi extends Mock implements AlertApi {}
 
 class FakeContactDto extends Fake implements ContactDto {}
 
@@ -41,11 +44,13 @@ FirebaseException _firebaseException(String code) =>
 
 void main() {
   late MockContactApi mockApi;
+  late MockAlertApi mockAlertApi;
   late ContactRepositoryImpl repository;
 
   setUp(() {
     mockApi = MockContactApi();
-    repository = ContactRepositoryImpl(api: mockApi);
+    mockAlertApi = MockAlertApi();
+    repository = ContactRepositoryImpl(api: mockApi, alertApi: mockAlertApi);
     registerFallbackValue(FakeContactDto());
   });
 
@@ -244,9 +249,18 @@ void main() {
 
   group('ContactRepositoryImpl.deleteContact', () {
     test(
-      '[HAPPY PATH] - GIVEN a valid contactId, WHEN deleteContact is called, THEN should return Result.success',
+      '[HAPPY PATH] - GIVEN a valid contactId, WHEN deleteContact is called, THEN should return Result.success and cascade alert cleanup',
       () async {
+        when(
+          () => mockApi.getContactById(any()),
+        ).thenAnswer((_) async => _dummyApiResult);
         when(() => mockApi.deleteContact(any())).thenAnswer((_) async {});
+        when(
+          () => mockAlertApi.removeContactFromAlerts(
+            ownerUid: any(named: 'ownerUid'),
+            trustedContactUid: any(named: 'trustedContactUid'),
+          ),
+        ).thenAnswer((_) async {});
 
         final result = await repository.deleteContact(
           contactId: 'contact_1',
@@ -254,13 +268,62 @@ void main() {
         );
 
         expect(result, isA<Success<void>>());
+        verify(() => mockApi.getContactById('contact_1')).called(1);
         verify(() => mockApi.deleteContact('contact_1')).called(1);
+        verify(
+          () => mockAlertApi.removeContactFromAlerts(
+            ownerUid: 'uid_alice',
+            trustedContactUid: 'uid_bob',
+          ),
+        ).called(1);
       },
     );
 
     test(
-      '[ERROR PATH] - GIVEN a FirebaseException with permission-denied, WHEN deleteContact is called, THEN should return AppFailure.forbidden',
+      '[ERROR PATH] - GIVEN getContactById returns null, WHEN deleteContact is called, THEN should return AppFailure.notFound',
       () async {
+        when(() => mockApi.getContactById(any())).thenAnswer((_) async => null);
+
+        final result = await repository.deleteContact(
+          contactId: 'contact_1',
+          requesterUid: 'uid_alice',
+        );
+
+        expect(result, isA<Failure<void>>());
+        expect(
+          (result as Failure).failure,
+          equals(const AppFailure.notFound('contact')),
+        );
+        verifyNever(() => mockApi.deleteContact(any()));
+      },
+    );
+
+    test(
+      '[ERROR PATH] - GIVEN a FirebaseException with permission-denied on getContactById, WHEN deleteContact is called, THEN should return AppFailure.forbidden',
+      () async {
+        when(
+          () => mockApi.getContactById(any()),
+        ).thenThrow(_firebaseException('permission-denied'));
+
+        final result = await repository.deleteContact(
+          contactId: 'contact_1',
+          requesterUid: 'uid_alice',
+        );
+
+        expect(result, isA<Failure<void>>());
+        expect(
+          (result as Failure).failure,
+          equals(const AppFailure.forbidden()),
+        );
+      },
+    );
+
+    test(
+      '[ERROR PATH] - GIVEN a FirebaseException with permission-denied on deleteContact, WHEN deleteContact is called, THEN should return AppFailure.forbidden',
+      () async {
+        when(
+          () => mockApi.getContactById(any()),
+        ).thenAnswer((_) async => _dummyApiResult);
         when(
           () => mockApi.deleteContact(any()),
         ).thenThrow(_firebaseException('permission-denied'));
@@ -281,6 +344,9 @@ void main() {
     test(
       '[ERROR PATH] - GIVEN an unexpected error, WHEN deleteContact is called, THEN should return AppFailure.unknown',
       () async {
+        when(
+          () => mockApi.getContactById(any()),
+        ).thenAnswer((_) async => _dummyApiResult);
         when(
           () => mockApi.deleteContact(any()),
         ).thenThrow(Exception('unexpected'));
