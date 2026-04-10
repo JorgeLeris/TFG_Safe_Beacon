@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
+import 'package:safe_beacon/presentation/features/guardian_mode/routes/guardian_mode_routes.dart';
 import 'package:safe_beacon/presentation/features/panic_button/cubits/panic_button_cubit.dart';
 import 'package:safe_beacon/presentation/features/panic_button/routes/panic_button_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
@@ -299,7 +300,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       icon: Icons.location_on_outlined,
                       label: l10n.guardianMode,
                       onPressed: () {
-                        // TODO: navigate to guardian mode
+                        const GuardianModeRoute().push(context);
                       },
                       backgroundColor: colorScheme.secondary,
                       contentColor: colorScheme.onSecondary,

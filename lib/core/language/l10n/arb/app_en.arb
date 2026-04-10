@@ -131,6 +131,7 @@
   "guardianMode": "Guardian mode",
   "sensors": "Sensors",
   "panicButtonInfoContent": "This feature sends immediate alerts to your trusted contacts with your current location. Use it only in emergency situations.",
+  "guardianModeInfoContent": "Activate this feature when you want increased safety during a journey.\n\nThe app monitors your route and estimated time. If there are deviations or delays, your trusted contacts will receive an automatic alert.",
   "addPanicButtonToDevice": "Add panic button to device",
   "panicButtonStatusStandby": "Standby",
   "panicButtonStatusActive": "Active",
