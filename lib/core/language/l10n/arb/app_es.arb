@@ -132,6 +132,8 @@
   "sensors": "Sensores",
   "panicButtonInfoContent": "Esta función envía alertas inmediatas a tus contactos de confianza con tu ubicación actual. Utilízala únicamente en situaciones de emergencia.",
   "guardianModeInfoContent": "Activa esta función cuando quieras mayor seguridad durante un trayecto.\n\nLa app controla tu ruta y el tiempo estimado. Si hay desvíos o retrasos, tus contactos de confianza recibirán un aviso automáticamente.",
+  "guardianModeNoContactsContent": "El modo guardián necesita al menos un contacto de confianza para compartir tu ruta. Ve a la sección de contactos para añadir uno.",
+  "guardianModePermissionDeniedContent": "SafeBeacon necesita acceso a tu ubicación para supervisar tu ruta en modo guardián. Pulsa el botón para ir a los ajustes y conceder el permiso.",
   "addPanicButtonToDevice": "Añadir botón del pánico al dispositivo",
   "panicButtonStatusStandby": "En espera",
   "panicButtonStatusActive": "Activado",

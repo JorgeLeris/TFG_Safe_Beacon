@@ -10,6 +10,7 @@ import 'package:safe_beacon/data/sources/firebase/profile/user_profile_api.dart'
 import 'package:safe_beacon/domain/alerts/alert_repository.dart';
 import 'package:safe_beacon/domain/contacts/contact_repository.dart';
 import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
+import 'package:safe_beacon/presentation/features/guardian_mode/cubits/guardian_mode_cubit.dart';
 import 'package:safe_beacon/presentation/features/panic_button/cubits/panic_button_cubit.dart';
 
 class HomeProvider extends StatelessWidget {
@@ -34,13 +35,23 @@ class HomeProvider extends StatelessWidget {
               ContactRepositoryImpl(api: ContactApi(), alertApi: AlertApi()),
         ),
       ],
-      child: BlocProvider(
-        create: (context) => PanicButtonCubit(
-          uid: uid,
-          alertRepository: context.read<AlertRepository>(),
-          userProfileRepository: context.read<UserProfileRepository>(),
-          contactRepository: context.read<ContactRepository>(),
-        ),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) => PanicButtonCubit(
+              uid: uid,
+              alertRepository: context.read<AlertRepository>(),
+              userProfileRepository: context.read<UserProfileRepository>(),
+              contactRepository: context.read<ContactRepository>(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => GuardianModeCubit(
+              uid: uid,
+              contactRepository: context.read<ContactRepository>(),
+            ),
+          ),
+        ],
         child: child,
       ),
     );
