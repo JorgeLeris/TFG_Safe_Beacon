@@ -295,5 +295,7 @@
   "guardianModeActivatedDescription": "Se está supervisando tu trayecto y el tiempo estimado. Si te desvías del recorrido o se supera la duración prevista, se avisará automáticamente a tus contactos de confianza.",
   "guardianModeArrivalDescription": "Si ya has llegado, puedes añadir una justificación opcional y finalizar el Modo Guardián.",
   "guardianModeCancelDescription": "Si decides cancelar, puedes añadir una breve justificación antes de finalizar el Modo Guardián.",
-  "guardianModeJustification": "Justificación"
+  "guardianModeJustification": "Justificación",
+  "guardianModeStatusActive": "Modo guardián activo",
+  "guardianModeStatusInactive": "Modo guardián inactivo"
 }

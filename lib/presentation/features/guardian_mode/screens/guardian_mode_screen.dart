@@ -167,6 +167,64 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     );
   }
 
+  Widget _buildStatusBanner(
+    AppLocalizations l10n,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+  ) {
+    final backgroundColor = _isActive
+        ? colorScheme.tertiary.withValues(alpha: 0.12)
+        : colorScheme.onSurface.withValues(alpha: 0.06);
+    final iconColor = _isActive
+        ? colorScheme.tertiary
+        : colorScheme.onSurface.withValues(alpha: 0.4);
+    final textColor = _isActive
+        ? colorScheme.tertiary
+        : colorScheme.onSurface.withValues(alpha: 0.5);
+    final icon = _isActive ? Icons.shield_rounded : Icons.shield_outlined;
+    final label = _isActive
+        ? l10n.guardianModeStatusActive
+        : l10n.guardianModeStatusInactive;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: iconColor, size: 22),
+            const SizedBox(width: 12),
+            Text(
+              label,
+              style: textTheme.bodyMedium?.copyWith(
+                color: textColor,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const Spacer(),
+            Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: _isActive
+                    ? colorScheme.tertiary
+                    : colorScheme.onSurface.withValues(alpha: 0.3),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildActionButtons(AppLocalizations l10n, ColorScheme colorScheme) {
     if (_isActive) {
       return Padding(
@@ -254,6 +312,14 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Status
+                          _buildSectionTitle(
+                            l10n.status,
+                            textTheme,
+                            colorScheme,
+                          ),
+                          _buildStatusBanner(l10n, colorScheme, textTheme),
+
                           // Route / Destination
                           _buildSectionTitle(
                             l10n.guardianModeRouteSection,

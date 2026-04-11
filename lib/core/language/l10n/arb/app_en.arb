@@ -295,5 +295,7 @@
   "guardianModeActivatedDescription": "Your route and estimated time are being monitored. If you deviate from the route or exceed the estimated duration, your trusted contacts will be notified automatically.",
   "guardianModeArrivalDescription": "If you have arrived, you can add an optional justification and end Guardian Mode.",
   "guardianModeCancelDescription": "If you decide to cancel, you can add a brief justification before ending Guardian Mode.",
-  "guardianModeJustification": "Justification"
+  "guardianModeJustification": "Justification",
+  "guardianModeStatusActive": "Guardian Mode Active",
+  "guardianModeStatusInactive": "Guardian Mode Inactive"
 }
