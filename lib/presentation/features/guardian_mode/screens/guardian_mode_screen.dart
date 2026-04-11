@@ -60,6 +60,50 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     );
   }
 
+  // TODO: two dialog for de necesary data
+
+  void _showActivationConfirmationDialog(BuildContext context) {
+    final l10n = context.l10n;
+    CustomDialog.show(
+      context: context,
+      title: l10n.guardianModeActivated,
+      content: Text(l10n.guardianModeActivatedDescription),
+      buttonText: l10n.accept,
+    );
+  }
+
+  void _showArrivalConfirmationDialog(BuildContext context) {
+    final l10n = context.l10n;
+    CustomDialog.show(
+      context: context,
+      title: l10n.guardianModeConfirmArrival,
+      content: Text(l10n.guardianModeArrivalDescription),
+      buttonText: l10n.guardianModeConfirmArrival,
+      onInputButtonPressed: (reason) {
+        Navigator.of(context, rootNavigator: true).pop();
+        _deactivate();
+      },
+      secondButtonText: l10n.cancel,
+      inputHint: l10n.guardianModeJustification,
+    );
+  }
+
+  void _showCancelConfirmationDialog(BuildContext context) {
+    final l10n = context.l10n;
+    CustomDialog.show(
+      context: context,
+      title: l10n.guardianModeCancel,
+      content: Text(l10n.guardianModeCancelDescription),
+      buttonText: l10n.guardianModeCancel,
+      onInputButtonPressed: (reason) {
+        Navigator.of(context, rootNavigator: true).pop();
+        _deactivate();
+      },
+      secondButtonText: l10n.cancel,
+      inputHint: l10n.guardianModeJustification,
+    );
+  }
+
   // ---------------------------------------------------------------------------
   // Section builders
   // ---------------------------------------------------------------------------
@@ -99,7 +143,9 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
             CustomFilledButton(
               text: l10n.guardianModeConfirmArrival,
               icon: Icons.check_circle_outline_rounded,
-              onPressed: _deactivate,
+              onPressed: () {
+                _showArrivalConfirmationDialog(context);
+              },
               backgroundColor: colorScheme.tertiary,
               foregroundColor: colorScheme.onTertiary,
               colorText: colorScheme.onTertiary,
@@ -110,7 +156,9 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
             CustomFilledButton(
               text: l10n.guardianModeCancel,
               icon: Icons.cancel_outlined,
-              onPressed: _deactivate,
+              onPressed: () {
+                _showCancelConfirmationDialog(context);
+              },
               backgroundColor: const Color(0xFFD32F2F),
               foregroundColor: Colors.white,
               colorText: Colors.white,
@@ -127,7 +175,10 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
       child: CustomFilledButton(
         text: l10n.guardianModeActivate,
         icon: Icons.shield_outlined,
-        onPressed: _activate,
+        onPressed: () {
+          _showActivationConfirmationDialog(context);
+          _activate();
+        },
         backgroundColor: colorScheme.tertiary,
         foregroundColor: colorScheme.onTertiary,
         colorText: colorScheme.onTertiary,

@@ -289,5 +289,10 @@
   "guardianModeSetDestination": "Appuyez sur la carte pour définir la destination",
   "durationDays": "jours",
   "durationHours": "heures",
-  "durationMinutes": "min"
+  "durationMinutes": "min",
+  "guardianModeActivated": "Mode Gardien activé",
+  "guardianModeActivatedDescription": "Votre trajet et le temps estimé sont surveillés. Si vous vous écartez du trajet ou dépassez la durée estimée, vos contacts de confiance seront automatiquement informés.",
+  "guardianModeArrivalDescription": "Si vous êtes arrivé, vous pouvez ajouter une justification facultative et terminer le Mode Gardien.",
+  "guardianModeCancelDescription": "Si vous décidez d'annuler, vous pouvez ajouter une brève justification avant de terminer le Mode Gardien.",
+  "guardianModeJustification": "Justification"
 }
