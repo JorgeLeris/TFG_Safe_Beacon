@@ -21,10 +21,18 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
   int _durationResetKey = 0;
   int _descriptionResetKey = 0;
 
+  late final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     _loadCurrentLocation();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadCurrentLocation() async {
@@ -40,7 +48,22 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     }
   }
 
-  void _activate() => setState(() => _isActive = true);
+  void _scrollToTop() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          0,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  void _activate() {
+    setState(() => _isActive = true);
+    _scrollToTop();
+  }
 
   void _deactivate() {
     setState(() {
@@ -49,6 +72,7 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
       _durationResetKey++;
       _descriptionResetKey++;
     });
+    _scrollToTop();
   }
 
   void _showInfoDialog(AppLocalizations l10n) {
@@ -225,6 +249,7 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
                     onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
                     behavior: HitTestBehavior.opaque,
                     child: SingleChildScrollView(
+                      controller: _scrollController,
                       padding: const EdgeInsets.only(bottom: 32),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
