@@ -32,6 +32,10 @@ abstract final class Constants {
   /// Bundle ID of the application.
   static const String bundleId = 'com.jlerisla.safebeacon';
 
+  /// OSRM public routing API base URL (walking profile).
+  static const String osrmRoutingUrl =
+      'https://router.project-osrm.org/route/v1/walking/';
+
   /// Returns the Google Maps search URL for the given coordinates.
   static String googleMapsUrl(double latitude, double longitude) =>
       'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';

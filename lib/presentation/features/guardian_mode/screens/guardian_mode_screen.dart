@@ -18,6 +18,7 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
 
   LatLng? _currentLocation;
   LatLng? _destinationPoint;
+  List<LatLng> _routePoints = [];
   int _durationResetKey = 0;
   int _descriptionResetKey = 0;
 
@@ -69,6 +70,7 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     setState(() {
       _isActive = false;
       _destinationPoint = null;
+      _routePoints = [];
       _durationResetKey++;
       _descriptionResetKey++;
     });
@@ -329,12 +331,15 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
                           GuardianModeMap(
                             currentLocation: _currentLocation!,
                             destinationPoint: _destinationPoint,
+                            routePoints: _routePoints,
                             isActive: _isActive,
                             l10n: l10n,
                             colorScheme: colorScheme,
                             textTheme: textTheme,
                             onDestinationChanged: (point) =>
                                 setState(() => _destinationPoint = point),
+                            onRouteChanged: (points) =>
+                                setState(() => _routePoints = points),
                           ),
 
                           // Estimated time

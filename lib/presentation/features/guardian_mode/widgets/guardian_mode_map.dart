@@ -1,19 +1,26 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/language/generated/l10n/app_localizations.dart';
 import 'package:safe_beacon/presentation/shared/widgets/others/map_location_pin.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+// TODO: without route we use the origin and destination for validations
+
 class GuardianModeMap extends StatefulWidget {
   final LatLng currentLocation;
   final LatLng? destinationPoint;
+  final List<LatLng> routePoints;
   final bool isActive;
   final AppLocalizations l10n;
   final ColorScheme colorScheme;
   final TextTheme textTheme;
   final ValueChanged<LatLng>? onDestinationChanged;
+  final ValueChanged<List<LatLng>>? onRouteChanged;
 
   const GuardianModeMap({
     super.key,
@@ -23,7 +30,9 @@ class GuardianModeMap extends StatefulWidget {
     required this.colorScheme,
     required this.textTheme,
     this.destinationPoint,
+    this.routePoints = const [],
     this.onDestinationChanged,
+    this.onRouteChanged,
   });
 
   @override
@@ -33,9 +42,41 @@ class GuardianModeMap extends StatefulWidget {
 class _GuardianModeMapState extends State<GuardianModeMap> {
   final MapController _mapController = MapController();
 
+  Future<void> _fetchRoute(LatLng from, LatLng to) async {
+    final url = Uri.parse(
+      '${Constants.osrmRoutingUrl}'
+      '${from.longitude},${from.latitude};'
+      '${to.longitude},${to.latitude}'
+      '?overview=full&geometries=geojson',
+    );
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final routes = data['routes'] as List<dynamic>?;
+        if (routes != null && routes.isNotEmpty) {
+          // ignore: avoid_dynamic_calls
+          final geometry = routes[0]['geometry'] as Map<String, dynamic>;
+          final coordinates = geometry['coordinates'] as List<dynamic>;
+          final points = coordinates
+              .cast<List<dynamic>>()
+              .map(
+                (c) =>
+                    LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()),
+              )
+              .toList();
+          if (mounted) widget.onRouteChanged?.call(points);
+        }
+      }
+    } catch (_) {
+      // Silently ignore routing errors — map remains usable without the overlay.
+    }
+  }
+
   void _onMapTap(TapPosition tapPosition, LatLng point) {
     if (widget.isActive) return;
     widget.onDestinationChanged?.call(point);
+    _fetchRoute(widget.currentLocation, point);
 
     debugPrint(
       '[GuardianModeMap] Current location: '
@@ -103,6 +144,16 @@ class _GuardianModeMapState extends State<GuardianModeMap> {
                           urlTemplate: Constants.openStreetMapTileUrl,
                           userAgentPackageName: Constants.bundleId,
                         ),
+                        if (widget.routePoints.isNotEmpty)
+                          PolylineLayer(
+                            polylines: [
+                              Polyline(
+                                points: widget.routePoints,
+                                strokeWidth: 4.0,
+                                color: const Color(0xFF4285F4),
+                              ),
+                            ],
+                          ),
                         MarkerLayer(markers: _markers),
                         RichAttributionWidget(
                           attributions: [
@@ -127,24 +178,37 @@ class _GuardianModeMapState extends State<GuardianModeMap> {
                         elevation: 2,
                         child: InkWell(
                           borderRadius: BorderRadius.circular(8),
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => _GuardianFullscreenMapPage(
-                                currentLocation: widget.currentLocation,
-                                destinationPoint: widget.destinationPoint,
-                                isActive: widget.isActive,
-                                colorScheme: widget.colorScheme,
-                                onDestinationChanged: (point) {
-                                  widget.onDestinationChanged?.call(point);
-                                  debugPrint(
-                                    '[GuardianModeMap] Current location: '
-                                    '${widget.currentLocation.latitude}, ${widget.currentLocation.longitude} | '
-                                    'Destination: ${point.latitude}, ${point.longitude}',
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
+                          onTap: () async {
+                            final result = await Navigator.of(context)
+                                .push<(LatLng, double)>(
+                                  MaterialPageRoute<(LatLng, double)>(
+                                    builder: (_) => _GuardianFullscreenMapPage(
+                                      currentLocation: widget.currentLocation,
+                                      destinationPoint: widget.destinationPoint,
+                                      routePoints: widget.routePoints,
+                                      isActive: widget.isActive,
+                                      colorScheme: widget.colorScheme,
+                                      initialCenter:
+                                          _mapController.camera.center,
+                                      initialZoom: _mapController.camera.zoom,
+                                      onDestinationChanged: (point) {
+                                        widget.onDestinationChanged?.call(
+                                          point,
+                                        );
+                                        debugPrint(
+                                          '[GuardianModeMap] Current location: '
+                                          '${widget.currentLocation.latitude}, ${widget.currentLocation.longitude} | '
+                                          'Destination: ${point.latitude}, ${point.longitude}',
+                                        );
+                                      },
+                                      onRouteChanged: widget.onRouteChanged,
+                                    ),
+                                  ),
+                                );
+                            if (result != null) {
+                              _mapController.move(result.$1, result.$2);
+                            }
+                          },
                           child: Padding(
                             padding: const EdgeInsets.all(8),
                             child: Icon(
@@ -283,9 +347,13 @@ class _LegendDot extends StatelessWidget {
 class _GuardianFullscreenMapPage extends StatefulWidget {
   final LatLng currentLocation;
   final LatLng? destinationPoint;
+  final List<LatLng> routePoints;
   final bool isActive;
   final ColorScheme colorScheme;
   final ValueChanged<LatLng> onDestinationChanged;
+  final ValueChanged<List<LatLng>>? onRouteChanged;
+  final LatLng initialCenter;
+  final double initialZoom;
 
   const _GuardianFullscreenMapPage({
     required this.currentLocation,
@@ -293,6 +361,10 @@ class _GuardianFullscreenMapPage extends StatefulWidget {
     required this.isActive,
     required this.colorScheme,
     required this.onDestinationChanged,
+    required this.initialCenter,
+    required this.initialZoom,
+    this.routePoints = const [],
+    this.onRouteChanged,
   });
 
   @override
@@ -304,17 +376,55 @@ class _GuardianFullscreenMapPageState
     extends State<_GuardianFullscreenMapPage> {
   final MapController _mapController = MapController();
   late LatLng? _destinationPoint;
+  late List<LatLng> _routePoints;
 
   @override
   void initState() {
     super.initState();
     _destinationPoint = widget.destinationPoint;
+    // Reuse already-computed route
+    _routePoints = List<LatLng>.of(widget.routePoints);
+  }
+
+  Future<void> _fetchRoute(LatLng from, LatLng to) async {
+    final url = Uri.parse(
+      '${Constants.osrmRoutingUrl}'
+      '${from.longitude},${from.latitude};'
+      '${to.longitude},${to.latitude}'
+      '?overview=full&geometries=geojson',
+    );
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final routes = data['routes'] as List<dynamic>?;
+        if (routes != null && routes.isNotEmpty) {
+          // ignore: avoid_dynamic_calls
+          final geometry = routes[0]['geometry'] as Map<String, dynamic>;
+          final coordinates = geometry['coordinates'] as List<dynamic>;
+          final points = coordinates
+              .cast<List<dynamic>>()
+              .map(
+                (c) =>
+                    LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()),
+              )
+              .toList();
+          if (mounted) {
+            setState(() => _routePoints = points);
+            widget.onRouteChanged?.call(points);
+          }
+        }
+      }
+    } catch (_) {
+      // Silently ignore routing errors.
+    }
   }
 
   void _onMapTap(TapPosition tapPosition, LatLng point) {
     if (widget.isActive) return;
     setState(() => _destinationPoint = point);
     widget.onDestinationChanged(point);
+    _fetchRoute(widget.currentLocation, point);
   }
 
   List<Marker> get _markers {
@@ -345,8 +455,8 @@ class _GuardianFullscreenMapPageState
           FlutterMap(
             mapController: _mapController,
             options: MapOptions(
-              initialCenter: widget.currentLocation,
-              initialZoom: 15,
+              initialCenter: widget.initialCenter,
+              initialZoom: widget.initialZoom,
               minZoom: 4,
               maxZoom: 19,
               interactionOptions: const InteractionOptions(
@@ -359,6 +469,16 @@ class _GuardianFullscreenMapPageState
                 urlTemplate: Constants.openStreetMapTileUrl,
                 userAgentPackageName: Constants.bundleId,
               ),
+              if (_routePoints.isNotEmpty)
+                PolylineLayer(
+                  polylines: [
+                    Polyline(
+                      points: _routePoints,
+                      color: const Color(0xFF4285F4),
+                      strokeWidth: 4.0,
+                    ),
+                  ],
+                ),
               MarkerLayer(markers: _markers),
               RichAttributionWidget(
                 attributions: [
@@ -383,7 +503,10 @@ class _GuardianFullscreenMapPageState
               elevation: 2,
               child: InkWell(
                 borderRadius: BorderRadius.circular(8),
-                onTap: () => Navigator.of(context).pop(),
+                onTap: () => Navigator.of(context).pop((
+                  _mapController.camera.center,
+                  _mapController.camera.zoom,
+                )),
                 child: Padding(
                   padding: const EdgeInsets.all(8),
                   child: Icon(
