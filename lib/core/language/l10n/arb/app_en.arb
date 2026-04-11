@@ -156,6 +156,7 @@
   "customization": "Customization",
   "featuresSettings": "Features settings",
   "featuresSettingsDescription": "Enable and disable the panic button or access customization settings.",
+  "guardianModeSettingsDescription": "Enable and disable guardian mode or access customization settings.",
   "deactivationPin": "Deactivation PIN",
   "deactivationPinDescription": "Add a PIN to deactivate the panic button and increase security.",
   "notAvailableYet": "Not available yet",

@@ -104,6 +104,15 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     );
   }
 
+  void _showFutureDialog(BuildContext context, AppLocalizations l10n) {
+    CustomDialog.show(
+      context: context,
+      title: l10n.notAvailableYet,
+      content: Text(l10n.futureUpdateContent),
+      buttonText: l10n.accept,
+    );
+  }
+
   // ---------------------------------------------------------------------------
   // Section builders
   // ---------------------------------------------------------------------------
@@ -271,6 +280,24 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
                           // Action buttons
                           const SizedBox(height: 28),
                           _buildActionButtons(l10n, colorScheme),
+                          const SizedBox(height: 35),
+
+                          // Customization options
+                          SettingsOptionsList(
+                            horizontalPadding: 24,
+                            sectionTitle: l10n.customization,
+                            options: [
+                              SettingsOption(
+                                icon: Icons.settings_outlined,
+                                title: l10n.featuresSettings,
+                                description:
+                                    l10n.guardianModeSettingsDescription,
+                                onPressed: () {
+                                  _showFutureDialog(context, l10n);
+                                },
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),

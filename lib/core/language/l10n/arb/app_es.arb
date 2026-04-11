@@ -156,6 +156,7 @@
   "customization": "Personalización",
   "featuresSettings": "Configuración de funcionalidades",
   "featuresSettingsDescription": "Habilita y deshabilita el botón del pánico o accede a las configuraciones de personalización.",
+  "guardianModeSettingsDescription": "Habilita y deshabilita el modo guardián o accede a las configuraciones de personalización.",
   "deactivationPin": "PIN de desactivación",
   "deactivationPinDescription": "Añade un PIN para desactivar el botón del pánico y así aumentar la seguridad.",
   "notAvailableYet": "No disponible todavía",
