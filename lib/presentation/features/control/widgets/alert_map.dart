@@ -29,6 +29,12 @@ class AlertMapState extends State<AlertMap> {
   final MapController _mapController = MapController();
 
   @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final point = LatLng(widget.alert.latitude, widget.alert.longitude);
 
@@ -206,6 +212,12 @@ class _FullscreenMapPage extends StatefulWidget {
 
 class _FullscreenMapPageState extends State<_FullscreenMapPage> {
   final MapController _mapController = MapController();
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

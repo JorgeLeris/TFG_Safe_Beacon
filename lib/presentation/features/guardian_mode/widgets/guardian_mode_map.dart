@@ -42,6 +42,12 @@ class GuardianModeMap extends StatefulWidget {
 class _GuardianModeMapState extends State<GuardianModeMap> {
   final MapController _mapController = MapController();
 
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
+
   Future<void> _fetchRoute(LatLng from, LatLng to) async {
     final url = Uri.parse(
       '${Constants.osrmRoutingUrl}'
@@ -384,6 +390,12 @@ class _GuardianFullscreenMapPageState
     _destinationPoint = widget.destinationPoint;
     // Reuse already-computed route
     _routePoints = List<LatLng>.of(widget.routePoints);
+  }
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
   }
 
   Future<void> _fetchRoute(LatLng from, LatLng to) async {
