@@ -9,6 +9,7 @@ export 'package:safe_beacon/presentation/shared/widgets/dialog/alert_filter_dial
 export 'package:safe_beacon/presentation/shared/widgets/dialog/custom_dialog_widget.dart';
 export 'package:safe_beacon/presentation/shared/widgets/inputs/date_input_field_widget.dart';
 export 'package:safe_beacon/presentation/shared/widgets/inputs/dropdown_input_field.dart';
+export 'package:safe_beacon/presentation/shared/widgets/inputs/duration_input_field.dart';
 export 'package:safe_beacon/presentation/shared/widgets/inputs/input_field_widget.dart';
 export 'package:safe_beacon/presentation/shared/widgets/inputs/search_input_field_widget.dart';
 export 'package:safe_beacon/presentation/shared/widgets/others/alert_list_item.dart';

@@ -277,5 +277,17 @@
   "widgetSosLabel": "SOS",
   "widgetActivateLabel": "Activate panic button",
   "widgetActiveTitle": "ALERT ACTIVE",
-  "widgetOpenApp": "Open SafeBeacon"
+  "widgetOpenApp": "Open SafeBeacon",
+  "guardianModeRouteSection": "ROUTE / DESTINATION",
+  "guardianModeEstimatedTimeSection": "ESTIMATED TIME",
+  "guardianModeDescriptionSection": "DESCRIPTION",
+  "guardianModeEstimatedTimeHint": "Estimated time",
+  "guardianModeDescriptionHint": "Route description",
+  "guardianModeActivate": "Activate guardian mode",
+  "guardianModeConfirmArrival": "Confirm arrival",
+  "guardianModeCancel": "Cancel guardian mode",
+  "guardianModeSetDestination": "Tap the map to set the destination",
+  "durationDays": "days",
+  "durationHours": "hours",
+  "durationMinutes": "min"
 }
