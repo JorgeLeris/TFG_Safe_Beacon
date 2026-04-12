@@ -42,6 +42,7 @@ class AlertDetailScreen extends StatelessWidget {
       username: displayName.capitalized(),
       alertType: typeLabel,
       isActive: isActive,
+      isGuardianMode: alert.alertType == AlertType.guardian,
       date: alert.activatedAt.toStringDate(),
       time: alert.activatedAt.toStringTime(),
       battery: battery,

@@ -369,5 +369,7 @@
         "type": "String"
       }
     }
-  }
+  },
+  "accessDetailedFollowUpSection": "Access detailed follow-up",
+  "accessDetailedFollowUpButton": "Access follow-up"
 }

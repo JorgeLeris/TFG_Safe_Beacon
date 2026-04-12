@@ -369,5 +369,7 @@
         "type": "String"
       }
     }
-  }
+  },
+  "accessDetailedFollowUpSection": "Acceder al seguimiento detallado",
+  "accessDetailedFollowUpButton": "Acceder al seguimiento"
 }

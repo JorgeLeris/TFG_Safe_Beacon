@@ -15,6 +15,7 @@ class AlertDetailDialog {
     required String username,
     required String alertType,
     required bool isActive,
+    required bool isGuardianMode,
     required String date,
     required String time,
     required String battery,
@@ -113,6 +114,60 @@ class AlertDetailDialog {
             textTheme: textTheme,
             colorScheme: colorScheme,
           ),
+        ],
+        // Guardian mode follow-up access
+        if (isGuardianMode) ...[
+          const SizedBox(height: 20),
+          Text(
+            l10n.accessDetailedFollowUpSection,
+            style: textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+              fontSize: textTheme.titleMedium?.fontSize != null
+                  ? textTheme.titleMedium!.fontSize! * 1.1
+                  : null,
+            ),
+          ),
+          const Divider(height: 16),
+          const SizedBox(height: 4),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: colorScheme.tertiary,
+                foregroundColor: colorScheme.onTertiary,
+                shape: const StadiumBorder(),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 14,
+                ),
+              ),
+              onPressed: () {
+                // TODO: Navigate to guardian mode follow-up detail - we need to send the id too.
+              },
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      l10n.accessDetailedFollowUpButton,
+                      style: TextStyle(
+                        color: colorScheme.onTertiary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_forward_rounded,
+                    color: colorScheme.onTertiary,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 4),
+          const Divider(height: 16),
         ],
       ],
     );
