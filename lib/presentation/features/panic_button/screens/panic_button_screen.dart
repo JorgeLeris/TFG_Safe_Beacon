@@ -458,7 +458,7 @@ class _PanicButtonCard extends StatelessWidget {
       case PanicButtonState.active:
         return Colors.green;
       case PanicButtonState.disabled:
-        return Colors.orange;
+        return Colors.grey;
     }
   }
 
