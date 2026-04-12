@@ -356,7 +356,7 @@ class _ControlScreenState extends State<ControlScreen> {
                 child: FollowUpListItem(
                   followUp: followUp,
                   onTap: () {
-                    // TODO: Navigate to follow-up detail screen.
+                    const FollowUpDetailRoute().push(context);
                   },
                   onProfileTap: () {
                     OtherProfileRoute(uid: followUp.uid).push(context);

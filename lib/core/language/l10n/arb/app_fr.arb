@@ -319,5 +319,55 @@
         "type": "int"
       }
     }
+  },
+  "activeFollowUpOfUser": "Suivi actif de {username}",
+  "@activeFollowUpOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "inactiveFollowUpOfUser": "Suivi terminé de {username}",
+  "@inactiveFollowUpOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "followUpActivationDate": "Date de début de surveillance: {date}",
+  "@followUpActivationDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "followUpDetailHeader": "Suivi de {username}",
+  "@followUpDetailHeader": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "followUpDataSection": "DONNÉES DU SUIVI",
+  "followUpDataTitle": "Données du suivi",
+  "followUpGeneratorUser": "Utilisateur générateur du suivi",
+  "followUpDescription": "Description",
+  "followUpEstimatedTime": "Temps estimé pour l'arrivée",
+  "followUpElapsedTime": "Temps écoulé",
+  "followUpCompletionSection": "Données de finalisation",
+  "followUpCompletionCause": "Cause de la finalisation",
+  "followUpCompletionReason": "Raison",
+  "followUpLocationSection": "DERNIÈRE POSITION DÉTECTÉE ET DESTINATION",
+  "followUpLastUpdate": "Dernière mise à jour : {datetime}",
+  "@followUpLastUpdate": {
+    "placeholders": {
+      "datetime": {
+        "type": "String"
+      }
+    }
   }
 }

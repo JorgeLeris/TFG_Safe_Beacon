@@ -129,6 +129,7 @@ GoRouter buildAppRouter() {
       $panicButtonRoute,
       $guardianModeRoute,
       $alertDetailRoute,
+      $followUpDetailRoute,
       ...mockRoutes,
     ],
   );

@@ -319,5 +319,55 @@
         "type": "int"
       }
     }
+  },
+  "activeFollowUpOfUser": "Active follow-up of {username}",
+  "@activeFollowUpOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "inactiveFollowUpOfUser": "Finished follow-up of {username}",
+  "@inactiveFollowUpOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "followUpActivationDate": "Follow-up started: {date}",
+  "@followUpActivationDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "followUpDetailHeader": "Follow-up of {username}",
+  "@followUpDetailHeader": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "followUpDataSection": "FOLLOW-UP DATA",
+  "followUpDataTitle": "Follow-up data",
+  "followUpGeneratorUser": "Follow-up generating user",
+  "followUpDescription": "Description",
+  "followUpEstimatedTime": "Estimated time to arrival",
+  "followUpElapsedTime": "Elapsed time",
+  "followUpCompletionSection": "Completion data",
+  "followUpCompletionCause": "Mode completion cause",
+  "followUpCompletionReason": "Reason",
+  "followUpLocationSection": "LAST DETECTED LOCATION AND DESTINATION",
+  "followUpLastUpdate": "Last update: {datetime}",
+  "@followUpLastUpdate": {
+    "placeholders": {
+      "datetime": {
+        "type": "String"
+      }
+    }
   }
 }

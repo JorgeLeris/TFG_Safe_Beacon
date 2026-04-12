@@ -319,5 +319,55 @@
         "type": "int"
       }
     }
+  },
+  "activeFollowUpOfUser": "Seguimiento activo de {username}",
+  "@activeFollowUpOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "inactiveFollowUpOfUser": "Seguimiento finalizado de {username}",
+  "@inactiveFollowUpOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "followUpActivationDate": "Fecha de inicio del seguimiento: {date}",
+  "@followUpActivationDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "followUpDetailHeader": "Seguimiento de {username}",
+  "@followUpDetailHeader": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "followUpDataSection": "DATOS DEL SEGUIMIENTO",
+  "followUpDataTitle": "Datos del seguimiento",
+  "followUpGeneratorUser": "Usuario generador del seguimiento",
+  "followUpDescription": "Descripción",
+  "followUpEstimatedTime": "Tiempo estimado para la llegada",
+  "followUpElapsedTime": "Tiempo transcurrido",
+  "followUpCompletionSection": "Datos finalización",
+  "followUpCompletionCause": "Causa finalización del modo",
+  "followUpCompletionReason": "Motivo",
+  "followUpLocationSection": "ÚLTIMA UBICACIÓN DETECTADA Y DESTINO",
+  "followUpLastUpdate": "Última actualización: {datetime}",
+  "@followUpLastUpdate": {
+    "placeholders": {
+      "datetime": {
+        "type": "String"
+      }
+    }
   }
 }
