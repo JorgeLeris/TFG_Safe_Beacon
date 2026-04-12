@@ -8,6 +8,7 @@ import 'package:safe_beacon/presentation/features/contacts/routes/contacts_route
 import 'package:safe_beacon/presentation/features/control/cubits/control_cubit.dart';
 import 'package:safe_beacon/presentation/features/control/routes/control_routes.dart';
 import 'package:safe_beacon/presentation/features/control/widgets/alert_list_header.dart';
+import 'package:safe_beacon/presentation/features/control/widgets/follow_up_list_header.dart';
 import 'package:safe_beacon/presentation/features/profile/routes/profile_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
@@ -25,6 +26,57 @@ class _ControlScreenState extends State<ControlScreen> {
   // Current filters applied to the alerts list
   AlertFilters _alertFilters = const AlertFilters();
 
+  Key _followUpsSearchKey = UniqueKey();
+  String _followUpsQuery = '';
+
+  // Current filters applied to the follow-ups list
+  FollowUpFilters _followUpFilters = const FollowUpFilters();
+
+  // TODO(follow-ups): Replace with data from service and manage error from service too.
+  static final List<FollowUpItem> _mockFollowUps = [
+    FollowUpItem(
+      uid: 'mock-uid-1',
+      username: 'maria_garcia',
+      isActive: true,
+      secondaryTags: [FollowUpSecondaryTag.routeDeviation],
+      dateTime: DateTime.now().subtract(const Duration(minutes: 35)),
+    ),
+    FollowUpItem(
+      uid: 'mock-uid-2',
+      username: 'carlos_lopez',
+      isActive: false,
+      secondaryTags: [FollowUpSecondaryTag.completionByArrival],
+      dateTime: DateTime.now().subtract(const Duration(hours: 2, minutes: 10)),
+    ),
+    FollowUpItem(
+      uid: 'mock-uid-3',
+      username: 'ana_martinez',
+      isActive: true,
+      secondaryTags: [
+        FollowUpSecondaryTag.routeDeviation,
+        FollowUpSecondaryTag.estimatedTimeExceeded,
+      ],
+      dateTime: DateTime.now().subtract(const Duration(hours: 1, minutes: 5)),
+    ),
+    FollowUpItem(
+      uid: 'mock-uid-4',
+      username: 'pedro_sanchez',
+      isActive: false,
+      secondaryTags: [FollowUpSecondaryTag.completionByCancellation],
+      dateTime: DateTime.now().subtract(const Duration(hours: 5)),
+    ),
+    FollowUpItem(
+      uid: 'mock-uid-5',
+      username: 'lucia_fernandez',
+      isActive: false,
+      secondaryTags: [
+        FollowUpSecondaryTag.estimatedTimeExceeded,
+        FollowUpSecondaryTag.completionByArrival,
+      ],
+      dateTime: DateTime.now().subtract(const Duration(hours: 3, minutes: 20)),
+    ),
+  ];
+
   // ---------------------------------------------------------------------------
   // Lifecycle
   // ---------------------------------------------------------------------------
@@ -41,6 +93,8 @@ class _ControlScreenState extends State<ControlScreen> {
     setState(() {
       _alertsSearchKey = UniqueKey();
       _alertsQuery = '';
+      _followUpsSearchKey = UniqueKey();
+      _followUpsQuery = '';
     });
     FocusManager.instance.primaryFocus?.unfocus();
   }
@@ -198,6 +252,124 @@ class _ControlScreenState extends State<ControlScreen> {
   }
 
   // ---------------------------------------------------------------------------
+  // Tab — Follow-ups
+  // ---------------------------------------------------------------------------
+
+  List<FollowUpItem> _applyFollowUpFilters(List<FollowUpItem> followUps) {
+    return followUps.where((f) {
+      final passesStatus = switch (_followUpFilters.status) {
+        FollowUpStatusFilter.all => true,
+        FollowUpStatusFilter.active => f.isActive,
+        FollowUpStatusFilter.finished => !f.isActive,
+      };
+
+      final passesEvent = switch (_followUpFilters.event) {
+        FollowUpEventFilter.all => true,
+        FollowUpEventFilter.routeDeviation => f.secondaryTags.contains(
+          FollowUpSecondaryTag.routeDeviation,
+        ),
+        FollowUpEventFilter.estimatedTimeExceeded => f.secondaryTags.contains(
+          FollowUpSecondaryTag.estimatedTimeExceeded,
+        ),
+      };
+
+      final passesCompletion = switch (_followUpFilters.completion) {
+        FollowUpCompletionFilter.all => true,
+        FollowUpCompletionFilter.completionByArrival =>
+          f.secondaryTags.contains(FollowUpSecondaryTag.completionByArrival),
+        FollowUpCompletionFilter.completionByCancellation =>
+          f.secondaryTags.contains(
+            FollowUpSecondaryTag.completionByCancellation,
+          ),
+      };
+
+      return passesStatus && passesEvent && passesCompletion;
+    }).toList();
+  }
+
+  Future<void> _applyFollowUpFiltersWithLoading(FollowUpFilters filters) async {
+    // TODO(follow-ups): Replace with cubit call.
+    setState(() => _followUpFilters = filters);
+  }
+
+  void _openFollowUpFilterDialog() {
+    FollowUpFilterDialog.show(
+      context: context,
+      initialFilters: _followUpFilters,
+      onApply: _applyFollowUpFiltersWithLoading,
+    );
+  }
+
+  Widget _buildFollowUpsList(BuildContext context, AppLocalizations l10n) {
+    final afterFilters = _applyFollowUpFilters(_mockFollowUps);
+    final filtered = _followUpsQuery.isEmpty
+        ? afterFilters
+        : afterFilters
+              .where(
+                (f) => f.username.toLowerCase().contains(
+                  _followUpsQuery.toLowerCase(),
+                ),
+              )
+              .toList();
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: Column(
+        children: [
+          // Counter + filter button
+          FollowUpsListHeader(
+            followUpCount: afterFilters.length,
+            activeFilterCount: _followUpFilters.activeCount,
+            onFilterTap: _openFollowUpFilterDialog,
+          ),
+
+          const SizedBox(height: 12),
+
+          // Search field
+          SearchInputField(
+            key: _followUpsSearchKey,
+            hint: l10n.searchContact,
+            onChanged: (q) => setState(() => _followUpsQuery = q),
+          ),
+
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4),
+            child: Divider(height: 30),
+          ),
+
+          if (_mockFollowUps.isEmpty)
+            EmptyStateView(
+              type: EmptyStateType.empty,
+              title: l10n.noFollowUpsTitle,
+              description: l10n.noFollowUpsDescription,
+            )
+          else if (filtered.isEmpty)
+            EmptyStateView(
+              type: EmptyStateType.noResults,
+              title: l10n.noResultsTitle,
+              description: l10n.noResultsDescription,
+            )
+          else
+            ...filtered.map((followUp) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: FollowUpListItem(
+                  followUp: followUp,
+                  onTap: () {
+                    // TODO: Navigate to follow-up detail screen.
+                  },
+                  onProfileTap: () {
+                    OtherProfileRoute(uid: followUp.uid).push(context);
+                  },
+                ),
+              );
+            }),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
   // Build
   // ---------------------------------------------------------------------------
 
@@ -268,7 +440,7 @@ class _ControlScreenState extends State<ControlScreen> {
                     onTabChanged: _onTabChanged,
                     children: [
                       _buildAlertsList(context, l10n, state),
-                      const Placeholder(),
+                      _buildFollowUpsList(context, l10n),
                       const Placeholder(),
                     ],
                   ),

@@ -297,5 +297,27 @@
   "guardianModeCancelDescription": "If you decide to cancel, you can add a brief justification before ending Guardian Mode.",
   "guardianModeJustification": "Justification",
   "guardianModeStatusActive": "Guardian Mode Active",
-  "guardianModeStatusInactive": "Guardian Mode Inactive"
+  "guardianModeStatusInactive": "Guardian Mode Inactive",
+  "followUpGuardianModeOf": "Guardian mode follow-up of:",
+  "noFollowUpsTitle": "No follow-ups yet",
+  "noFollowUpsDescription": "When a guardian mode follow-up from one of your protected people starts, it will appear here for you to monitor.",
+  "activeFollowUp": "Active follow-up",
+  "finishedFollowUp": "Finished follow-up",
+  "activeFollowUps": "Active follow-up",
+  "finishedFollowUps": "Finished follow-up",
+  "routeDeviationTag": "Route deviation",
+  "estimatedTimeExceededTag": "Estimated time exceeded",
+  "completionByArrivalTag": "Completed on arrival",
+  "completionByCancellationTag": "Completed by cancellation",
+  "filterFollowUpsTitle": "Filter follow-ups",
+  "filterByEvent": "By events:",
+  "filterByCompletionType": "By completion type:",
+  "followUpsCount": "Follow-ups: {count}",
+  "@followUpsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

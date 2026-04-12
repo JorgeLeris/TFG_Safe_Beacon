@@ -1,0 +1,329 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:safe_beacon/core/assets/assets.dart';
+import 'package:safe_beacon/core/extensions/date_extensions.dart';
+import 'package:safe_beacon/core/extensions/string_extensions.dart';
+import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/presentation/shared/widgets/dialog/follow_up_filter_dialog.dart';
+
+/// Data model for a single follow-up entry in the list.
+class FollowUpItem {
+  final String uid;
+  final String username;
+  final String? profilePhoto;
+  final bool isActive;
+  final List<FollowUpSecondaryTag> secondaryTags;
+  final DateTime dateTime;
+
+  const FollowUpItem({
+    required this.uid,
+    required this.username,
+    this.profilePhoto,
+    required this.isActive,
+    required this.secondaryTags,
+    required this.dateTime,
+  });
+}
+
+/// Follow-up list item widget, mirroring the AlertListItem layout.
+class FollowUpListItem extends StatelessWidget {
+  const FollowUpListItem({
+    super.key,
+    required this.followUp,
+    required this.onTap,
+    required this.onProfileTap,
+  });
+
+  final FollowUpItem followUp;
+  final VoidCallback onTap;
+  final VoidCallback onProfileTap;
+
+  static const double _avatarRadius = 30.0;
+
+  ImageProvider _resolveImage() {
+    final photo = followUp.profilePhoto;
+    if (photo != null && photo.isNotEmpty) {
+      if (photo.startsWith('http://') || photo.startsWith('https://')) {
+        return NetworkImage(photo);
+      }
+      try {
+        return MemoryImage(base64Decode(photo));
+      } catch (_) {}
+    }
+    return const AssetImage(AppImages.placeholderProfileImage);
+  }
+
+  String _secondaryTagLabel(FollowUpSecondaryTag tag, AppLocalizations l10n) {
+    return switch (tag) {
+      FollowUpSecondaryTag.routeDeviation => l10n.routeDeviationTag,
+      FollowUpSecondaryTag.estimatedTimeExceeded =>
+        l10n.estimatedTimeExceededTag,
+      FollowUpSecondaryTag.completionByArrival => l10n.completionByArrivalTag,
+      FollowUpSecondaryTag.completionByCancellation =>
+        l10n.completionByCancellationTag,
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = context.l10n;
+
+    final primaryColor = followUp.isActive
+        ? (isDark ? const Color(0xFF66BB6A) : const Color(0xFF2E7D32))
+        : (isDark ? const Color(0xFFFF6B6B) : const Color(0xFFD32F2F));
+
+    final primaryBg = isDark
+        ? primaryColor.withValues(alpha: 0.15)
+        : HSLColor.fromColor(
+            primaryColor,
+          ).withLightness(0.92).withSaturation(0.55).toColor();
+
+    final dt = followUp.dateTime;
+    final timeStr =
+        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    final dateStr = '${dt.toStringDate()}  $timeStr';
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Profile photo
+        GestureDetector(
+          onTap: onProfileTap,
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: colorScheme.onSurface.withValues(alpha: 0.15),
+                width: 1.25,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.15),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: CircleAvatar(
+              radius: _avatarRadius,
+              backgroundColor: colorScheme.surfaceContainerHighest,
+              backgroundImage: _resolveImage(),
+            ),
+          ),
+        ),
+
+        const SizedBox(width: 10),
+
+        // Content column
+        Expanded(
+          child: Card(
+            elevation: 2,
+            color: colorScheme.surfaceContainerLowest,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+              side: BorderSide(
+                color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                width: 0.75,
+              ),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(14),
+              child: InkWell(
+                onTap: onTap,
+                borderRadius: BorderRadius.circular(14),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Header label
+                            Text(
+                              l10n.followUpGuardianModeOf,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurface,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            // Username
+                            Text(
+                              followUp.username.capitalized(),
+                              style: textTheme.titleSmall?.copyWith(
+                                color: colorScheme.onSurface,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 8),
+                            // Primary status tag
+                            _StatusTag(
+                              isActive: followUp.isActive,
+                              primaryColor: primaryColor,
+                              primaryBg: primaryBg,
+                              textTheme: textTheme,
+                            ),
+                            // Secondary tags
+                            if (followUp.secondaryTags.isNotEmpty) ...[
+                              const SizedBox(height: 6),
+                              Wrap(
+                                spacing: 6,
+                                runSpacing: 4,
+                                children: followUp.secondaryTags
+                                    .map(
+                                      (tag) => _SecondaryTag(
+                                        label: _secondaryTagLabel(tag, l10n),
+                                        isDark: isDark,
+                                        textTheme: textTheme,
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                            ],
+                            const SizedBox(height: 8),
+                            // Date row
+                            Row(
+                              children: [
+                                Text(
+                                  '•',
+                                  style: TextStyle(
+                                    color: colorScheme.onSurface,
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const SizedBox(width: 5),
+                                Expanded(
+                                  child: Text(
+                                    'Fecha: $dateStr',
+                                    style: textTheme.bodySmall?.copyWith(
+                                      color: colorScheme.onSurface,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Trailing arrow
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20, left: 8),
+                        child: Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          color: colorScheme.tertiary,
+                          size: 22,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _StatusTag extends StatelessWidget {
+  const _StatusTag({
+    required this.isActive,
+    required this.primaryColor,
+    required this.primaryBg,
+    required this.textTheme,
+  });
+
+  final bool isActive;
+  final Color primaryColor;
+  final Color primaryBg;
+  final TextTheme textTheme;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: primaryBg,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: primaryColor.withValues(alpha: 0.4),
+          width: 0.75,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: primaryColor,
+            ),
+          ),
+          const SizedBox(width: 5),
+          Text(
+            isActive ? l10n.activeFollowUp : l10n.finishedFollowUp,
+            style: textTheme.labelSmall?.copyWith(
+              color: primaryColor,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SecondaryTag extends StatelessWidget {
+  const _SecondaryTag({
+    required this.label,
+    required this.isDark,
+    required this.textTheme,
+  });
+
+  final String label;
+  final bool isDark;
+  final TextTheme textTheme;
+
+  @override
+  Widget build(BuildContext context) {
+    final tagColor = isDark ? const Color(0xFFFFA726) : const Color(0xFFE65100);
+
+    final tagBg = isDark
+        ? tagColor.withValues(alpha: 0.15)
+        : const Color(0xFFFFF3E0);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: tagBg,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: tagColor.withValues(alpha: 0.4), width: 0.75),
+      ),
+      child: Text(
+        label,
+        style: textTheme.labelSmall?.copyWith(
+          color: tagColor,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+}

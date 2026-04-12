@@ -7,6 +7,7 @@ export 'package:safe_beacon/presentation/shared/widgets/buttons/panic_button.dar
 export 'package:safe_beacon/presentation/shared/widgets/buttons/section_button.dart';
 export 'package:safe_beacon/presentation/shared/widgets/dialog/alert_filter_dialog.dart';
 export 'package:safe_beacon/presentation/shared/widgets/dialog/custom_dialog_widget.dart';
+export 'package:safe_beacon/presentation/shared/widgets/dialog/follow_up_filter_dialog.dart';
 export 'package:safe_beacon/presentation/shared/widgets/inputs/date_input_field_widget.dart';
 export 'package:safe_beacon/presentation/shared/widgets/inputs/dropdown_input_field.dart';
 export 'package:safe_beacon/presentation/shared/widgets/inputs/duration_input_field.dart';
@@ -15,6 +16,7 @@ export 'package:safe_beacon/presentation/shared/widgets/inputs/search_input_fiel
 export 'package:safe_beacon/presentation/shared/widgets/others/alert_list_item.dart';
 export 'package:safe_beacon/presentation/shared/widgets/others/copyable_code_field.dart';
 export 'package:safe_beacon/presentation/shared/widgets/others/empty_state_view.dart';
+export 'package:safe_beacon/presentation/shared/widgets/others/follow_up_list_item.dart';
 export 'package:safe_beacon/presentation/shared/widgets/others/map_location_pin.dart';
 export 'package:safe_beacon/presentation/shared/widgets/others/settings_option_list.dart';
 export 'package:safe_beacon/presentation/shared/widgets/others/user_list_item.dart';

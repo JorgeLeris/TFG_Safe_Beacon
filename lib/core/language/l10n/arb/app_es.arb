@@ -297,5 +297,27 @@
   "guardianModeCancelDescription": "Si decides cancelar, puedes añadir una breve justificación antes de finalizar el Modo Guardián.",
   "guardianModeJustification": "Justificación",
   "guardianModeStatusActive": "Modo guardián activo",
-  "guardianModeStatusInactive": "Modo guardián inactivo"
+  "guardianModeStatusInactive": "Modo guardián inactivo",
+  "followUpGuardianModeOf": "Seguimiento del modo guardián de:",
+  "noFollowUpsTitle": "Aún no hay seguimientos",
+  "noFollowUpsDescription": "Cuando se realice un seguimiento del modo guardián de una de tus personas protegidas, aparecerá aquí para que puedas supervisarlo.",
+  "activeFollowUp": "Seguimiento activo",
+  "finishedFollowUp": "Seguimiento finalizado",
+  "activeFollowUps": "Seguimiento activo",
+  "finishedFollowUps": "Seguimiento finalizado",
+  "routeDeviationTag": "Desviación de la ruta",
+  "estimatedTimeExceededTag": "Tiempo estimado superado",
+  "completionByArrivalTag": "Finalización por llegada",
+  "completionByCancellationTag": "Finalización por cancelación",
+  "filterFollowUpsTitle": "Filtrar seguimientos",
+  "filterByEvent": "Por sucesos:",
+  "filterByCompletionType": "Por tipo de finalización:",
+  "followUpsCount": "Seguimientos: {count}",
+  "@followUpsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }
