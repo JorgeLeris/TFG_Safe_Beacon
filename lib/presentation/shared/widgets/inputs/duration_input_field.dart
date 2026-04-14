@@ -7,12 +7,14 @@ class DurationInputField extends StatefulWidget {
   final String hint;
   final bool readOnly;
   final ValueChanged<Duration>? onChanged;
+  final Duration? initialValue;
 
   const DurationInputField({
     super.key,
     required this.hint,
     this.readOnly = false,
     this.onChanged,
+    this.initialValue,
   });
 
   @override
@@ -40,6 +42,16 @@ class _DurationInputFieldState extends State<DurationInputField> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialValue != null) {
+      final d = widget.initialValue!;
+      final totalMins = d.inMinutes;
+      final nd = totalMins ~/ (24 * 60);
+      final nh = (totalMins % (24 * 60)) ~/ 60;
+      final nm = totalMins % 60;
+      if (nd > 0) _daysCtrl.text = '$nd';
+      if (nh > 0) _hoursCtrl.text = '$nh';
+      if (nm > 0) _minsCtrl.text = '$nm';
+    }
     _daysFocus.addListener(_onFocusChange);
     _hoursFocus.addListener(_onFocusChange);
     _minsFocus.addListener(_onFocusChange);
@@ -66,13 +78,16 @@ class _DurationInputFieldState extends State<DurationInputField> {
   }
 
   void _onFocusChange() {
+    if (!mounted) return;
     setState(() {});
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       if (!_anyFocused) _normalize();
     });
   }
 
   void _normalize() {
+    if (!mounted) return;
     final totalMins =
         (int.tryParse(_daysCtrl.text) ?? 0) * 24 * 60 +
         (int.tryParse(_hoursCtrl.text) ?? 0) * 60 +

@@ -21,6 +21,7 @@ class GuardianModeMap extends StatefulWidget {
   final TextTheme textTheme;
   final ValueChanged<LatLng>? onDestinationChanged;
   final ValueChanged<List<LatLng>>? onRouteChanged;
+  final ValueChanged<Duration>? onEstimatedDurationChanged;
 
   const GuardianModeMap({
     super.key,
@@ -33,6 +34,7 @@ class GuardianModeMap extends StatefulWidget {
     this.routePoints = const [],
     this.onDestinationChanged,
     this.onRouteChanged,
+    this.onEstimatedDurationChanged,
   });
 
   @override
@@ -55,6 +57,7 @@ class _GuardianModeMapState extends State<GuardianModeMap> {
       '${to.longitude},${to.latitude}'
       '?overview=full&geometries=geojson',
     );
+    var routeSucceeded = false;
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
@@ -71,11 +74,26 @@ class _GuardianModeMapState extends State<GuardianModeMap> {
                     LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()),
               )
               .toList();
-          if (mounted) widget.onRouteChanged?.call(points);
+          // ignore: avoid_dynamic_calls
+          final durationSecs = (routes[0]['duration'] as num).toDouble();
+          final estimated = Duration(seconds: (durationSecs * 1.25).round());
+          if (mounted) {
+            widget.onRouteChanged?.call(points);
+            widget.onEstimatedDurationChanged?.call(estimated);
+          }
+          routeSucceeded = true;
         }
       }
     } catch (_) {
-      // Silently ignore routing errors — map remains usable without the overlay.
+      // Fall through to distance-based estimation.
+    }
+    if (!routeSucceeded) {
+      final distMeters = const Distance()(from, to);
+      const walkSpeedMs = 5000.0 / 3600.0;
+      final fallback = Duration(
+        seconds: (distMeters / walkSpeedMs * 1.25).round(),
+      );
+      if (mounted) widget.onEstimatedDurationChanged?.call(fallback);
     }
   }
 
@@ -208,6 +226,8 @@ class _GuardianModeMapState extends State<GuardianModeMap> {
                                         );
                                       },
                                       onRouteChanged: widget.onRouteChanged,
+                                      onEstimatedDurationChanged:
+                                          widget.onEstimatedDurationChanged,
                                     ),
                                   ),
                                 );
@@ -358,6 +378,7 @@ class _GuardianFullscreenMapPage extends StatefulWidget {
   final ColorScheme colorScheme;
   final ValueChanged<LatLng> onDestinationChanged;
   final ValueChanged<List<LatLng>>? onRouteChanged;
+  final ValueChanged<Duration>? onEstimatedDurationChanged;
   final LatLng initialCenter;
   final double initialZoom;
 
@@ -371,6 +392,7 @@ class _GuardianFullscreenMapPage extends StatefulWidget {
     required this.initialZoom,
     this.routePoints = const [],
     this.onRouteChanged,
+    this.onEstimatedDurationChanged,
   });
 
   @override
@@ -405,6 +427,7 @@ class _GuardianFullscreenMapPageState
       '${to.longitude},${to.latitude}'
       '?overview=full&geometries=geojson',
     );
+    var routeSucceeded = false;
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
@@ -421,14 +444,27 @@ class _GuardianFullscreenMapPageState
                     LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()),
               )
               .toList();
+          // ignore: avoid_dynamic_calls
+          final durationSecs = (routes[0]['duration'] as num).toDouble();
+          final estimated = Duration(seconds: (durationSecs * 1.25).round());
           if (mounted) {
             setState(() => _routePoints = points);
             widget.onRouteChanged?.call(points);
+            widget.onEstimatedDurationChanged?.call(estimated);
           }
+          routeSucceeded = true;
         }
       }
     } catch (_) {
-      // Silently ignore routing errors.
+      // Fall through to distance-based estimation.
+    }
+    if (!routeSucceeded) {
+      final distMeters = const Distance()(from, to);
+      const walkSpeedMs = 5000.0 / 3600.0;
+      final fallback = Duration(
+        seconds: (distMeters / walkSpeedMs * 1.25).round(),
+      );
+      if (mounted) widget.onEstimatedDurationChanged?.call(fallback);
     }
   }
 

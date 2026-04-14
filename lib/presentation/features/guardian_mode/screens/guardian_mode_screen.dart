@@ -19,6 +19,9 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
   LatLng? _currentLocation;
   LatLng? _destinationPoint;
   List<LatLng> _routePoints = [];
+  Duration? _enteredDuration;
+  Duration? _estimatedDuration;
+  Duration? _acceptedDuration;
   int _durationResetKey = 0;
   int _descriptionResetKey = 0;
 
@@ -71,6 +74,9 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
       _isActive = false;
       _destinationPoint = null;
       _routePoints = [];
+      _enteredDuration = null;
+      _estimatedDuration = null;
+      _acceptedDuration = null;
       _durationResetKey++;
       _descriptionResetKey++;
     });
@@ -84,6 +90,103 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
       content: Text(l10n.guardianModeInfoContent),
       buttonText: l10n.accept,
     );
+  }
+
+  String _formatDuration(Duration d) {
+    final h = d.inHours;
+    final m = d.inMinutes.remainder(60);
+    if (h > 0 && m > 0) return '${h}h ${m}min';
+    if (h > 0) return '${h}h';
+    return '${m}min';
+  }
+
+  void _showMissingDataDialog(BuildContext context, AppLocalizations l10n) {
+    CustomDialog.show(
+      context: context,
+      title: l10n.guardianModeMissingDataTitle,
+      content: Text(l10n.guardianModeMissingDataContent),
+      buttonText: l10n.accept,
+    );
+  }
+
+  void _showEstimatedTimeDialog(BuildContext context, AppLocalizations l10n) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    // Fallback: compute from straight-line distance if OSRM hasn't responded yet.
+    final Duration estimated;
+    if (_estimatedDuration != null) {
+      estimated = _estimatedDuration!;
+    } else if (_currentLocation != null && _destinationPoint != null) {
+      const walkSpeedMs = 5000.0 / 3600.0;
+      final distMeters = const Distance()(
+        _currentLocation!,
+        _destinationPoint!,
+      );
+      estimated = Duration(seconds: (distMeters / walkSpeedMs * 1.25).round());
+    } else {
+      estimated = Duration.zero;
+    }
+
+    CustomDialog.show(
+      context: context,
+      title: l10n.guardianModeEstimatedTimeDialogTitle,
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(l10n.guardianModeEstimatedTimeDialogContent),
+          const SizedBox(height: 14),
+          Text(
+            l10n.guardianModeEstimatedTimeLabel,
+            style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              color: colorScheme.onSurface.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: colorScheme.outline.withValues(alpha: 0.3),
+              ),
+            ),
+            child: Text(
+              _formatDuration(estimated),
+              style: textTheme.bodyMedium,
+            ),
+          ),
+        ],
+      ),
+      buttonText: l10n.guardianModeActivate,
+      onButtonPressed: () {
+        Navigator.of(context, rootNavigator: true).pop();
+        setState(() {
+          _acceptedDuration = estimated;
+          _enteredDuration = estimated;
+          _durationResetKey++;
+        });
+        _showActivationConfirmationDialog(context);
+        _activate();
+      },
+      secondButtonText: l10n.cancel,
+    );
+  }
+
+  void _onActivatePressed(BuildContext context, AppLocalizations l10n) {
+    final hasDuration =
+        _enteredDuration != null && _enteredDuration!.inMinutes > 0;
+    final hasDestination = _destinationPoint != null;
+
+    if (!hasDestination && !hasDuration) {
+      _showMissingDataDialog(context, l10n);
+    } else if (hasDestination && !hasDuration) {
+      _showEstimatedTimeDialog(context, l10n);
+    } else {
+      _showActivationConfirmationDialog(context);
+      _activate();
+    }
   }
 
   // TODO: two dialog for de necesary data
@@ -268,10 +371,7 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
       child: CustomFilledButton(
         text: l10n.guardianModeActivate,
         icon: Icons.shield_outlined,
-        onPressed: () {
-          _showActivationConfirmationDialog(context);
-          _activate();
-        },
+        onPressed: () => _onActivatePressed(context, l10n),
         backgroundColor: colorScheme.tertiary,
         foregroundColor: colorScheme.onTertiary,
         colorText: colorScheme.onTertiary,
@@ -340,6 +440,8 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
                                 setState(() => _destinationPoint = point),
                             onRouteChanged: (points) =>
                                 setState(() => _routePoints = points),
+                            onEstimatedDurationChanged: (d) =>
+                                setState(() => _estimatedDuration = d),
                           ),
 
                           // Estimated time
@@ -354,6 +456,9 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
                               key: ValueKey(_durationResetKey),
                               hint: l10n.guardianModeEstimatedTimeHint,
                               readOnly: _isActive,
+                              initialValue: _acceptedDuration,
+                              onChanged: (d) =>
+                                  setState(() => _enteredDuration = d),
                             ),
                           ),
 
