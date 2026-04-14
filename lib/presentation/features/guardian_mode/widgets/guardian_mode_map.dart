@@ -45,6 +45,17 @@ class _GuardianModeMapState extends State<GuardianModeMap> {
   final MapController _mapController = MapController();
 
   @override
+  void initState() {
+    super.initState();
+    // Auto-fetch the route when the widget is created with a destination
+    if (widget.destinationPoint != null && widget.routePoints.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _fetchRoute(widget.currentLocation, widget.destinationPoint!);
+      });
+    }
+  }
+
+  @override
   void dispose() {
     _mapController.dispose();
     super.dispose();

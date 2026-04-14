@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:safe_beacon/presentation/features/guardian_mode/providers/guardian_mode_provider.dart';
 import 'package:safe_beacon/presentation/features/guardian_mode/screens/guardian_mode_screen.dart';
 
 part 'guardian_mode_routes.g.dart';
@@ -13,5 +14,5 @@ class GuardianModeRoute extends GoRouteData with $GuardianModeRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
-      const GuardianModeScreen();
+      const GuardianModeProvider(child: GuardianModeScreen());
 }
