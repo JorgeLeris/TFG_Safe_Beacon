@@ -6,6 +6,7 @@ import 'package:safe_beacon/data/repositories/contact_repository_impl.dart';
 import 'package:safe_beacon/data/sources/firebase/alerts/alert_api.dart';
 import 'package:safe_beacon/data/sources/firebase/contacts/contact_api.dart';
 import 'package:safe_beacon/data/sources/firebase/contacts/dto/contact_dto.dart';
+import 'package:safe_beacon/data/sources/firebase/guardian_mode/guardian_session_api.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/domain/common/result.dart';
 import 'package:safe_beacon/domain/contacts/entities/contact.dart';
@@ -15,6 +16,8 @@ import 'package:safe_beacon/domain/contacts/entities/contact.dart';
 class MockContactApi extends Mock implements ContactApi {}
 
 class MockAlertApi extends Mock implements AlertApi {}
+
+class MockGuardianSessionApi extends Mock implements GuardianSessionApi {}
 
 class FakeContactDto extends Fake implements ContactDto {}
 
@@ -45,12 +48,18 @@ FirebaseException _firebaseException(String code) =>
 void main() {
   late MockContactApi mockApi;
   late MockAlertApi mockAlertApi;
+  late MockGuardianSessionApi mockGuardianSessionApi;
   late ContactRepositoryImpl repository;
 
   setUp(() {
     mockApi = MockContactApi();
     mockAlertApi = MockAlertApi();
-    repository = ContactRepositoryImpl(api: mockApi, alertApi: mockAlertApi);
+    mockGuardianSessionApi = MockGuardianSessionApi();
+    repository = ContactRepositoryImpl(
+      api: mockApi,
+      alertApi: mockAlertApi,
+      guardianSessionApi: mockGuardianSessionApi,
+    );
     registerFallbackValue(FakeContactDto());
   });
 
@@ -257,6 +266,12 @@ void main() {
         when(() => mockApi.deleteContact(any())).thenAnswer((_) async {});
         when(
           () => mockAlertApi.removeContactFromAlerts(
+            ownerUid: any(named: 'ownerUid'),
+            trustedContactUid: any(named: 'trustedContactUid'),
+          ),
+        ).thenAnswer((_) async {});
+        when(
+          () => mockGuardianSessionApi.removeContactFromSessions(
             ownerUid: any(named: 'ownerUid'),
             trustedContactUid: any(named: 'trustedContactUid'),
           ),
