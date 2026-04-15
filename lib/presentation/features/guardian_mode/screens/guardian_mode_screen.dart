@@ -5,6 +5,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/domain/guardian_mode/entities/guardian_coordinate.dart';
+import 'package:safe_beacon/domain/guardian_mode/entities/guardian_session.dart';
 import 'package:safe_beacon/presentation/features/guardian_mode/cubits/guardian_mode_cubit.dart';
 import 'package:safe_beacon/presentation/features/guardian_mode/widgets/guardian_mode_map.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
@@ -71,7 +72,6 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
   // MARK: - Cubit state transitions
   // ==============================================
 
-  // TODO: handle session updates and deactivations types
   void _onCubitStateChanged(
     BuildContext context,
     GuardianModeCubitState state,
@@ -92,6 +92,26 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
       _showActivateErrorDialog(context, state.activateFailure!);
       context.read<GuardianModeCubit>().consumeActivateFailure();
     }
+
+    // Completion succeeded: show confirmation dialog and reset form.
+    if (!state.isCompleting &&
+        state.activeSession == null &&
+        state.completeFailure == null) {
+      _showCompletionConfirmationDialog(context);
+      setState(() {
+        _routePoints = [];
+        _estimatedDuration = null;
+        _durationResetKey++;
+        _descriptionResetKey++;
+      });
+      _scrollToTop();
+    }
+
+    // Completion failed: show error dialog.
+    if (state.completeFailure != null) {
+      _showCompleteErrorDialog(context);
+      context.read<GuardianModeCubit>().consumeCompleteFailure();
+    }
   }
 
   void _showActivateErrorDialog(BuildContext context, AppFailure failure) {
@@ -111,21 +131,14 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     );
   }
 
-  // ==============================================
-  // MARK: - Deactivation
-  // ==============================================
-
-  // TODO: handle session deactivations types
-  /// Clears the active session from local cubit state and resets the form.
-  void _handleDeactivate() {
-    context.read<GuardianModeCubit>().clearActiveSession();
-    setState(() {
-      _routePoints = [];
-      _estimatedDuration = null;
-      _durationResetKey++;
-      _descriptionResetKey++;
-    });
-    _scrollToTop();
+  void _showCompleteErrorDialog(BuildContext context) {
+    final l10n = context.l10n;
+    CustomDialog.show(
+      context: context,
+      title: l10n.guardianModeCompleteErrorTitle,
+      content: Text(l10n.guardianModeCompleteErrorContent),
+      buttonText: l10n.accept,
+    );
   }
 
   // ==============================================
@@ -267,6 +280,16 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     );
   }
 
+  void _showCompletionConfirmationDialog(BuildContext context) {
+    final l10n = context.l10n;
+    CustomDialog.show(
+      context: context,
+      title: l10n.guardianModeCompleteSuccessTitle,
+      content: Text(l10n.guardianModeCompleteSuccessContent),
+      buttonText: l10n.accept,
+    );
+  }
+
   void _showArrivalConfirmationDialog(BuildContext context) {
     final l10n = context.l10n;
     CustomDialog.show(
@@ -274,9 +297,14 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
       title: l10n.guardianModeConfirmArrival,
       content: Text(l10n.guardianModeArrivalDescription),
       buttonText: l10n.guardianModeConfirmArrival,
-      onInputButtonPressed: (reason) {
+      onInputButtonPressed: (justification) {
         Navigator.of(context, rootNavigator: true).pop();
-        _handleDeactivate();
+        context.read<GuardianModeCubit>().completeSession(
+          completionStatus: GuardianSessionSecondaryStatus.completedByArrival,
+          completionJustification: justification.trim().isEmpty
+              ? null
+              : justification.trim(),
+        );
       },
       secondButtonText: l10n.cancel,
       inputHint: l10n.guardianModeJustification,
@@ -290,9 +318,15 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
       title: l10n.guardianModeCancel,
       content: Text(l10n.guardianModeCancelDescription),
       buttonText: l10n.guardianModeCancel,
-      onInputButtonPressed: (reason) {
+      onInputButtonPressed: (justification) {
         Navigator.of(context, rootNavigator: true).pop();
-        _handleDeactivate();
+        context.read<GuardianModeCubit>().completeSession(
+          completionStatus:
+              GuardianSessionSecondaryStatus.completedByCancellation,
+          completionJustification: justification.trim().isEmpty
+              ? null
+              : justification.trim(),
+        );
       },
       secondButtonText: l10n.cancel,
       inputHint: l10n.guardianModeJustification,
@@ -464,7 +498,9 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     return BlocConsumer<GuardianModeCubit, GuardianModeCubitState>(
       listenWhen: (prev, curr) =>
           (prev.isActivating && !curr.isActivating) ||
-          (curr.activateFailure != null && prev.activateFailure == null),
+          (curr.activateFailure != null && prev.activateFailure == null) ||
+          (prev.isCompleting && !curr.isCompleting) ||
+          (curr.completeFailure != null && prev.completeFailure == null),
       listener: _onCubitStateChanged,
       builder: (context, state) {
         final isActive = state.activeSession != null;

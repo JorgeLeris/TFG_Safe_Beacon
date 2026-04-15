@@ -116,6 +116,53 @@ class GuardianModeCubit extends Cubit<GuardianModeCubitState> {
   }
 
   // ==============================================
+  // MARK: - Session completion
+  // ==============================================
+
+  /// Completes the active guardian session.
+  ///
+  /// [completionStatus] must be [GuardianSessionSecondaryStatus.completedByArrival]
+  /// or [GuardianSessionSecondaryStatus.completedByCancellation].
+  Future<void> completeSession({
+    required GuardianSessionSecondaryStatus completionStatus,
+    String? completionJustification,
+  }) async {
+    appLogger.fine(
+      'Completing guardian session for uid: $_uid (${completionStatus.id})',
+    );
+    emit(state.copyWith(isCompleting: true, completeFailure: null));
+
+    final result = await _guardianSessionRepository.completeSession(
+      ownerUid: _uid,
+      completionStatus: completionStatus,
+      completionJustification: completionJustification,
+    );
+
+    result.when(
+      success: (_) {
+        appLogger.info('Guardian session completed for uid: $_uid');
+        emit(
+          state.copyWith(
+            isCompleting: false,
+            activeSession: null,
+            pendingDestination: null,
+            pendingDuration: null,
+            pendingDescription: null,
+          ),
+        );
+      },
+      failure: (failure) {
+        appLogger.severe('Failed to complete guardian session', failure);
+        emit(state.copyWith(isCompleting: false, completeFailure: failure));
+      },
+    );
+  }
+
+  void consumeCompleteFailure() {
+    emit(state.copyWith(completeFailure: null));
+  }
+
+  // ==============================================
   // MARK: - Pending form state
   // ==============================================
 

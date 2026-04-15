@@ -24,6 +24,10 @@ abstract class GuardianModeCubitState with _$GuardianModeCubitState {
     @Default(false) bool isActivating,
     AppFailure? activateFailure,
 
+    // -- Session completion
+    @Default(false) bool isCompleting,
+    AppFailure? completeFailure,
+
     GuardianSession? activeSession,
     AppFailure? failure,
 
