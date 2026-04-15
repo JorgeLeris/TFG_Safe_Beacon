@@ -4,6 +4,7 @@ import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/core/helpers/helpers.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/alerts/entities/alert.dart';
+import 'package:safe_beacon/domain/guardian_mode/entities/guardian_session.dart';
 import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
 import 'package:safe_beacon/presentation/features/control/cubits/control_cubit.dart';
 import 'package:safe_beacon/presentation/features/control/routes/control_routes.dart';
@@ -32,51 +33,6 @@ class _ControlScreenState extends State<ControlScreen> {
   // Current filters applied to the follow-ups list
   FollowUpFilters _followUpFilters = const FollowUpFilters();
 
-  // TODO(follow-ups): Replace with data from service and manage error from service too.
-  static final List<FollowUpItem> _mockFollowUps = [
-    FollowUpItem(
-      uid: 'mock-uid-1',
-      username: 'maria_garcia',
-      isActive: true,
-      secondaryTags: [FollowUpSecondaryTag.routeDeviation],
-      dateTime: DateTime.now().subtract(const Duration(minutes: 35)),
-    ),
-    FollowUpItem(
-      uid: 'mock-uid-2',
-      username: 'carlos_lopez',
-      isActive: false,
-      secondaryTags: [FollowUpSecondaryTag.completionByArrival],
-      dateTime: DateTime.now().subtract(const Duration(hours: 2, minutes: 10)),
-    ),
-    FollowUpItem(
-      uid: 'mock-uid-3',
-      username: 'ana_martinez',
-      isActive: true,
-      secondaryTags: [
-        FollowUpSecondaryTag.routeDeviation,
-        FollowUpSecondaryTag.estimatedTimeExceeded,
-      ],
-      dateTime: DateTime.now().subtract(const Duration(hours: 1, minutes: 5)),
-    ),
-    FollowUpItem(
-      uid: 'mock-uid-4',
-      username: 'pedro_sanchez',
-      isActive: false,
-      secondaryTags: [FollowUpSecondaryTag.completionByCancellation],
-      dateTime: DateTime.now().subtract(const Duration(hours: 5)),
-    ),
-    FollowUpItem(
-      uid: 'mock-uid-5',
-      username: 'lucia_fernandez',
-      isActive: false,
-      secondaryTags: [
-        FollowUpSecondaryTag.estimatedTimeExceeded,
-        FollowUpSecondaryTag.completionByArrival,
-      ],
-      dateTime: DateTime.now().subtract(const Duration(hours: 3, minutes: 20)),
-    ),
-  ];
-
   // ---------------------------------------------------------------------------
   // Lifecycle
   // ---------------------------------------------------------------------------
@@ -87,6 +43,7 @@ class _ControlScreenState extends State<ControlScreen> {
     final cubit = context.read<ControlCubit>();
     cubit.loadReceivedRequestsCount();
     cubit.loadAlerts();
+    cubit.loadFollowUps();
   }
 
   void _onTabChanged(int index) {
@@ -288,7 +245,6 @@ class _ControlScreenState extends State<ControlScreen> {
   }
 
   Future<void> _applyFollowUpFiltersWithLoading(FollowUpFilters filters) async {
-    // TODO(follow-ups): Replace with cubit call.
     setState(() => _followUpFilters = filters);
   }
 
@@ -300,8 +256,61 @@ class _ControlScreenState extends State<ControlScreen> {
     );
   }
 
-  Widget _buildFollowUpsList(BuildContext context, AppLocalizations l10n) {
-    final afterFilters = _applyFollowUpFilters(_mockFollowUps);
+  FollowUpSecondaryTag _mapSecondaryStatus(
+    GuardianSessionSecondaryStatus status,
+  ) {
+    return switch (status) {
+      GuardianSessionSecondaryStatus.routeDeviation =>
+        FollowUpSecondaryTag.routeDeviation,
+      GuardianSessionSecondaryStatus.estimatedTimeExceeded =>
+        FollowUpSecondaryTag.estimatedTimeExceeded,
+      GuardianSessionSecondaryStatus.completedByArrival =>
+        FollowUpSecondaryTag.completionByArrival,
+      GuardianSessionSecondaryStatus.completedByCancellation =>
+        FollowUpSecondaryTag.completionByCancellation,
+    };
+  }
+
+  Widget _buildFollowUpsList(
+    BuildContext context,
+    AppLocalizations l10n,
+    ControlState state,
+  ) {
+    if (state.isLoadingFollowUps) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state.followUpsFailure != null) {
+      return EmptyStateView(
+        type: EmptyStateType.error,
+        title: l10n.errorTitle,
+        description: l10n.errorDescription,
+      );
+    }
+
+    if (state.followUps.isEmpty) {
+      return EmptyStateView(
+        type: EmptyStateType.empty,
+        title: l10n.noFollowUpsTitle,
+        description: l10n.noFollowUpsDescription,
+      );
+    }
+
+    final followUpItems = state.followUps.map((session) {
+      return FollowUpItem(
+        uid: session.ownerUid,
+        username:
+            state.followUpDisplayNames[session.ownerUid] ?? session.ownerUid,
+        profilePhoto: state.followUpProfilePhotos[session.ownerUid],
+        isActive: session.status == GuardianSessionStatus.active,
+        secondaryTags: session.secondaryStatuses
+            .map(_mapSecondaryStatus)
+            .toList(),
+        dateTime: session.activatedAt,
+      );
+    }).toList();
+
+    final afterFilters = _applyFollowUpFilters(followUpItems);
     final filtered = _followUpsQuery.isEmpty
         ? afterFilters
         : afterFilters
@@ -337,7 +346,7 @@ class _ControlScreenState extends State<ControlScreen> {
             child: Divider(height: 30),
           ),
 
-          if (_mockFollowUps.isEmpty)
+          if (state.followUps.isEmpty)
             EmptyStateView(
               type: EmptyStateType.empty,
               title: l10n.noFollowUpsTitle,
@@ -394,6 +403,7 @@ class _ControlScreenState extends State<ControlScreen> {
                     await Future.wait([
                       context.read<ControlCubit>().loadReceivedRequestsCount(),
                       context.read<ControlCubit>().loadAlerts(),
+                      context.read<ControlCubit>().loadFollowUps(),
                     ]);
                   },
                 ),
@@ -440,7 +450,7 @@ class _ControlScreenState extends State<ControlScreen> {
                     onTabChanged: _onTabChanged,
                     children: [
                       _buildAlertsList(context, l10n, state),
-                      _buildFollowUpsList(context, l10n),
+                      _buildFollowUpsList(context, l10n, state),
                       const Placeholder(),
                     ],
                   ),
