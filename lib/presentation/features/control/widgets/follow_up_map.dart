@@ -18,6 +18,7 @@ class FollowUpMap extends StatefulWidget {
   final LatLng userPoint;
   final LatLng? destinationPoint;
   final String lastUpdateLabel;
+  final String userPointLabel;
   final AppLocalizations l10n;
   final ColorScheme colorScheme;
   final TextTheme textTheme;
@@ -28,6 +29,7 @@ class FollowUpMap extends StatefulWidget {
     required this.userPoint,
     this.destinationPoint,
     required this.lastUpdateLabel,
+    required this.userPointLabel,
     required this.l10n,
     required this.colorScheme,
     required this.textTheme,
@@ -46,6 +48,18 @@ class _FollowUpMapState extends State<FollowUpMap> {
     super.initState();
     if (widget.destinationPoint != null) {
       _fetchRoute(widget.startPoint, widget.destinationPoint!);
+    }
+  }
+
+  @override
+  void didUpdateWidget(FollowUpMap oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.userPoint != widget.userPoint) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _mapController.move(widget.userPoint, 15);
+        }
+      });
     }
   }
 
@@ -151,7 +165,7 @@ class _FollowUpMapState extends State<FollowUpMap> {
                       mapController: _mapController,
                       options: MapOptions(
                         initialCenter: widget.userPoint,
-                        initialZoom: 14,
+                        initialZoom: 15,
                         minZoom: 4,
                         maxZoom: 19,
                         interactionOptions: const InteractionOptions(
@@ -266,22 +280,23 @@ class _FollowUpMapState extends State<FollowUpMap> {
             children: [
               _LegendDot(
                 color: const Color(0xFF2E7D32),
-                label: 'Origen',
+                label: widget.l10n.followUpOriginLabel,
                 textTheme: widget.textTheme,
                 colorScheme: widget.colorScheme,
               ),
               _LegendDot(
                 color: const Color(0xFF1565C0),
-                label: 'Ubicación actual',
+                label: widget.userPointLabel,
                 textTheme: widget.textTheme,
                 colorScheme: widget.colorScheme,
               ),
-              _LegendDot(
-                color: const Color(0xFFE53935),
-                label: 'Destino',
-                textTheme: widget.textTheme,
-                colorScheme: widget.colorScheme,
-              ),
+              if (widget.destinationPoint != null)
+                _LegendDot(
+                  color: const Color(0xFFE53935),
+                  label: widget.l10n.followUpDestinationLabel,
+                  textTheme: widget.textTheme,
+                  colorScheme: widget.colorScheme,
+                ),
             ],
           ),
 

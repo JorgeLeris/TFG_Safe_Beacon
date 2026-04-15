@@ -9,6 +9,7 @@ import 'package:safe_beacon/presentation/shared/widgets/dialog/follow_up_filter_
 
 /// Data model for a single follow-up entry in the list.
 class FollowUpItem {
+  final String sessionId;
   final String uid;
   final String username;
   final String? profilePhoto;
@@ -17,6 +18,7 @@ class FollowUpItem {
   final DateTime dateTime;
 
   const FollowUpItem({
+    required this.sessionId,
     required this.uid,
     required this.username,
     this.profilePhoto,

@@ -1,72 +1,56 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:safe_beacon/core/extensions/date_extensions.dart';
 import 'package:safe_beacon/core/extensions/duration_extensions.dart';
 import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/domain/guardian_mode/entities/guardian_session.dart';
+import 'package:safe_beacon/presentation/features/control/cubits/follow_up_detail_cubit.dart';
 import 'package:safe_beacon/presentation/features/control/widgets/follow_up_map.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
-
-// ---------------------------------------------------------------------------
-// Mock data model (inline, no domain entity)
-// TODO(follow-ups): Replace with data from service.
-// ---------------------------------------------------------------------------
-
-class _MockFollowUpDetail {
-  final String username;
-  final bool isActive;
-  final List<String> primaryTags;
-  final List<String> secondaryTags;
-  final DateTime startedAt;
-  final DateTime? endedAt;
-  final String description;
-  final Duration estimatedTime;
-  final String? completionReason;
-  final LatLng startPoint;
-  final LatLng userPoint;
-  final LatLng destinationPoint;
-  final DateTime lastLocationUpdate;
-
-  const _MockFollowUpDetail({
-    required this.username,
-    required this.isActive,
-    required this.primaryTags,
-    required this.secondaryTags,
-    required this.startedAt,
-    this.endedAt,
-    required this.description,
-    required this.estimatedTime,
-    this.completionReason,
-    required this.startPoint,
-    required this.userPoint,
-    required this.destinationPoint,
-    required this.lastLocationUpdate,
-  });
-}
-
-// ---------------------------------------------------------------------------
-// Screen
-// ---------------------------------------------------------------------------
 
 class FollowUpDetailScreen extends StatelessWidget {
   const FollowUpDetailScreen({super.key});
 
-  // TODO(follow-ups): Replace _mock with data loaded from service.
-  static final _MockFollowUpDetail _mock = _MockFollowUpDetail(
-    username: 'Maria García',
-    isActive: false,
-    primaryTags: ['Seguimiento activo'],
-    secondaryTags: ['Desviación de la ruta'],
-    startedAt: DateTime.now().subtract(const Duration(minutes: 35)),
-    description: 'Trayecto al trabajo por la avenida principal.',
-    estimatedTime: const Duration(hours: 1, minutes: 15),
-    startPoint: const LatLng(40.4168, -3.7038),
-    userPoint: const LatLng(40.4220, -3.6950),
-    destinationPoint: const LatLng(40.4530, -3.6883),
-    lastLocationUpdate: DateTime.now().subtract(const Duration(minutes: 2)),
-    endedAt: DateTime.now().subtract(const Duration(minutes: 5)),
-    completionReason: 'Ya he llegado a mi destino.',
-  );
+  // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
+
+  String _secondaryTagLabel(
+    GuardianSessionSecondaryStatus status,
+    AppLocalizations l10n,
+  ) {
+    return switch (status) {
+      GuardianSessionSecondaryStatus.routeDeviation => l10n.routeDeviationTag,
+      GuardianSessionSecondaryStatus.estimatedTimeExceeded =>
+        l10n.estimatedTimeExceededTag,
+      GuardianSessionSecondaryStatus.completedByArrival =>
+        l10n.completionByArrivalTag,
+      GuardianSessionSecondaryStatus.completedByCancellation =>
+        l10n.completionByCancellationTag,
+    };
+  }
+
+  String _buildStatusLabel(GuardianSession session, AppLocalizations l10n) {
+    final isActive = session.status == GuardianSessionStatus.active;
+    final primary = isActive ? l10n.activeFollowUp : l10n.finishedFollowUp;
+    final secondaries = session.secondaryStatuses
+        .map((s) => _secondaryTagLabel(s, l10n))
+        .join(' - ');
+    return secondaries.isEmpty ? primary : '$primary - $secondaries';
+  }
+
+  String _completionCause(GuardianSession session, AppLocalizations l10n) {
+    final cause = session.secondaryStatuses
+        .where(
+          (s) =>
+              s == GuardianSessionSecondaryStatus.completedByArrival ||
+              s == GuardianSessionSecondaryStatus.completedByCancellation,
+        )
+        .firstOrNull;
+    return cause != null ? _secondaryTagLabel(cause, l10n) : '-';
+  }
 
   // ---------------------------------------------------------------------------
   // Section builders
@@ -103,10 +87,12 @@ class FollowUpDetailScreen extends StatelessWidget {
     ColorScheme colorScheme,
     TextTheme textTheme,
     bool isDark,
+    GuardianSession session,
+    String displayName,
   ) {
-    final isActive = _mock.isActive;
+    final isActive = session.status == GuardianSessionStatus.active;
     final dateStr =
-        '${_mock.startedAt.toStringDate()} - ${_mock.startedAt.toStringTime()}';
+        '${session.activatedAt.toStringDate()} - ${session.activatedAt.toStringTime()}';
 
     final iconColor = isActive
         ? (isDark ? const Color(0xFF66BB6A) : const Color(0xFF2E7D32))
@@ -129,8 +115,8 @@ class FollowUpDetailScreen extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             isActive
-                ? l10n.activeFollowUpOfUser(_mock.username.capitalized())
-                : l10n.inactiveFollowUpOfUser(_mock.username.capitalized()),
+                ? l10n.activeFollowUpOfUser(displayName.capitalized())
+                : l10n.inactiveFollowUpOfUser(displayName.capitalized()),
             style: textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               fontSize: textTheme.titleMedium?.fontSize != null
@@ -157,8 +143,10 @@ class FollowUpDetailScreen extends StatelessWidget {
     ColorScheme colorScheme,
     TextTheme textTheme,
     bool isDark,
+    GuardianSession session,
+    String displayName,
   ) {
-    final isActive = _mock.isActive;
+    final isActive = session.status == GuardianSessionStatus.active;
     final primaryColor = isActive
         ? (isDark ? const Color(0xFF66BB6A) : const Color(0xFF2E7D32))
         : (isDark ? const Color(0xFFFF6B6B) : const Color(0xFFD32F2F));
@@ -186,7 +174,7 @@ class FollowUpDetailScreen extends StatelessWidget {
         ),
         elevation: 2,
         child: InkWell(
-          onTap: () => _showDetailDialog(context, l10n),
+          onTap: () => _showDetailDialog(context, l10n, session, displayName),
           borderRadius: BorderRadius.circular(14),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -214,15 +202,15 @@ class FollowUpDetailScreen extends StatelessWidget {
                         textTheme: textTheme,
                       ),
                       // Secondary tags
-                      if (_mock.secondaryTags.isNotEmpty) ...[
+                      if (session.secondaryStatuses.isNotEmpty) ...[
                         const SizedBox(height: 6),
                         Wrap(
                           spacing: 6,
                           runSpacing: 4,
-                          children: _mock.secondaryTags
+                          children: session.secondaryStatuses
                               .map(
-                                (tag) => _Tag(
-                                  label: tag,
+                                (s) => _Tag(
+                                  label: _secondaryTagLabel(s, l10n),
                                   color: orangeColor,
                                   bg: orangeBg,
                                   textTheme: textTheme,
@@ -240,7 +228,7 @@ class FollowUpDetailScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '${_mock.startedAt.toStringDate()} - ${_mock.startedAt.toStringTime()}',
+                        '${session.activatedAt.toStringDate()} - ${session.activatedAt.toStringTime()}',
                         style: textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: colorScheme.onSurface,
@@ -262,12 +250,18 @@ class FollowUpDetailScreen extends StatelessWidget {
     );
   }
 
-  void _showDetailDialog(BuildContext context, AppLocalizations l10n) {
+  void _showDetailDialog(
+    BuildContext context,
+    AppLocalizations l10n,
+    GuardianSession session,
+    String displayName,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final isActive = _mock.isActive;
+    final isActive = session.status == GuardianSessionStatus.active;
 
-    final elapsed = DateTime.now().difference(_mock.startedAt);
+    final endTime = session.deactivatedAt ?? DateTime.now();
+    final elapsed = endTime.difference(session.activatedAt);
 
     final content = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -275,42 +269,42 @@ class FollowUpDetailScreen extends StatelessWidget {
       children: [
         _DetailRow(
           label: l10n.followUpGeneratorUser,
-          value: _mock.username.capitalized(),
+          value: displayName.capitalized(),
           textTheme: textTheme,
           colorScheme: colorScheme,
         ),
         const SizedBox(height: 14),
         _DetailRow(
           label: l10n.status,
-          value: isActive ? l10n.activeFollowUp : l10n.finishedFollowUp,
+          value: _buildStatusLabel(session, l10n),
           textTheme: textTheme,
           colorScheme: colorScheme,
         ),
         const SizedBox(height: 14),
         _DetailRow(
           label: l10n.followUpDescription,
-          value: _mock.description.orDash(),
+          value: session.description.orDash(),
           textTheme: textTheme,
           colorScheme: colorScheme,
         ),
         const SizedBox(height: 14),
         _DetailRow(
           label: l10n.activationDateDetail,
-          value: _mock.startedAt.toStringDate().orDash(),
+          value: session.activatedAt.toStringDate().orDash(),
           textTheme: textTheme,
           colorScheme: colorScheme,
         ),
         const SizedBox(height: 14),
         _DetailRow(
           label: l10n.activationTimeDetail,
-          value: _mock.startedAt.toStringTime().orDash(),
+          value: session.activatedAt.toStringTime().orDash(),
           textTheme: textTheme,
           colorScheme: colorScheme,
         ),
         const SizedBox(height: 14),
         _DetailRow(
           label: l10n.followUpEstimatedTime,
-          value: _mock.estimatedTime.formatDuration(),
+          value: session.estimatedDuration.formatDuration(),
           textTheme: textTheme,
           colorScheme: colorScheme,
         ),
@@ -334,17 +328,16 @@ class FollowUpDetailScreen extends StatelessWidget {
             ),
           ),
           const Divider(height: 16),
-          // TODO: detect if is cancelation or normal completion
           _DetailRow(
             label: l10n.followUpCompletionCause,
-            value: _mock.secondaryTags.first.orDash(),
+            value: _completionCause(session, l10n),
             textTheme: textTheme,
             colorScheme: colorScheme,
           ),
           const SizedBox(height: 14),
           _DetailRow(
             label: l10n.followUpCompletionReason,
-            value: _mock.completionReason.orDash(),
+            value: session.completionJustification.orDash(),
             textTheme: textTheme,
             colorScheme: colorScheme,
           ),
@@ -360,11 +353,15 @@ class FollowUpDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContactButton(AppLocalizations l10n, ColorScheme colorScheme) {
+  Widget _buildContactButton(
+    AppLocalizations l10n,
+    ColorScheme colorScheme,
+    String displayName,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: CustomFilledButton(
-        text: l10n.startChatWith(_mock.username.capitalized()),
+        text: l10n.startChatWith(displayName.capitalized()),
         icon: Icons.chat_outlined,
         onPressed: () {
           // TODO: Navigate to chat with user.
@@ -389,68 +386,133 @@ class FollowUpDetailScreen extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final lastUpdateStr =
-        '${_mock.lastLocationUpdate.toStringDate()} ${_mock.lastLocationUpdate.toStringTime()}';
-
     return Scaffold(
       backgroundColor: colorScheme.surface,
       appBar: const CustomAppBar(),
-      body: Column(
-        children: [
-          SectionHeader(
-            text: l10n.followUpDetailHeader(_mock.username.capitalized()),
-            onRefresh: () {
-              // TODO: implement refresh logic to reload follow-up details from service.
-              return Future.delayed(const Duration(seconds: 1));
-            },
-          ),
+      body: BlocBuilder<FollowUpDetailCubit, FollowUpDetailState>(
+        builder: (context, state) {
+          if (state.isLoading && state.session == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-          // Info banner
-          _buildInfoSection(l10n, colorScheme, textTheme, isDark),
+          if (state.failure != null || state.session == null) {
+            return Column(
+              children: [
+                SectionHeader(text: l10n.followUpDetailHeader('-')),
+                Expanded(
+                  child: EmptyStateView(
+                    type: EmptyStateType.error,
+                    title: l10n.errorTitle,
+                    description: l10n.errorDescription,
+                  ),
+                ),
+              ],
+            );
+          }
 
-          // Scrollable content
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 32),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Follow-up data
-                  _buildSectionTitle(
-                    l10n.followUpDataSection,
-                    textTheme,
-                    colorScheme,
-                  ),
-                  _buildDataCard(context, l10n, colorScheme, textTheme, isDark),
+          final session = state.session!;
+          final displayName = state.displayName;
 
-                  // Location & destination
-                  _buildSectionTitle(
-                    l10n.followUpLocationSection,
-                    textTheme,
-                    colorScheme,
-                  ),
-                  FollowUpMap(
-                    startPoint: _mock.startPoint,
-                    userPoint: _mock.userPoint,
-                    destinationPoint: _mock.destinationPoint,
-                    lastUpdateLabel: l10n.followUpLastUpdate(lastUpdateStr),
-                    l10n: l10n,
-                    colorScheme: colorScheme,
-                    textTheme: textTheme,
-                  ),
+          final startPoint = LatLng(
+            session.recordedLocations.first.latitude,
+            session.recordedLocations.first.longitude,
+          );
+          final userPoint = LatLng(
+            session.recordedLocations.last.latitude,
+            session.recordedLocations.last.longitude,
+          );
+          final destinationPoint = session.destination != null
+              ? LatLng(
+                  session.destination!.latitude,
+                  session.destination!.longitude,
+                )
+              : null;
 
-                  // Contact
-                  _buildSectionTitle(
-                    l10n.contactSection,
-                    textTheme,
-                    colorScheme,
-                  ),
-                  _buildContactButton(l10n, colorScheme),
-                ],
+          final lastUpdate =
+              session.lastLocationTimestamp ?? session.activatedAt;
+          final lastUpdateStr =
+              '${lastUpdate.toStringDate()} ${lastUpdate.toStringTime()}';
+
+          final isActive = session.status == GuardianSessionStatus.active;
+
+          return Column(
+            children: [
+              SectionHeader(
+                text: l10n.followUpDetailHeader(displayName.capitalized()),
+                onRefresh: isActive
+                    ? () => context
+                          .read<FollowUpDetailCubit>()
+                          .loadFollowUpDetail()
+                    : null,
               ),
-            ),
-          ),
-        ],
+
+              // Info banner
+              _buildInfoSection(
+                l10n,
+                colorScheme,
+                textTheme,
+                isDark,
+                session,
+                displayName,
+              ),
+
+              // Scrollable content
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.only(bottom: 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Follow-up data
+                      _buildSectionTitle(
+                        l10n.followUpDataSection,
+                        textTheme,
+                        colorScheme,
+                      ),
+                      _buildDataCard(
+                        context,
+                        l10n,
+                        colorScheme,
+                        textTheme,
+                        isDark,
+                        session,
+                        displayName,
+                      ),
+
+                      // Location & destination
+                      _buildSectionTitle(
+                        l10n.followUpLocationSection,
+                        textTheme,
+                        colorScheme,
+                      ),
+                      FollowUpMap(
+                        startPoint: startPoint,
+                        userPoint: userPoint,
+                        destinationPoint: destinationPoint,
+                        lastUpdateLabel: l10n.followUpLastUpdate(lastUpdateStr),
+                        userPointLabel:
+                            session.status == GuardianSessionStatus.active
+                            ? l10n.followUpCurrentLocationLabel
+                            : l10n.followUpLastLocationLabel,
+                        l10n: l10n,
+                        colorScheme: colorScheme,
+                        textTheme: textTheme,
+                      ),
+
+                      // Contact
+                      _buildSectionTitle(
+                        l10n.contactSection,
+                        textTheme,
+                        colorScheme,
+                      ),
+                      _buildContactButton(l10n, colorScheme, displayName),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

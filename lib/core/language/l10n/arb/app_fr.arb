@@ -384,5 +384,9 @@
     }
   },
   "accessDetailedFollowUpSection": "Accéder au suivi détaillé",
-  "accessDetailedFollowUpButton": "Accéder au suivi"
+  "accessDetailedFollowUpButton": "Accéder au suivi",
+  "followUpCurrentLocationLabel": "Localisation actuelle",
+  "followUpLastLocationLabel": "Dernière localisation",
+  "followUpOriginLabel": "Origine",
+  "followUpDestinationLabel": "Destination"
 }

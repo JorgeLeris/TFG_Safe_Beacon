@@ -298,6 +298,7 @@ class _ControlScreenState extends State<ControlScreen> {
 
     final followUpItems = state.followUps.map((session) {
       return FollowUpItem(
+        sessionId: session.id,
         uid: session.ownerUid,
         username:
             state.followUpDisplayNames[session.ownerUid] ?? session.ownerUid,
@@ -365,7 +366,9 @@ class _ControlScreenState extends State<ControlScreen> {
                 child: FollowUpListItem(
                   followUp: followUp,
                   onTap: () {
-                    const FollowUpDetailRoute().push(context);
+                    FollowUpDetailRoute(
+                      sessionId: followUp.sessionId,
+                    ).push(context);
                   },
                   onProfileTap: () {
                     OtherProfileRoute(uid: followUp.uid).push(context);

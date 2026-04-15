@@ -384,5 +384,9 @@
     }
   },
   "accessDetailedFollowUpSection": "Access detailed follow-up",
-  "accessDetailedFollowUpButton": "Access follow-up"
+  "accessDetailedFollowUpButton": "Access follow-up",
+  "followUpCurrentLocationLabel": "Current location",
+  "followUpLastLocationLabel": "Last location",
+  "followUpOriginLabel": "Origin",
+  "followUpDestinationLabel": "Destination"
 }
