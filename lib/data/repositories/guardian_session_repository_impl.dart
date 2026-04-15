@@ -31,12 +31,14 @@ class GuardianSessionRepositoryImpl implements GuardianSessionRepository {
           trustedContactUids: const [],
           status: GuardianSessionStatus.active.name,
           secondaryStatuses: const [],
-          recordedLocations: [
-            GuardianCoordinateDto(
-              latitude: initialLocation.latitude,
-              longitude: initialLocation.longitude,
-            ),
-          ],
+          originLocation: GuardianCoordinateDto(
+            latitude: initialLocation.latitude,
+            longitude: initialLocation.longitude,
+          ),
+          currentLocation: GuardianCoordinateDto(
+            latitude: initialLocation.latitude,
+            longitude: initialLocation.longitude,
+          ),
           destination: destination != null
               ? GuardianCoordinateDto(
                   latitude: destination.latitude,
@@ -91,20 +93,20 @@ class GuardianSessionRepositoryImpl implements GuardianSessionRepository {
     }
   }
 
-  /// Updates a session with new locations and optional secondary statuses.
   @override
   Future<Result<void>> updateSession({
     required String sessionId,
-    required List<GuardianCoordinate> newLocations,
+    required GuardianCoordinate newLocation,
     List<GuardianSessionSecondaryStatus>? newSecondaryStatuses,
   }) async {
     appLogger.fine('Updating guardian session: $sessionId');
     try {
       await _api.updateSession(
         sessionId: sessionId,
-        newLocations: newLocations
-            .map((c) => {'latitude': c.latitude, 'longitude': c.longitude})
-            .toList(),
+        newLocation: {
+          'latitude': newLocation.latitude,
+          'longitude': newLocation.longitude,
+        },
         newSecondaryStatuses: newSecondaryStatuses?.map((s) => s.id).toList(),
       );
       appLogger.info('Guardian session updated: $sessionId');
@@ -215,14 +217,14 @@ class GuardianSessionRepositoryImpl implements GuardianSessionRepository {
           .map(GuardianSessionSecondaryStatus.fromId)
           .whereType<GuardianSessionSecondaryStatus>()
           .toList(),
-      recordedLocations: dto.recordedLocations
-          .map(
-            (c) => GuardianCoordinate(
-              latitude: c.latitude,
-              longitude: c.longitude,
-            ),
-          )
-          .toList(),
+      originLocation: GuardianCoordinate(
+        latitude: dto.originLocation.latitude,
+        longitude: dto.originLocation.longitude,
+      ),
+      currentLocation: GuardianCoordinate(
+        latitude: dto.currentLocation.latitude,
+        longitude: dto.currentLocation.longitude,
+      ),
       destination: dto.destination != null
           ? GuardianCoordinate(
               latitude: dto.destination!.latitude,

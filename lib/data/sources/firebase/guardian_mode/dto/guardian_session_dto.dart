@@ -29,7 +29,8 @@ class GuardianSessionDto {
     required this.trustedContactUids,
     required this.status,
     required this.secondaryStatuses,
-    required this.recordedLocations,
+    required this.originLocation,
+    required this.currentLocation,
     this.destination,
     required this.estimatedDurationSeconds,
     this.description,
@@ -50,7 +51,8 @@ class GuardianSessionDto {
   /// Stored as text identifiers, e.g. 'route_deviation'.
   final List<String> secondaryStatuses;
 
-  final List<GuardianCoordinateDto> recordedLocations;
+  final GuardianCoordinateDto originLocation;
+  final GuardianCoordinateDto currentLocation;
   final GuardianCoordinateDto? destination;
 
   /// Estimated route duration stored as total seconds.
@@ -73,9 +75,12 @@ class GuardianSessionDto {
       secondaryStatuses: List<String>.from(
         data['secondaryStatuses'] as List? ?? [],
       ),
-      recordedLocations: (data['recordedLocations'] as List? ?? [])
-          .map((e) => GuardianCoordinateDto.fromMap(e as Map<String, dynamic>))
-          .toList(),
+      originLocation: GuardianCoordinateDto.fromMap(
+        data['originLocation'] as Map<String, dynamic>,
+      ),
+      currentLocation: GuardianCoordinateDto.fromMap(
+        data['currentLocation'] as Map<String, dynamic>,
+      ),
       destination: data['destination'] != null
           ? GuardianCoordinateDto.fromMap(
               data['destination'] as Map<String, dynamic>,
@@ -101,7 +106,8 @@ class GuardianSessionDto {
       'ownerUid': ownerUid,
       'status': status,
       'secondaryStatuses': secondaryStatuses,
-      'recordedLocations': recordedLocations.map((c) => c.toMap()).toList(),
+      'originLocation': originLocation.toMap(),
+      'currentLocation': currentLocation.toMap(),
       if (destination != null) 'destination': destination!.toMap(),
       'estimatedDurationSeconds': estimatedDurationSeconds,
       if (description != null) 'description': description,

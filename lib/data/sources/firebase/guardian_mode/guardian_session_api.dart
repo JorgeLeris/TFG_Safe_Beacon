@@ -98,16 +98,15 @@ class GuardianSessionApi {
 
   /// Appends new tracking data to the session identified by [sessionId].
   ///
-  /// Uses [FieldValue.arrayUnion] to append [newLocations] to
-  /// [recordedLocations] and updates [lastLocationTimestamp]. Optionally
-  /// appends [newSecondaryStatuses].
+  /// Overwrites [currentLocation] with [newLocation] and updates
+  /// [lastLocationTimestamp]. Optionally appends [newSecondaryStatuses].
   Future<void> updateSession({
     required String sessionId,
-    required List<Map<String, dynamic>> newLocations,
+    required Map<String, dynamic> newLocation,
     List<String>? newSecondaryStatuses,
   }) async {
     final updates = <String, dynamic>{
-      'recordedLocations': FieldValue.arrayUnion(newLocations),
+      'currentLocation': newLocation,
       'lastLocationTimestamp': FieldValue.serverTimestamp(),
       if (newSecondaryStatuses != null && newSecondaryStatuses.isNotEmpty)
         'secondaryStatuses': FieldValue.arrayUnion(newSecondaryStatuses),

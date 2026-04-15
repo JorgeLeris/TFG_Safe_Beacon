@@ -37,16 +37,16 @@ abstract class GuardianSessionRepository {
     String? completionJustification,
   });
 
-  /// Updates an active session with new tracking data.
+  /// Updates an active session with a new current location.
   ///
-  /// Appends [newLocations] to the recorded locations list and updates the
-  /// last-location timestamp. Optionally appends [newSecondaryStatuses] to
-  /// the existing secondary statuses (e.g. route deviation detected).
+  /// Overwrites [currentLocation] and updates [lastLocationTimestamp].
+  /// Optionally appends [newSecondaryStatuses] to the existing secondary
+  /// statuses (e.g. route deviation detected).
   ///
   /// Fails with [AppFailure.notFound] if the session does not exist.
   Future<Result<void>> updateSession({
     required String sessionId,
-    required List<GuardianCoordinate> newLocations,
+    required GuardianCoordinate newLocation,
     List<GuardianSessionSecondaryStatus>? newSecondaryStatuses,
   });
 

@@ -7,6 +7,7 @@ import 'package:safe_beacon/domain/alerts/entities/alert.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/domain/common/result.dart';
 import 'package:safe_beacon/domain/contacts/contact_request_repository.dart';
+import 'package:safe_beacon/domain/guardian_mode/guardian_session_repository.dart';
 import 'package:safe_beacon/domain/profile/entities/user_profile.dart';
 import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
 import 'package:safe_beacon/presentation/features/control/cubits/control_cubit.dart';
@@ -19,6 +20,9 @@ class MockContactRequestRepository extends Mock
 class MockAlertRepository extends Mock implements AlertRepository {}
 
 class MockUserProfileRepository extends Mock implements UserProfileRepository {}
+
+class MockGuardianSessionRepository extends Mock
+    implements GuardianSessionRepository {}
 
 const _uid = 'uid_test';
 const _alertId = 'alert-abc';
@@ -47,17 +51,20 @@ void main() {
   late MockContactRequestRepository mockContactRequestRepository;
   late MockAlertRepository mockAlertRepository;
   late MockUserProfileRepository mockUserProfileRepository;
+  late MockGuardianSessionRepository mockGuardianSessionRepository;
   late ControlCubit controlCubit;
 
   setUp(() {
     mockContactRequestRepository = MockContactRequestRepository();
     mockAlertRepository = MockAlertRepository();
     mockUserProfileRepository = MockUserProfileRepository();
+    mockGuardianSessionRepository = MockGuardianSessionRepository();
     controlCubit = ControlCubit(
       uid: _uid,
       contactRequestRepository: mockContactRequestRepository,
       alertRepository: mockAlertRepository,
       userProfileRepository: mockUserProfileRepository,
+      guardianSessionRepository: mockGuardianSessionRepository,
     );
   });
 

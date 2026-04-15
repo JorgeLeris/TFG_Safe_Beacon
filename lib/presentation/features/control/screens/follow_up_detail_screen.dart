@@ -414,12 +414,12 @@ class FollowUpDetailScreen extends StatelessWidget {
           final displayName = state.displayName;
 
           final startPoint = LatLng(
-            session.recordedLocations.first.latitude,
-            session.recordedLocations.first.longitude,
+            session.originLocation.latitude,
+            session.originLocation.longitude,
           );
           final userPoint = LatLng(
-            session.recordedLocations.last.latitude,
-            session.recordedLocations.last.longitude,
+            session.currentLocation.latitude,
+            session.currentLocation.longitude,
           );
           final destinationPoint = session.destination != null
               ? LatLng(
