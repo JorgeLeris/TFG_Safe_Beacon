@@ -139,6 +139,39 @@ class AlertApi {
   }
 
   // ==============================================
+  // MARK: - Guardian session linkage
+  // ==============================================
+
+  /// Deactivates the active alert associated with [guardianSessionId].
+  ///
+  /// Looks up the active alert that has [guardianSessionId] set and updates
+  /// its [status], [deactivatedAt], and optionally [cancellationReason].
+  ///
+  /// Throws [Exception] with code 'no_active_alert' if none is found.
+  Future<void> deactivateAlertByGuardianSession({
+    required String guardianSessionId,
+    String? cancellationReason,
+  }) async {
+    final snap = await _alerts
+        .where('guardianSessionId', isEqualTo: guardianSessionId)
+        .where('status', isEqualTo: 'active')
+        .limit(1)
+        .get();
+
+    if (snap.docs.isEmpty) {
+      throw Exception('no_active_alert');
+    }
+
+    final updates = <String, dynamic>{
+      'status': 'deactivated',
+      'deactivatedAt': FieldValue.serverTimestamp(),
+      'cancellationReason': ?cancellationReason,
+    };
+
+    await snap.docs.first.reference.update(updates);
+  }
+
+  // ==============================================
   // MARK: - Cascade
   // ==============================================
 

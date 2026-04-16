@@ -22,6 +22,7 @@ class AlertRepositoryImpl implements AlertRepository {
     required double latitude,
     required double longitude,
     required int batteryLevel,
+    String? guardianSessionId,
   }) async {
     appLogger.fine(
       'Creating alert for uid: $ownerUid (type: ${alertType.name})',
@@ -37,6 +38,7 @@ class AlertRepositoryImpl implements AlertRepository {
           batteryLevel: batteryLevel,
           status: AlertStatus.active.name,
           trustedContactUids: const [],
+          guardianSessionId: guardianSessionId,
           activatedAt: DateTime.now(),
         ),
       );
@@ -142,6 +144,43 @@ class AlertRepositoryImpl implements AlertRepository {
     }
   }
 
+  /// Deactivates the active alert associated with [guardianSessionId].
+  @override
+  Future<Result<void>> deactivateAlertByGuardianSession({
+    required String guardianSessionId,
+    String? cancellationReason,
+  }) async {
+    appLogger.fine(
+      'Deactivating alert for guardian session: $guardianSessionId',
+    );
+    try {
+      await _api.deactivateAlertByGuardianSession(
+        guardianSessionId: guardianSessionId,
+        cancellationReason: cancellationReason,
+      );
+      appLogger.info(
+        'Alert deactivated for guardian session: $guardianSessionId',
+      );
+      return const Result.success(null);
+    } on FirebaseException catch (e, st) {
+      appLogger.severe(
+        'Firebase error deactivating alert by guardian session',
+        e,
+        st,
+      );
+      return Result.failure(_mapFirebaseError(e));
+    } on Exception catch (e, st) {
+      return Result.failure(_mapBusinessError(e, st));
+    } catch (e, st) {
+      appLogger.severe(
+        'Unexpected error deactivating alert by guardian session',
+        e,
+        st,
+      );
+      return const Result.failure(AppFailure.unknown());
+    }
+  }
+
   // ==============================================
   // MARK: - Private helpers
   // ==============================================
@@ -164,6 +203,7 @@ class AlertRepositoryImpl implements AlertRepository {
       ),
       trustedContactUids: dto.trustedContactUids,
       cancellationReason: dto.cancellationReason,
+      guardianSessionId: dto.guardianSessionId,
       activatedAt: dto.activatedAt,
       deactivatedAt: dto.deactivatedAt,
     );

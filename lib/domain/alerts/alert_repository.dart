@@ -13,6 +13,9 @@ abstract class AlertRepository {
   /// can see it. The [trustedContactUids] list is resolved server-side from
   /// the contacts collection at creation time.
   ///
+  /// [guardianSessionId] can be provided when the alert is triggered from
+  /// guardian mode, to link the alert to the active session.
+  ///
   /// Fails with [AppFailure.conflict] if the user already has an active alert.
   /// Fails with [AppFailure.business] if the user has no trusted contacts.
   Future<Result<void>> createAlert({
@@ -22,6 +25,7 @@ abstract class AlertRepository {
     required double latitude,
     required double longitude,
     required int batteryLevel,
+    String? guardianSessionId,
   });
 
   /// Deactivates the current active alert for [ownerUid].
@@ -45,4 +49,16 @@ abstract class AlertRepository {
 
   /// Returns all alerts that involve [trustedContactUid] as a monitor.
   Future<Result<List<Alert>>> getContactsAlerts(String trustedContactUid);
+
+  /// Deactivates the active alert associated with [guardianSessionId].
+  ///
+  /// Used when a guardian mode session ends to automatically deactivate the
+  /// linked alert.
+  ///
+  /// Fails with [AppFailure.notFound] if no active alert is linked to the
+  /// given [guardianSessionId].
+  Future<Result<void>> deactivateAlertByGuardianSession({
+    required String guardianSessionId,
+    String? cancellationReason,
+  });
 }
