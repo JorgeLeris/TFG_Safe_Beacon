@@ -251,7 +251,10 @@ class GuardianModeCheckService {
     _onAlertGenerated(newStatuses);
 
     // Fetch the created alert to obtain its ID and trusted-contact list.
-    final alertResult = await _alertRepository.getActiveAlert(_uid);
+    final alertResult = await _alertRepository.getActiveAlert(
+      _uid,
+      alertType: AlertType.guardian,
+    );
     final alertId = alertResult.valueOrNull?.id;
     final trustedContactUids =
         alertResult.valueOrNull?.trustedContactUids ?? <String>[];

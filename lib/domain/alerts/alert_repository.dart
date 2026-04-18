@@ -4,7 +4,7 @@ import 'package:safe_beacon/domain/common/result.dart';
 /// Contract for Alert repository.
 ///
 /// Defines the operations available for managing alerts.
-/// A user can only have one active alert at a time.
+/// A user can have one active alert per [AlertType] at a time.
 /// Creating an alert requires at least one trusted contact.
 abstract class AlertRepository {
   /// Creates a new alert for [ownerUid].
@@ -33,14 +33,24 @@ abstract class AlertRepository {
   /// Sets the alert status to [AlertStatus.deactivated], records the
   /// deactivation timestamp, and optionally stores a [cancellationReason].
   ///
+  /// When [alertType] is provided only the alert of that type is deactivated,
+  /// allowing panic and guardian alerts to be managed independently.
+  ///
   /// Fails with [AppFailure.notFound] if the user has no active alert.
   Future<Result<void>> deactivateAlert({
     required String ownerUid,
+    AlertType? alertType,
     String? cancellationReason,
   });
 
   /// Returns the active alert for [ownerUid], or null if none exists.
-  Future<Result<Alert?>> getActiveAlert(String ownerUid);
+  ///
+  /// When [alertType] is provided the query is scoped to that type, allowing
+  /// panic and guardian alerts to be checked independently.
+  Future<Result<Alert?>> getActiveAlert(
+    String ownerUid, {
+    AlertType? alertType,
+  });
 
   /// Returns the full details of the alert identified by [alertId].
   ///

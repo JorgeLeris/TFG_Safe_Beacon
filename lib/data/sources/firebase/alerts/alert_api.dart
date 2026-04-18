@@ -27,10 +27,11 @@ class AlertApi {
     final newRef = _alerts.doc();
 
     await _firestore.runTransaction((tx) async {
-      // Check no active alert exists for this owner.
+      // Check no active alert of the same type exists for this owner.
       final existingAlert = await _alerts
           .where('ownerUid', isEqualTo: dto.ownerUid)
           .where('status', isEqualTo: 'active')
+          .where('alertType', isEqualTo: dto.alertType)
           .limit(1)
           .get();
 
@@ -66,19 +67,19 @@ class AlertApi {
 
   /// Deactivates the active alert for [ownerUid].
   ///
-  /// Looks up the active alert and updates its [status], [deactivatedAt],
-  /// and optionally [cancellationReason].
-  ///
-  /// Throws [Exception] with code 'no_active_alert' if none is found.
+  /// When [alertType] is provided only the alert of that type is deactivated.
   Future<void> deactivateAlert({
     required String ownerUid,
+    String? alertType,
     String? cancellationReason,
   }) async {
-    final snap = await _alerts
+    Query<Map<String, dynamic>> query = _alerts
         .where('ownerUid', isEqualTo: ownerUid)
-        .where('status', isEqualTo: 'active')
-        .limit(1)
-        .get();
+        .where('status', isEqualTo: 'active');
+    if (alertType != null) {
+      query = query.where('alertType', isEqualTo: alertType);
+    }
+    final snap = await query.limit(1).get();
 
     if (snap.docs.isEmpty) {
       throw Exception('no_active_alert');
@@ -98,12 +99,19 @@ class AlertApi {
   // ==============================================
 
   /// Returns the active alert for [ownerUid], or null if none exists.
-  Future<({String id, AlertDto dto})?> getActiveAlert(String ownerUid) async {
-    final snap = await _alerts
+  ///
+  /// When [alertType] is provided the query is scoped to that type.
+  Future<({String id, AlertDto dto})?> getActiveAlert(
+    String ownerUid, {
+    String? alertType,
+  }) async {
+    Query<Map<String, dynamic>> query = _alerts
         .where('ownerUid', isEqualTo: ownerUid)
-        .where('status', isEqualTo: 'active')
-        .limit(1)
-        .get();
+        .where('status', isEqualTo: 'active');
+    if (alertType != null) {
+      query = query.where('alertType', isEqualTo: alertType);
+    }
+    final snap = await query.limit(1).get();
 
     if (snap.docs.isEmpty) return null;
 
