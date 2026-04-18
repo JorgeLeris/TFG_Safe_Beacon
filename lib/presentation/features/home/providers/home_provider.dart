@@ -61,6 +61,8 @@ class HomeProvider extends StatelessWidget {
               contactRepository: context.read<ContactRepository>(),
               guardianSessionRepository: context
                   .read<GuardianSessionRepository>(),
+              alertRepository: context.read<AlertRepository>(),
+              userProfileRepository: context.read<UserProfileRepository>(),
             ),
           ),
         ],

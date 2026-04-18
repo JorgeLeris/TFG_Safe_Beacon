@@ -298,6 +298,24 @@
   "guardianModeJustification": "Justification",
   "guardianModeStatusActive": "Mode Gardien actif",
   "guardianModeStatusInactive": "Mode Gardien inactif",
+  "guardianModeAlertActiveBanner": "Alerte générée : {cause}",
+  "@guardianModeAlertActiveBanner": {
+    "placeholders": {
+      "cause": {
+        "type": "String"
+      }
+    }
+  },
+  "guardianModeAlertBannerContacts": "Vos contacts de confiance ont été notifiés",
+  "guardianModeAlertCauseBoth": "écart de trajet et temps estimé dépassé",
+  "notificationGuardianBody": "Votre personne protégée {username} a déclenché une alerte du mode gardien.",
+  "@notificationGuardianBody": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
   "guardianModeMissingDataTitle": "Données manquantes",
   "guardianModeMissingDataContent": "Avant d'activer le Mode Gardien, ajoutez une destination ou une durée estimée pour pouvoir surveiller votre trajet.",
   "guardianModeEstimatedTimeDialogTitle": "Temps estimé",

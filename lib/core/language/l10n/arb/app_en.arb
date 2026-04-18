@@ -298,6 +298,24 @@
   "guardianModeJustification": "Justification",
   "guardianModeStatusActive": "Guardian Mode Active",
   "guardianModeStatusInactive": "Guardian Mode Inactive",
+  "guardianModeAlertActiveBanner": "Alert generated: {cause}",
+  "@guardianModeAlertActiveBanner": {
+    "placeholders": {
+      "cause": {
+        "type": "String"
+      }
+    }
+  },
+  "guardianModeAlertBannerContacts": "Your trusted contacts have been notified",
+  "guardianModeAlertCauseBoth": "route deviation and estimated time exceeded",
+  "notificationGuardianBody": "Your protected person {username} has triggered a guardian mode alert.",
+  "@notificationGuardianBody": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
   "guardianModeMissingDataTitle": "Missing data",
   "guardianModeMissingDataContent": "Before activating Guardian Mode, add a destination or an estimated duration to monitor your journey.",
   "guardianModeEstimatedTimeDialogTitle": "Estimated time",

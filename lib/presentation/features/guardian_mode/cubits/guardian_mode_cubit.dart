@@ -1,13 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:safe_beacon/app/monitoring/logging.dart';
+import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/domain/alerts/alert_repository.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/domain/common/result.dart';
 import 'package:safe_beacon/domain/contacts/contact_repository.dart';
 import 'package:safe_beacon/domain/guardian_mode/entities/guardian_coordinate.dart';
 import 'package:safe_beacon/domain/guardian_mode/entities/guardian_session.dart';
 import 'package:safe_beacon/domain/guardian_mode/guardian_session_repository.dart';
+import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
+import 'package:safe_beacon/presentation/features/guardian_mode/services/guardian_mode_check_service.dart';
 
 part 'guardian_mode_state.dart';
 part 'guardian_mode_cubit.freezed.dart';
@@ -17,14 +24,27 @@ class GuardianModeCubit extends Cubit<GuardianModeCubitState> {
     required String uid,
     required ContactRepository contactRepository,
     required GuardianSessionRepository guardianSessionRepository,
+    required AlertRepository alertRepository,
+    required UserProfileRepository userProfileRepository,
   }) : _uid = uid,
        _contactRepository = contactRepository,
        _guardianSessionRepository = guardianSessionRepository,
-       super(const GuardianModeCubitState());
+       _alertRepository = alertRepository,
+       super(const GuardianModeCubitState()) {
+    _checkService = GuardianModeCheckService(
+      uid: uid,
+      guardianSessionRepository: guardianSessionRepository,
+      alertRepository: alertRepository,
+      userProfileRepository: userProfileRepository,
+      onAlertGenerated: _onCheckAlertGenerated,
+    );
+  }
 
   final String _uid;
   final ContactRepository _contactRepository;
   final GuardianSessionRepository _guardianSessionRepository;
+  final AlertRepository _alertRepository;
+  late final GuardianModeCheckService _checkService;
 
   // ==============================================
   // MARK: - Session loading
@@ -44,7 +64,29 @@ class GuardianModeCubit extends Cubit<GuardianModeCubitState> {
               ? 'Active guardian session found for uid: $_uid'
               : 'No active guardian session for uid: $_uid',
         );
-        emit(state.copyWith(isLoadingSession: false, activeSession: session));
+
+        // Restore alert-trigger statuses from the session's secondary statuses
+        List<GuardianSessionSecondaryStatus>? restoredAlertStatuses;
+        if (session != null) {
+          final alertStatuses = session.secondaryStatuses
+              .where(
+                (s) =>
+                    s == GuardianSessionSecondaryStatus.routeDeviation ||
+                    s == GuardianSessionSecondaryStatus.estimatedTimeExceeded,
+              )
+              .toList();
+          if (alertStatuses.isNotEmpty) {
+            restoredAlertStatuses = alertStatuses;
+          }
+        }
+
+        emit(
+          state.copyWith(
+            isLoadingSession: false,
+            activeSession: session,
+            alertTriggerStatuses: restoredAlertStatuses,
+          ),
+        );
       },
       failure: (failure) {
         appLogger.severe('Failed to load guardian session state', failure);
@@ -105,9 +147,11 @@ class GuardianModeCubit extends Cubit<GuardianModeCubitState> {
   /// Clears the active session state.
   // TODO: implement session cancellation with service (two posible cancelations)
   void clearActiveSession() {
+    _checkService.stop();
     emit(
       state.copyWith(
         activeSession: null,
+        alertTriggerStatuses: null,
         pendingDestination: null,
         pendingDuration: null,
         pendingDescription: null,
@@ -130,6 +174,26 @@ class GuardianModeCubit extends Cubit<GuardianModeCubitState> {
     appLogger.fine(
       'Completing guardian session for uid: $_uid (${completionStatus.id})',
     );
+
+    // Stop the check loop.
+    _checkService.stop();
+
+    // Deactivate any linked alert in the background.
+    final sessionId = state.activeSession?.id;
+    if (sessionId != null) {
+      unawaited(
+        _alertRepository
+            .deactivateAlertByGuardianSession(guardianSessionId: sessionId)
+            .then(
+              (result) => result.onFailure(
+                (f) => appLogger.warning(
+                  'Failed to deactivate guardian alert on completion: $f',
+                ),
+              ),
+            ),
+      );
+    }
+
     emit(state.copyWith(isCompleting: true, completeFailure: null));
 
     final result = await _guardianSessionRepository.completeSession(
@@ -145,6 +209,7 @@ class GuardianModeCubit extends Cubit<GuardianModeCubitState> {
           state.copyWith(
             isCompleting: false,
             activeSession: null,
+            alertTriggerStatuses: null,
             pendingDestination: null,
             pendingDuration: null,
             pendingDescription: null,
@@ -160,6 +225,54 @@ class GuardianModeCubit extends Cubit<GuardianModeCubitState> {
 
   void consumeCompleteFailure() {
     emit(state.copyWith(completeFailure: null));
+  }
+
+  // ==============================================
+  // MARK: - Guardian check service
+  // ==============================================
+
+  /// Starts the periodic check loop for the currently active session.
+  ///
+  /// [routePoints] is the OSRM polyline from the map widget.
+  /// [l10n] is used to build localised push-notification strings.
+  void startChecks({
+    required List<LatLng> routePoints,
+    required AppLocalizations l10n,
+  }) {
+    final session = state.activeSession;
+    if (session == null) return;
+    if (_checkService.isRunning) return;
+
+    _checkService.start(
+      session: session,
+      routePoints: routePoints,
+      notificationTitleBuilder: l10n.notificationAlertTitle,
+      notificationBodyBuilder: l10n.notificationGuardianBody,
+    );
+  }
+
+  /// Stops the periodic check loop without completing the session.
+  ///
+  /// Currently called when the screen is disposed so the timer does not
+  /// outlive its owner.
+  // TODO(background): Once background execution is implemented, this method
+  // should no longer be called on screen disposal — the service will run
+  // independently of the UI lifecycle.
+  void stopChecks() {
+    _checkService.stop();
+  }
+
+  /// Updates the route polyline used by the running check service.
+  ///
+  /// Call when the map widget resolves a new route after checks have started.
+  void updateCheckRoutePoints(List<LatLng> routePoints) {
+    _checkService.updateRoutePoints(routePoints);
+  }
+
+  /// Called by [GuardianModeCheckService] when a guardian alert is created.
+  void _onCheckAlertGenerated(List<GuardianSessionSecondaryStatus> statuses) {
+    appLogger.info('Guardian alert generated — updating state');
+    emit(state.copyWith(alertTriggerStatuses: statuses));
   }
 
   // ==============================================

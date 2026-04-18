@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
@@ -21,6 +24,9 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
   LatLng? _currentLocation;
   List<LatLng> _routePoints = [];
 
+  /// Origin pin shown on the map.
+  LatLng? _pendingOrigin;
+
   /// Duration estimated by the map widget (OSRM or fallback), used for the suggestion.
   Duration? _estimatedDuration;
 
@@ -30,22 +36,38 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
 
   late final ScrollController _scrollController = ScrollController();
 
+  /// Real-time location stream subscription.
+  StreamSubscription<Position>? _positionSubscription;
+
+  /// Cached cubit reference
+  late final GuardianModeCubit _cubit;
+
   @override
   void initState() {
     super.initState();
+    _cubit = context.read<GuardianModeCubit>();
     _loadCurrentLocation();
-    context.read<GuardianModeCubit>().loadSessionState();
+    _startLocationStream();
+    _cubit.loadSessionState();
   }
 
   @override
   void dispose() {
+    // TODO(background): When background execution is implemented, remove this
+    _cubit.stopChecks();
+    _positionSubscription?.cancel();
     _scrollController.dispose();
     super.dispose();
   }
 
   Future<void> _loadCurrentLocation() async {
     try {
-      final position = await Geolocator.getCurrentPosition();
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.bestForNavigation,
+          timeLimit: Duration(seconds: 15),
+        ),
+      );
       if (mounted) {
         setState(() {
           _currentLocation = LatLng(position.latitude, position.longitude);
@@ -54,6 +76,38 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     } catch (_) {
       // Permission already granted (enforced by navigation guard) — ignore.
     }
+  }
+
+  void _startLocationStream() {
+    // Use platform-specific settings to request ~1 s GPS updates.
+    final LocationSettings locationSettings = Platform.isAndroid
+        ? AndroidSettings(
+            accuracy: LocationAccuracy.bestForNavigation,
+            intervalDuration: const Duration(seconds: 1),
+          )
+        : AppleSettings(
+            accuracy: LocationAccuracy.bestForNavigation,
+            activityType: ActivityType.fitness,
+          );
+
+    _positionSubscription =
+        Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+          (position) {
+            // Skip imprecise fixes,
+            if (position.accuracy > 40.0) return;
+            if (mounted) {
+              setState(() {
+                _currentLocation = LatLng(
+                  position.latitude,
+                  position.longitude,
+                );
+              });
+            }
+          },
+          onError: (_) {
+            // Permission is guaranteed by the navigation guard — ignore stream errors.
+          },
+        );
   }
 
   void _scrollToTop() {
@@ -76,9 +130,10 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     BuildContext context,
     GuardianModeCubitState state,
   ) {
-    // Activation succeeded: show confirmation dialog and reset form widgets.
+    // Activation succeeded: show confirmation dialog, start checks, reset form.
     if (!state.isActivating && state.activeSession != null) {
       _showActivationConfirmationDialog(context);
+      _startChecks(context);
       _scrollToTop();
       setState(() {
         _estimatedDuration = null;
@@ -100,6 +155,7 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
       _showCompletionConfirmationDialog(context);
       setState(() {
         _routePoints = [];
+        _pendingOrigin = null;
         _estimatedDuration = null;
         _durationResetKey++;
         _descriptionResetKey++;
@@ -112,6 +168,14 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
       _showCompleteErrorDialog(context);
       context.read<GuardianModeCubit>().consumeCompleteFailure();
     }
+  }
+
+  /// Starts the guardian check service via the cubit.
+  void _startChecks(BuildContext context) {
+    context.read<GuardianModeCubit>().startChecks(
+      routePoints: _routePoints,
+      l10n: context.l10n,
+    );
   }
 
   void _showActivateErrorDialog(BuildContext context, AppFailure failure) {
@@ -431,6 +495,78 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     );
   }
 
+  Widget _buildAlertBanner(
+    AppLocalizations l10n,
+    ColorScheme colorScheme,
+    TextTheme textTheme,
+    List<GuardianSessionSecondaryStatus> statuses,
+  ) {
+    final cause = _alertCauseLabel(l10n, statuses);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: colorScheme.error.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: colorScheme.error.withValues(alpha: 0.35)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 1),
+              child: Icon(
+                Icons.warning_amber_rounded,
+                color: colorScheme.error,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.guardianModeAlertActiveBanner(cause),
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.error,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.guardianModeAlertBannerContacts,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: colorScheme.error.withValues(alpha: 0.75),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _alertCauseLabel(
+    AppLocalizations l10n,
+    List<GuardianSessionSecondaryStatus> statuses,
+  ) {
+    final hasDeviation = statuses.contains(
+      GuardianSessionSecondaryStatus.routeDeviation,
+    );
+    final hasTimeExceeded = statuses.contains(
+      GuardianSessionSecondaryStatus.estimatedTimeExceeded,
+    );
+    if (hasDeviation && hasTimeExceeded) return l10n.guardianModeAlertCauseBoth;
+    if (hasDeviation) return l10n.routeDeviationTag;
+    if (hasTimeExceeded) return l10n.estimatedTimeExceededTag;
+    return '';
+  }
+
   Widget _buildActionButtons(
     bool isActive,
     bool isActivating,
@@ -495,189 +631,230 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return BlocConsumer<GuardianModeCubit, GuardianModeCubitState>(
+    // TODO: Change this when background mode implemented
+    // Outer listener: starts checks when an existing active session is restored after app launch.
+    return BlocListener<GuardianModeCubit, GuardianModeCubitState>(
       listenWhen: (prev, curr) =>
-          (prev.isActivating && !curr.isActivating) ||
-          (curr.activateFailure != null && prev.activateFailure == null) ||
-          (prev.isCompleting && !curr.isCompleting) ||
-          (curr.completeFailure != null && prev.completeFailure == null),
-      listener: _onCubitStateChanged,
-      builder: (context, state) {
-        final isActive = state.activeSession != null;
-        final activeSession = state.activeSession;
-        final pendingDest = state.pendingDestination;
-        final LatLng? destinationPoint =
-            isActive && activeSession?.destination != null
-            ? LatLng(
-                activeSession!.destination!.latitude,
-                activeSession.destination!.longitude,
-              )
-            : pendingDest != null
-            ? LatLng(pendingDest.latitude, pendingDest.longitude)
-            : null;
+          prev.isLoadingSession &&
+          !curr.isLoadingSession &&
+          curr.activeSession != null,
+      listener: (context, state) => _startChecks(context),
+      child: BlocConsumer<GuardianModeCubit, GuardianModeCubitState>(
+        listenWhen: (prev, curr) =>
+            (prev.isActivating && !curr.isActivating) ||
+            (curr.activateFailure != null && prev.activateFailure == null) ||
+            (prev.isCompleting && !curr.isCompleting) ||
+            (curr.completeFailure != null && prev.completeFailure == null),
+        listener: _onCubitStateChanged,
+        builder: (context, state) {
+          final isActive = state.activeSession != null;
+          final activeSession = state.activeSession;
+          final pendingDest = state.pendingDestination;
+          final LatLng? destinationPoint =
+              isActive && activeSession?.destination != null
+              ? LatLng(
+                  activeSession!.destination!.latitude,
+                  activeSession.destination!.longitude,
+                )
+              : pendingDest != null
+              ? LatLng(pendingDest.latitude, pendingDest.longitude)
+              : null;
 
-        return Scaffold(
-          backgroundColor: colorScheme.surface,
-          appBar: const CustomAppBar(),
-          body: Column(
-            children: [
-              SectionHeader(
-                text: l10n.guardianMode,
-                trailingIcon: Icons.info_outline_rounded,
-                onTrailingIconPressed: () => _showInfoDialog(l10n),
-              ),
+          // Origin pin: fixed from the session when active, pending otherwise.
+          final LatLng? originPoint =
+              isActive && activeSession?.originLocation != null
+              ? LatLng(
+                  activeSession!.originLocation.latitude,
+                  activeSession.originLocation.longitude,
+                )
+              : _pendingOrigin;
 
-              Expanded(
-                child: (_currentLocation == null || state.isLoadingSession)
-                    ? const Center(child: CircularProgressIndicator())
-                    : GestureDetector(
-                        onTap: () =>
-                            FocusManager.instance.primaryFocus?.unfocus(),
-                        behavior: HitTestBehavior.opaque,
-                        child: SingleChildScrollView(
-                          controller: _scrollController,
-                          padding: const EdgeInsets.only(bottom: 32),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Status
-                              _buildSectionTitle(
-                                l10n.status,
-                                textTheme,
-                                colorScheme,
-                              ),
-                              _buildStatusBanner(
-                                isActive,
-                                l10n,
-                                colorScheme,
-                                textTheme,
-                              ),
+          return Scaffold(
+            backgroundColor: colorScheme.surface,
+            appBar: const CustomAppBar(),
+            body: Column(
+              children: [
+                SectionHeader(
+                  text: l10n.guardianMode,
+                  trailingIcon: Icons.info_outline_rounded,
+                  onTrailingIconPressed: () => _showInfoDialog(l10n),
+                ),
 
-                              // Route / Destination
-                              _buildSectionTitle(
-                                l10n.guardianModeRouteSection,
-                                textTheme,
-                                colorScheme,
-                              ),
-                              GuardianModeMap(
-                                currentLocation: _currentLocation!,
-                                destinationPoint: destinationPoint,
-                                routePoints: _routePoints,
-                                isActive: isActive,
-                                l10n: l10n,
-                                colorScheme: colorScheme,
-                                textTheme: textTheme,
-                                onDestinationChanged: isActive
-                                    ? null
-                                    : (point) {
-                                        context
-                                            .read<GuardianModeCubit>()
-                                            .updatePendingDestination(
-                                              GuardianCoordinate(
-                                                latitude: point.latitude,
-                                                longitude: point.longitude,
-                                              ),
-                                            );
-                                      },
-                                onRouteChanged: (points) =>
-                                    setState(() => _routePoints = points),
-                                onEstimatedDurationChanged: isActive
-                                    ? null
-                                    : (d) => setState(
-                                        () => _estimatedDuration = d,
-                                      ),
-                              ),
-
-                              // Estimated time
-                              _buildSectionTitle(
-                                l10n.guardianModeEstimatedTimeSection,
-                                textTheme,
-                                colorScheme,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
+                Expanded(
+                  child: (_currentLocation == null || state.isLoadingSession)
+                      ? const Center(child: CircularProgressIndicator())
+                      : GestureDetector(
+                          onTap: () =>
+                              FocusManager.instance.primaryFocus?.unfocus(),
+                          behavior: HitTestBehavior.opaque,
+                          child: SingleChildScrollView(
+                            controller: _scrollController,
+                            padding: const EdgeInsets.only(bottom: 32),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Status
+                                _buildSectionTitle(
+                                  l10n.status,
+                                  textTheme,
+                                  colorScheme,
                                 ),
-                                child: DurationInputField(
-                                  key: ValueKey(
-                                    'dur_${activeSession?.id}_$_durationResetKey',
-                                  ),
-                                  hint: l10n.guardianModeEstimatedTimeHint,
-                                  readOnly: isActive,
-                                  initialValue: isActive
-                                      ? activeSession?.estimatedDuration
-                                      : state.pendingDuration,
-                                  onChanged: isActive
-                                      ? null
-                                      : (d) => context
-                                            .read<GuardianModeCubit>()
-                                            .updatePendingDuration(d),
+                                _buildStatusBanner(
+                                  isActive,
+                                  l10n,
+                                  colorScheme,
+                                  textTheme,
                                 ),
-                              ),
 
-                              // Description
-                              _buildSectionTitle(
-                                l10n.guardianModeDescriptionSection,
-                                textTheme,
-                                colorScheme,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                ),
-                                child: InputField(
-                                  key: ValueKey(
-                                    'desc_${activeSession?.id}_$_descriptionResetKey',
-                                  ),
-                                  hint: l10n.guardianModeDescriptionHint,
-                                  maxLines: 3,
-                                  readOnly: isActive,
-                                  initialValue: isActive
-                                      ? activeSession?.description
-                                      : state.pendingDescription,
-                                  onChanged: isActive
-                                      ? null
-                                      : (v) => context
-                                            .read<GuardianModeCubit>()
-                                            .updatePendingDescription(v),
-                                ),
-                              ),
-
-                              // Action buttons
-                              const SizedBox(height: 28),
-                              _buildActionButtons(
-                                isActive,
-                                state.isActivating,
-                                l10n,
-                                colorScheme,
-                                state,
-                              ),
-                              const SizedBox(height: 35),
-
-                              // Customization options
-                              SettingsOptionsList(
-                                horizontalPadding: 24,
-                                sectionTitle: l10n.customization,
-                                options: [
-                                  SettingsOption(
-                                    icon: Icons.settings_outlined,
-                                    title: l10n.featuresSettings,
-                                    description:
-                                        l10n.guardianModeSettingsDescription,
-                                    onPressed: () =>
-                                        _showFutureDialog(context, l10n),
+                                // Alert banner (only when a check-triggered alert exists)
+                                if (state.alertTriggerStatuses != null) ...[
+                                  const SizedBox(height: 12),
+                                  _buildAlertBanner(
+                                    l10n,
+                                    colorScheme,
+                                    textTheme,
+                                    state.alertTriggerStatuses!,
                                   ),
                                 ],
-                              ),
-                            ],
+
+                                // Route / Destination
+                                _buildSectionTitle(
+                                  l10n.guardianModeRouteSection,
+                                  textTheme,
+                                  colorScheme,
+                                ),
+                                GuardianModeMap(
+                                  currentLocation: _currentLocation!,
+                                  destinationPoint: destinationPoint,
+                                  originPoint: originPoint,
+                                  routePoints: _routePoints,
+                                  isActive: isActive,
+                                  l10n: l10n,
+                                  colorScheme: colorScheme,
+                                  textTheme: textTheme,
+                                  onDestinationChanged: isActive
+                                      ? null
+                                      : (point) {
+                                          setState(
+                                            () => _pendingOrigin =
+                                                _currentLocation,
+                                          );
+                                          context
+                                              .read<GuardianModeCubit>()
+                                              .updatePendingDestination(
+                                                GuardianCoordinate(
+                                                  latitude: point.latitude,
+                                                  longitude: point.longitude,
+                                                ),
+                                              );
+                                        },
+                                  onRouteChanged: (points) {
+                                    setState(() => _routePoints = points);
+                                    // Keep the check service route in sync, needed when we enter having an active session.
+                                    if (isActive) {
+                                      context
+                                          .read<GuardianModeCubit>()
+                                          .updateCheckRoutePoints(points);
+                                    }
+                                  },
+                                  onEstimatedDurationChanged: isActive
+                                      ? null
+                                      : (d) => setState(
+                                          () => _estimatedDuration = d,
+                                        ),
+                                ),
+
+                                // Estimated time
+                                _buildSectionTitle(
+                                  l10n.guardianModeEstimatedTimeSection,
+                                  textTheme,
+                                  colorScheme,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  child: DurationInputField(
+                                    key: ValueKey(
+                                      'dur_${activeSession?.id}_$_durationResetKey',
+                                    ),
+                                    hint: l10n.guardianModeEstimatedTimeHint,
+                                    readOnly: isActive,
+                                    initialValue: isActive
+                                        ? activeSession?.estimatedDuration
+                                        : state.pendingDuration,
+                                    onChanged: isActive
+                                        ? null
+                                        : (d) => context
+                                              .read<GuardianModeCubit>()
+                                              .updatePendingDuration(d),
+                                  ),
+                                ),
+
+                                // Description
+                                _buildSectionTitle(
+                                  l10n.guardianModeDescriptionSection,
+                                  textTheme,
+                                  colorScheme,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  child: InputField(
+                                    key: ValueKey(
+                                      'desc_${activeSession?.id}_$_descriptionResetKey',
+                                    ),
+                                    hint: l10n.guardianModeDescriptionHint,
+                                    maxLines: 3,
+                                    readOnly: isActive,
+                                    initialValue: isActive
+                                        ? activeSession?.description
+                                        : state.pendingDescription,
+                                    onChanged: isActive
+                                        ? null
+                                        : (v) => context
+                                              .read<GuardianModeCubit>()
+                                              .updatePendingDescription(v),
+                                  ),
+                                ),
+
+                                // Action buttons
+                                const SizedBox(height: 28),
+                                _buildActionButtons(
+                                  isActive,
+                                  state.isActivating,
+                                  l10n,
+                                  colorScheme,
+                                  state,
+                                ),
+                                const SizedBox(height: 35),
+
+                                // Customization options
+                                SettingsOptionsList(
+                                  horizontalPadding: 24,
+                                  sectionTitle: l10n.customization,
+                                  options: [
+                                    SettingsOption(
+                                      icon: Icons.settings_outlined,
+                                      title: l10n.featuresSettings,
+                                      description:
+                                          l10n.guardianModeSettingsDescription,
+                                      onPressed: () =>
+                                          _showFutureDialog(context, l10n),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                      ),
-              ),
-            ],
-          ),
-        );
-      },
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

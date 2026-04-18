@@ -31,6 +31,9 @@ abstract class GuardianModeCubitState with _$GuardianModeCubitState {
     GuardianSession? activeSession,
     AppFailure? failure,
 
+    // -- Guardian check alert
+    List<GuardianSessionSecondaryStatus>? alertTriggerStatuses,
+
     // -- Pending form data (pre-activation)
     GuardianCoordinate? pendingDestination,
     Duration? pendingDuration,

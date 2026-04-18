@@ -14,6 +14,7 @@ import 'package:url_launcher/url_launcher.dart';
 class GuardianModeMap extends StatefulWidget {
   final LatLng currentLocation;
   final LatLng? destinationPoint;
+  final LatLng? originPoint;
   final List<LatLng> routePoints;
   final bool isActive;
   final AppLocalizations l10n;
@@ -31,6 +32,7 @@ class GuardianModeMap extends StatefulWidget {
     required this.colorScheme,
     required this.textTheme,
     this.destinationPoint,
+    this.originPoint,
     this.routePoints = const [],
     this.onDestinationChanged,
     this.onRouteChanged,
@@ -41,22 +43,66 @@ class GuardianModeMap extends StatefulWidget {
   State<GuardianModeMap> createState() => _GuardianModeMapState();
 }
 
-class _GuardianModeMapState extends State<GuardianModeMap> {
+class _GuardianModeMapState extends State<GuardianModeMap>
+    with SingleTickerProviderStateMixin {
   final MapController _mapController = MapController();
+
+  // ==============================================
+  // MARK: - Smooth location animation
+  // ==============================================
+
+  late AnimationController _locationAnimCtrl;
+  // Start and target of the current animation leg.
+  late LatLng _animFrom;
+  late LatLng _animTarget;
+
+  /// The interpolated position used for the marker and camera-follow.
+  LatLng get _displayedLocation {
+    final t = _locationAnimCtrl.value;
+    return LatLng(
+      _animFrom.latitude + (_animTarget.latitude - _animFrom.latitude) * t,
+      _animFrom.longitude + (_animTarget.longitude - _animFrom.longitude) * t,
+    );
+  }
 
   @override
   void initState() {
     super.initState();
+    _animFrom = widget.currentLocation;
+    _animTarget = widget.currentLocation;
+    _locationAnimCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _locationAnimCtrl.addListener(() {
+      if (mounted) setState(() {});
+    });
     // Auto-fetch the route when the widget is created with a destination
     if (widget.destinationPoint != null && widget.routePoints.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _fetchRoute(widget.currentLocation, widget.destinationPoint!);
+        _fetchRoute(
+          widget.originPoint ?? widget.currentLocation,
+          widget.destinationPoint!,
+        );
       });
     }
   }
 
   @override
+  void didUpdateWidget(GuardianModeMap oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.currentLocation != widget.currentLocation) {
+      // Capture the current visual position as the new animation start so
+      // mid-animation restarts chain smoothly instead of snapping back.
+      _animFrom = _displayedLocation;
+      _animTarget = widget.currentLocation;
+      _locationAnimCtrl.forward(from: 0.0);
+    }
+  }
+
+  @override
   void dispose() {
+    _locationAnimCtrl.dispose();
     _mapController.dispose();
     super.dispose();
   }
@@ -111,6 +157,9 @@ class _GuardianModeMapState extends State<GuardianModeMap> {
   void _onMapTap(TapPosition tapPosition, LatLng point) {
     if (widget.isActive) return;
     widget.onDestinationChanged?.call(point);
+    // Use currentLocation directly: the screen sets _pendingOrigin = currentLocation
+    // on this same tap via the callback, but the widget hasn't rebuilt yet so
+    // widget.originPoint would still hold the stale previous value.
     _fetchRoute(widget.currentLocation, point);
 
     debugPrint(
@@ -121,10 +170,20 @@ class _GuardianModeMapState extends State<GuardianModeMap> {
   }
 
   List<Marker> get _markers {
+    final loc = _displayedLocation;
     return [
-      // Current location marker (blue)
+      // Origin marker (green) — shown when a destination has been set.
+      if (widget.originPoint != null)
+        Marker(
+          point: widget.originPoint!,
+          width: 25,
+          height: 35,
+          alignment: Alignment.topCenter,
+          child: const MapLocationPin(size: 25, color: Color(0xFF2E7D32)),
+        ),
+      // Current location marker (blue) — uses animated position.
       Marker(
-        point: widget.currentLocation,
+        point: loc,
         width: 25,
         height: 35,
         alignment: Alignment.topCenter,
@@ -220,6 +279,7 @@ class _GuardianModeMapState extends State<GuardianModeMap> {
                                     builder: (_) => _GuardianFullscreenMapPage(
                                       currentLocation: widget.currentLocation,
                                       destinationPoint: widget.destinationPoint,
+                                      originPoint: widget.originPoint,
                                       routePoints: widget.routePoints,
                                       isActive: widget.isActive,
                                       colorScheme: widget.colorScheme,
@@ -346,6 +406,17 @@ class _GuardianModeMapState extends State<GuardianModeMap> {
                   color: widget.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
               ),
+              if (widget.originPoint != null) ...[
+                const SizedBox(width: 14),
+                const _LegendDot(color: Color(0xFF2E7D32)),
+                const SizedBox(width: 4),
+                Text(
+                  widget.l10n.followUpOriginLabel,
+                  style: widget.textTheme.labelSmall?.copyWith(
+                    color: widget.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                ),
+              ],
               const SizedBox(width: 14),
               const _LegendDot(color: Color(0xFFE53935)),
               const SizedBox(width: 4),
@@ -384,6 +455,7 @@ class _LegendDot extends StatelessWidget {
 class _GuardianFullscreenMapPage extends StatefulWidget {
   final LatLng currentLocation;
   final LatLng? destinationPoint;
+  final LatLng? originPoint;
   final List<LatLng> routePoints;
   final bool isActive;
   final ColorScheme colorScheme;
@@ -401,6 +473,7 @@ class _GuardianFullscreenMapPage extends StatefulWidget {
     required this.onDestinationChanged,
     required this.initialCenter,
     required this.initialZoom,
+    this.originPoint,
     this.routePoints = const [],
     this.onRouteChanged,
     this.onEstimatedDurationChanged,
@@ -483,11 +556,22 @@ class _GuardianFullscreenMapPageState
     if (widget.isActive) return;
     setState(() => _destinationPoint = point);
     widget.onDestinationChanged(point);
+    // Same reasoning as in the inline map: use currentLocation so the route
+    // always starts from where the user is right now, not the stale originPoint.
     _fetchRoute(widget.currentLocation, point);
   }
 
   List<Marker> get _markers {
     return [
+      // Origin marker (green) — shown when a destination has been set.
+      if (widget.originPoint != null)
+        Marker(
+          point: widget.originPoint!,
+          width: 25,
+          height: 35,
+          alignment: Alignment.topCenter,
+          child: const MapLocationPin(size: 25, color: Color(0xFF2E7D32)),
+        ),
       Marker(
         point: widget.currentLocation,
         width: 25,
