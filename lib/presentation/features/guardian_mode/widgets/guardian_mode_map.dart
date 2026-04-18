@@ -1,7 +1,10 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:safe_beacon/core/constants/constants.dart';
@@ -482,22 +485,74 @@ class _GuardianFullscreenMapPage extends StatefulWidget {
       _GuardianFullscreenMapPageState();
 }
 
-class _GuardianFullscreenMapPageState
-    extends State<_GuardianFullscreenMapPage> {
+class _GuardianFullscreenMapPageState extends State<_GuardianFullscreenMapPage>
+    with SingleTickerProviderStateMixin {
   final MapController _mapController = MapController();
   late LatLng? _destinationPoint;
   late List<LatLng> _routePoints;
+
+  LatLng? _localOriginPoint;
+
+  late AnimationController _locationAnimCtrl;
+  late LatLng _animFrom;
+  late LatLng _animTarget;
+
+  LatLng get _displayedLocation {
+    final t = _locationAnimCtrl.value;
+    return LatLng(
+      _animFrom.latitude + (_animTarget.latitude - _animFrom.latitude) * t,
+      _animFrom.longitude + (_animTarget.longitude - _animFrom.longitude) * t,
+    );
+  }
+
+  StreamSubscription<Position>? _positionSubscription;
 
   @override
   void initState() {
     super.initState();
     _destinationPoint = widget.destinationPoint;
-    // Reuse already-computed route
     _routePoints = List<LatLng>.of(widget.routePoints);
+    _localOriginPoint = widget.originPoint;
+    _animFrom = widget.currentLocation;
+    _animTarget = widget.currentLocation;
+    _locationAnimCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+    _locationAnimCtrl.addListener(() {
+      if (mounted) setState(() {});
+    });
+    _startLocationStream();
+  }
+
+  void _startLocationStream() {
+    final LocationSettings locationSettings = Platform.isAndroid
+        ? AndroidSettings(
+            accuracy: LocationAccuracy.bestForNavigation,
+            intervalDuration: const Duration(seconds: 1),
+          )
+        : AppleSettings(
+            accuracy: LocationAccuracy.bestForNavigation,
+            activityType: ActivityType.fitness,
+          );
+
+    _positionSubscription =
+        Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+          (position) {
+            if (position.accuracy > 40.0) return;
+            if (mounted) {
+              _animFrom = _displayedLocation;
+              _animTarget = LatLng(position.latitude, position.longitude);
+              _locationAnimCtrl.forward(from: 0.0);
+            }
+          },
+        );
   }
 
   @override
   void dispose() {
+    _positionSubscription?.cancel();
+    _locationAnimCtrl.dispose();
     _mapController.dispose();
     super.dispose();
   }
@@ -552,26 +607,28 @@ class _GuardianFullscreenMapPageState
 
   void _onMapTap(TapPosition tapPosition, LatLng point) {
     if (widget.isActive) return;
-    setState(() => _destinationPoint = point);
+    final origin = _displayedLocation;
+    setState(() {
+      _destinationPoint = point;
+      _localOriginPoint = origin;
+    });
     widget.onDestinationChanged(point);
-    // Same reasoning as in the inline map: use currentLocation so the route
-    // always starts from where the user is right now, not the stale originPoint.
-    _fetchRoute(widget.currentLocation, point);
+    _fetchRoute(origin, point);
   }
 
   List<Marker> get _markers {
     return [
       // Origin marker (green) — shown when a destination has been set.
-      if (widget.originPoint != null)
+      if (_localOriginPoint != null)
         Marker(
-          point: widget.originPoint!,
+          point: _localOriginPoint!,
           width: 25,
           height: 35,
           alignment: Alignment.topCenter,
           child: const MapLocationPin(size: 25, color: Color(0xFF2E7D32)),
         ),
       Marker(
-        point: widget.currentLocation,
+        point: _displayedLocation,
         width: 25,
         height: 35,
         alignment: Alignment.topCenter,
@@ -670,7 +727,7 @@ class _GuardianFullscreenMapPageState
               elevation: 2,
               child: InkWell(
                 borderRadius: BorderRadius.circular(8),
-                onTap: () => _mapController.move(widget.currentLocation, 15),
+                onTap: () => _mapController.move(_displayedLocation, 15),
                 child: Padding(
                   padding: const EdgeInsets.all(8),
                   child: Icon(

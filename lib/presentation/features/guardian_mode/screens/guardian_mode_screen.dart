@@ -299,10 +299,11 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
         cubit.updatePendingDuration(estimated);
         setState(() => _durationResetKey++);
         if (_currentLocation != null) {
+          final origin = _pendingOrigin ?? _currentLocation!;
           cubit.activateSession(
             initialLocation: GuardianCoordinate(
-              latitude: _currentLocation!.latitude,
-              longitude: _currentLocation!.longitude,
+              latitude: origin.latitude,
+              longitude: origin.longitude,
             ),
           );
         }
@@ -325,10 +326,11 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     } else if (hasDestination && !hasDuration) {
       _showEstimatedTimeDialog(context, l10n, state);
     } else if (_currentLocation != null) {
+      final origin = _pendingOrigin ?? _currentLocation!;
       context.read<GuardianModeCubit>().activateSession(
         initialLocation: GuardianCoordinate(
-          latitude: _currentLocation!.latitude,
-          longitude: _currentLocation!.longitude,
+          latitude: origin.latitude,
+          longitude: origin.longitude,
         ),
       );
     }
