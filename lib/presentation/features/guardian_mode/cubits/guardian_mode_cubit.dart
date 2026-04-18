@@ -144,21 +144,6 @@ class GuardianModeCubit extends Cubit<GuardianModeCubitState> {
     emit(state.copyWith(isActivating: false, activeSession: session));
   }
 
-  /// Clears the active session state.
-  // TODO: implement session cancellation with service (two posible cancelations)
-  void clearActiveSession() {
-    _checkService.stop();
-    emit(
-      state.copyWith(
-        activeSession: null,
-        alertTriggerStatuses: null,
-        pendingDestination: null,
-        pendingDuration: null,
-        pendingDescription: null,
-      ),
-    );
-  }
-
   // ==============================================
   // MARK: - Session completion
   // ==============================================

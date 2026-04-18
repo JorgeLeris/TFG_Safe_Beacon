@@ -9,8 +9,6 @@ import 'package:safe_beacon/core/language/generated/l10n/app_localizations.dart'
 import 'package:safe_beacon/presentation/shared/widgets/others/map_location_pin.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-// TODO: without route we use the origin and destination for validations
-
 class GuardianModeMap extends StatefulWidget {
   final LatLng currentLocation;
   final LatLng? destinationPoint;

@@ -631,7 +631,7 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    // TODO: Change this when background mode implemented
+    // TODO(background): Change this when background mode implemented
     // Outer listener: starts checks when an existing active session is restored after app launch.
     return BlocListener<GuardianModeCubit, GuardianModeCubitState>(
       listenWhen: (prev, curr) =>
