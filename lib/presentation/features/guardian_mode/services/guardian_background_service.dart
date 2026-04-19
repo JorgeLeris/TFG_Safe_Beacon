@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -178,6 +179,12 @@ Future<bool> onGuardianIosBackground(ServiceInstance service) async {
 // ==============================================
 
 /// Controls the guardian mode background service from the UI isolate.
+///
+/// On **Android** this delegates to [FlutterBackgroundService] which runs
+/// in a separate foreground-service isolate (survives app close).
+///
+/// On **iOS** `flutter_background_service` runs the `onForeground` handler in
+/// the *same* isolate as the main app.
 class GuardianBackgroundServiceManager {
   GuardianBackgroundServiceManager._();
 
@@ -185,6 +192,11 @@ class GuardianBackgroundServiceManager {
 
   static const _notificationChannelId = 'guardian_mode_service';
   static const _notificationChannelName = 'Modo Guardián';
+
+  // iOS in-process check service
+  static GuardianModeCheckService? _iosCheckService;
+  static final _iosAlertController =
+      StreamController<List<GuardianSessionSecondaryStatus>>.broadcast();
 
   // ──────────────────────────────────────────
   // Setup
@@ -194,38 +206,41 @@ class GuardianBackgroundServiceManager {
   ///
   /// Must be called once before [startChecks], typically from [main].
   static Future<void> initialize() async {
-    await FlutterLocalNotificationsPlugin()
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >()
-        ?.createNotificationChannel(
-          const AndroidNotificationChannel(
-            _notificationChannelId,
-            _notificationChannelName,
-            description: 'Supervisión activa del Modo Guardián',
-            importance: Importance.low,
-            playSound: false,
-            enableVibration: false,
-          ),
-        );
+    if (Platform.isAndroid) {
+      await FlutterLocalNotificationsPlugin()
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >()
+          ?.createNotificationChannel(
+            const AndroidNotificationChannel(
+              _notificationChannelId,
+              _notificationChannelName,
+              description: 'Supervisión activa del Modo Guardián',
+              importance: Importance.low,
+              playSound: false,
+              enableVibration: false,
+            ),
+          );
 
-    await _service.configure(
-      androidConfiguration: AndroidConfiguration(
-        onStart: onGuardianBackgroundStart,
-        autoStart: false,
-        isForegroundMode: true,
-        notificationChannelId: _notificationChannelId,
-        initialNotificationTitle: _notificationChannelName,
-        initialNotificationContent: 'Supervisando tu sesión activa',
-        autoStartOnBoot: false,
-        foregroundServiceTypes: const [AndroidForegroundType.location],
-      ),
-      iosConfiguration: IosConfiguration(
-        autoStart: false,
-        onForeground: onGuardianBackgroundStart,
-        onBackground: onGuardianIosBackground,
-      ),
-    );
+      await _service.configure(
+        androidConfiguration: AndroidConfiguration(
+          onStart: onGuardianBackgroundStart,
+          autoStart: false,
+          isForegroundMode: true,
+          notificationChannelId: _notificationChannelId,
+          initialNotificationTitle: _notificationChannelName,
+          initialNotificationContent: 'Supervisando tu sesión activa',
+          autoStartOnBoot: false,
+          foregroundServiceTypes: const [AndroidForegroundType.location],
+        ),
+        iosConfiguration: IosConfiguration(
+          autoStart: false,
+          onForeground: onGuardianBackgroundStart,
+          onBackground: onGuardianIosBackground,
+        ),
+      );
+    }
+    // iOS: no service configuration needed — we run in-process.
   }
 
   // ──────────────────────────────────────────
@@ -233,7 +248,10 @@ class GuardianBackgroundServiceManager {
   // ──────────────────────────────────────────
 
   /// Whether the background service is currently running.
-  static Future<bool> isRunning() => _service.isRunning();
+  static Future<bool> isRunning() async {
+    if (Platform.isAndroid) return _service.isRunning();
+    return _iosCheckService?.isRunning ?? false;
+  }
 
   /// Starts the background service and kicks off the guardian check loop.
   ///
@@ -243,8 +261,74 @@ class GuardianBackgroundServiceManager {
     required List<LatLng> routePoints,
     required String locale,
   }) async {
+    if (Platform.isAndroid) {
+      return _startChecksAndroid(
+        uid: uid,
+        routePoints: routePoints,
+        locale: locale,
+      );
+    }
+    return _startChecksIos(uid: uid, routePoints: routePoints, locale: locale);
+  }
+
+  /// Forwards an updated route polyline to the running service.
+  static Future<void> updateRoutePoints(List<LatLng> points) async {
+    if (Platform.isAndroid) {
+      final prefs = await SharedPreferences.getInstance();
+      final encoded = jsonEncode(
+        points.map((p) => [p.latitude, p.longitude]).toList(),
+      );
+      await prefs.setString(_kPrefRoutePoints, encoded);
+      _service.invoke(_kEvtUpdateRoute, {'routePoints': encoded});
+    } else {
+      _iosCheckService?.updateRoutePoints(points);
+    }
+  }
+
+  /// Sends the stop command and clears stored params.
+  static Future<void> stopChecks() async {
+    if (Platform.isAndroid) {
+      _service.invoke(_kEvtStop, {});
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_kPrefUid);
+      await prefs.remove(_kPrefLocale);
+      await prefs.remove(_kPrefRoutePoints);
+    } else {
+      _iosCheckService?.stop();
+      _iosCheckService = null;
+    }
+  }
+
+  // ──────────────────────────────────────────
+  // Events
+  // ──────────────────────────────────────────
+
+  /// Stream of alert-trigger status lists broadcast by the background service.
+  static Stream<List<GuardianSessionSecondaryStatus>> get onAlertGenerated {
+    if (Platform.isAndroid) {
+      return _service.on(kEvtAlertGenerated).map((data) {
+        if (data == null) return const [];
+        final ids = (data['statuses'] as List).cast<String>();
+        return ids
+            .map(GuardianSessionSecondaryStatus.fromId)
+            .whereType<GuardianSessionSecondaryStatus>()
+            .toList();
+      });
+    }
+    return _iosAlertController.stream;
+  }
+
+  // ──────────────────────────────────────────
+  // Android-specific start
+  // ──────────────────────────────────────────
+
+  static Future<bool> _startChecksAndroid({
+    required String uid,
+    required List<LatLng> routePoints,
+    required String locale,
+  }) async {
     try {
-      if (await isRunning()) return true;
+      if (await _service.isRunning()) return true;
 
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(_kPrefUid, uid);
@@ -279,40 +363,60 @@ class GuardianBackgroundServiceManager {
     }
   }
 
-  /// Forwards an updated route polyline to the running background service.
-  static Future<void> updateRoutePoints(List<LatLng> points) async {
-    final prefs = await SharedPreferences.getInstance();
-    final encoded = jsonEncode(
-      points.map((p) => [p.latitude, p.longitude]).toList(),
-    );
-    await prefs.setString(_kPrefRoutePoints, encoded);
-    _service.invoke(_kEvtUpdateRoute, {'routePoints': encoded});
-  }
-
-  /// Sends the stop command to the background service and clears stored params.
-  static Future<void> stopChecks() async {
-    _service.invoke(_kEvtStop, {});
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_kPrefUid);
-    await prefs.remove(_kPrefLocale);
-    await prefs.remove(_kPrefRoutePoints);
-  }
-
   // ──────────────────────────────────────────
-  // Events
+  // iOS-specific start (in-process)
   // ──────────────────────────────────────────
 
-  /// Stream of alert-trigger status lists broadcast by the background isolate.
-  ///
-  /// Subscribe in [GuardianModeCubit] to surface alert banners in the UI.
-  static Stream<List<GuardianSessionSecondaryStatus>> get onAlertGenerated {
-    return _service.on(kEvtAlertGenerated).map((data) {
-      if (data == null) return const [];
-      final ids = (data['statuses'] as List).cast<String>();
-      return ids
-          .map(GuardianSessionSecondaryStatus.fromId)
-          .whereType<GuardianSessionSecondaryStatus>()
-          .toList();
-    });
+  static Future<bool> _startChecksIos({
+    required String uid,
+    required List<LatLng> routePoints,
+    required String locale,
+  }) async {
+    try {
+      // Stop any leftover instance from a previous session.
+      _iosCheckService?.stop();
+      _iosCheckService = null;
+
+      final guardianSessionRepo = GuardianSessionRepositoryImpl(
+        api: GuardianSessionApi(),
+      );
+      final alertRepo = AlertRepositoryImpl(api: AlertApi());
+      final userProfileRepo = UserProfileRepositoryImpl(api: UserProfileApi());
+
+      final l10n = await AppLocalizations.delegate.load(Locale(locale));
+
+      final sessionResult = await guardianSessionRepo.getActiveSession(uid);
+      final session = sessionResult.valueOrNull;
+      if (session == null) {
+        appLogger.warning(
+          'Guardian iOS: no active session for uid $uid — not starting checks',
+        );
+        return false;
+      }
+
+      final checkService = GuardianModeCheckService(
+        uid: uid,
+        guardianSessionRepository: guardianSessionRepo,
+        alertRepository: alertRepo,
+        userProfileRepository: userProfileRepo,
+        onAlertGenerated: (statuses) {
+          _iosAlertController.add(statuses);
+        },
+      );
+
+      checkService.start(
+        session: session,
+        routePoints: routePoints,
+        notificationTitleBuilder: l10n.notificationAlertTitle,
+        notificationBodyBuilder: l10n.notificationGuardianBody,
+      );
+
+      _iosCheckService = checkService;
+      appLogger.info('Guardian iOS: check service started in main isolate');
+      return true;
+    } catch (e, st) {
+      appLogger.severe('Guardian iOS: failed to start check service', e, st);
+      return false;
+    }
   }
 }
