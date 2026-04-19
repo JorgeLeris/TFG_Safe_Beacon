@@ -15,7 +15,8 @@ import 'package:safe_beacon/domain/guardian_mode/guardian_session_repository.dar
 import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
 import 'package:safe_beacon/notification_service.dart';
 
-// TODO(background): Once background execution is implemented this is going to change
+// The check interval runs inside the background isolate started by
+// [GuardianBackgroundServiceManager].
 /// Interval between periodic guardian checks.
 const _kCheckInterval = Duration(minutes: 1);
 
@@ -92,7 +93,11 @@ class GuardianModeCheckService {
       'interval: ${_kCheckInterval.inSeconds}s)',
     );
 
-    _checkTimer = Timer.periodic(_kCheckInterval, (_) => _runCheck());
+    _checkTimer = Timer.periodic(_kCheckInterval, (_) {
+      _runCheck().catchError((Object e, StackTrace st) {
+        appLogger.severe('Guardian check: unhandled error in _runCheck', e, st);
+      });
+    });
   }
 
   /// Updates the route polyline used for deviation detection while running.

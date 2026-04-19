@@ -62,7 +62,6 @@ class HomeProvider extends StatelessWidget {
               guardianSessionRepository: context
                   .read<GuardianSessionRepository>(),
               alertRepository: context.read<AlertRepository>(),
-              userProfileRepository: context.read<UserProfileRepository>(),
             ),
           ),
         ],

@@ -53,8 +53,6 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
 
   @override
   void dispose() {
-    // TODO(background): When background execution is implemented, remove this
-    _cubit.stopChecks();
     _positionSubscription?.cancel();
     _scrollController.dispose();
     super.dispose();
@@ -170,11 +168,13 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     }
   }
 
-  /// Starts the guardian check service via the cubit.
+  /// Starts the guardian check service in the background via the cubit.
   void _startChecks(BuildContext context) {
-    context.read<GuardianModeCubit>().startChecks(
-      routePoints: _routePoints,
-      l10n: context.l10n,
+    unawaited(
+      context.read<GuardianModeCubit>().startChecks(
+        routePoints: _routePoints,
+        locale: Localizations.localeOf(context).languageCode,
+      ),
     );
   }
 
@@ -633,8 +633,8 @@ class _GuardianModeScreenState extends State<GuardianModeScreen> {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    // TODO(background): Change this when background mode implemented
-    // Outer listener: starts checks when an existing active session is restored after app launch.
+    // Outer listener: starts background checks when an existing active session
+    // is restored after app launch.
     return BlocListener<GuardianModeCubit, GuardianModeCubitState>(
       listenWhen: (prev, curr) =>
           prev.isLoadingSession &&
