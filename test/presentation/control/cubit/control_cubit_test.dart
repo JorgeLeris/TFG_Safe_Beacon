@@ -7,6 +7,8 @@ import 'package:safe_beacon/domain/alerts/entities/alert.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/domain/common/result.dart';
 import 'package:safe_beacon/domain/contacts/contact_request_repository.dart';
+import 'package:safe_beacon/domain/guardian_mode/entities/guardian_coordinate.dart';
+import 'package:safe_beacon/domain/guardian_mode/entities/guardian_session.dart';
 import 'package:safe_beacon/domain/guardian_mode/guardian_session_repository.dart';
 import 'package:safe_beacon/domain/profile/entities/user_profile.dart';
 import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
@@ -29,6 +31,24 @@ const _alertId = 'alert-abc';
 const _ownerUid = 'uid-123';
 const _ownerUsername = 'john_doe';
 const _dummyFailure = AppFailure.unknown();
+
+final _dummySession = GuardianSession(
+  id: 'session-1',
+  ownerUid: _ownerUid,
+  trustedContactUids: const [],
+  status: GuardianSessionStatus.active,
+  secondaryStatuses: const [],
+  originLocation: const GuardianCoordinate(
+    latitude: 41.6488,
+    longitude: -0.8891,
+  ),
+  currentLocation: const GuardianCoordinate(
+    latitude: 41.6488,
+    longitude: -0.8891,
+  ),
+  estimatedDuration: const Duration(minutes: 30),
+  activatedAt: DateTime(2024),
+);
 
 final _dummyAlert = Alert(
   id: _alertId,
@@ -222,6 +242,136 @@ void main() {
       expect: () => [
         const ControlState(isLoadingAlerts: true),
         const ControlState(alertsFailure: _dummyFailure),
+      ],
+    );
+  });
+
+  // ---------------------------------------------------------------------------
+  // loadFollowUps
+  // ---------------------------------------------------------------------------
+
+  group('ControlCubit.loadFollowUps', () {
+    blocTest<ControlCubit, ControlState>(
+      '[HAPPY PATH] - GIVEN sessions exist and profiles resolve, '
+      'WHEN loadFollowUps is called, '
+      'THEN should emit [loading, loaded with sessions and display names]',
+      build: () {
+        when(
+          () => mockGuardianSessionRepository.getContactsSessions(_uid),
+        ).thenAnswer((_) async => Result.success([_dummySession]));
+        when(
+          () => mockUserProfileRepository.getProfile(_ownerUid),
+        ).thenAnswer((_) async => const Result.success(_dummyProfile));
+        return controlCubit;
+      },
+      act: (cubit) => cubit.loadFollowUps(),
+      expect: () => [
+        const ControlState(isLoadingFollowUps: true),
+        isA<ControlState>()
+            .having((s) => s.isLoadingFollowUps, 'isLoadingFollowUps', false)
+            .having((s) => s.followUps, 'followUps', [_dummySession])
+            .having(
+              (s) => s.followUpDisplayNames[_ownerUid],
+              'displayName resolved from profile',
+              'John Doe',
+            ),
+      ],
+    );
+
+    blocTest<ControlCubit, ControlState>(
+      '[HAPPY PATH] - GIVEN no sessions exist, '
+      'WHEN loadFollowUps is called, '
+      'THEN should emit [loading, empty loaded state]',
+      build: () {
+        when(
+          () => mockGuardianSessionRepository.getContactsSessions(_uid),
+        ).thenAnswer((_) async => const Result.success([]));
+        return controlCubit;
+      },
+      act: (cubit) => cubit.loadFollowUps(),
+      expect: () => [
+        const ControlState(isLoadingFollowUps: true),
+        const ControlState(),
+      ],
+    );
+
+    blocTest<ControlCubit, ControlState>(
+      '[HAPPY PATH] - GIVEN sessions exist but profile fetch fails, '
+      'WHEN loadFollowUps is called, '
+      'THEN should emit loaded state with empty display name for that uid',
+      build: () {
+        when(
+          () => mockGuardianSessionRepository.getContactsSessions(_uid),
+        ).thenAnswer((_) async => Result.success([_dummySession]));
+        when(
+          () => mockUserProfileRepository.getProfile(_ownerUid),
+        ).thenAnswer((_) async => const Result.failure(AppFailure.unknown()));
+        return controlCubit;
+      },
+      act: (cubit) => cubit.loadFollowUps(),
+      expect: () => [
+        const ControlState(isLoadingFollowUps: true),
+        isA<ControlState>()
+            .having((s) => s.isLoadingFollowUps, 'isLoadingFollowUps', false)
+            .having((s) => s.followUps, 'followUps', [_dummySession])
+            .having(
+              (s) => s.followUpDisplayNames.containsKey(_ownerUid),
+              'no display name entry for failed profile',
+              false,
+            ),
+      ],
+    );
+
+    blocTest<ControlCubit, ControlState>(
+      '[HAPPY PATH] - GIVEN two sessions with the same owner, '
+      'WHEN loadFollowUps is called, '
+      'THEN profile should only be fetched once',
+      build: () {
+        final session2 = GuardianSession(
+          id: 'session-2',
+          ownerUid: _ownerUid,
+          trustedContactUids: const [],
+          status: GuardianSessionStatus.active,
+          secondaryStatuses: const [],
+          originLocation: const GuardianCoordinate(
+            latitude: 41.0,
+            longitude: -1.0,
+          ),
+          currentLocation: const GuardianCoordinate(
+            latitude: 41.0,
+            longitude: -1.0,
+          ),
+          estimatedDuration: const Duration(minutes: 20),
+          activatedAt: DateTime(2024),
+        );
+        when(
+          () => mockGuardianSessionRepository.getContactsSessions(_uid),
+        ).thenAnswer((_) async => Result.success([_dummySession, session2]));
+        when(
+          () => mockUserProfileRepository.getProfile(_ownerUid),
+        ).thenAnswer((_) async => const Result.success(_dummyProfile));
+        return controlCubit;
+      },
+      act: (cubit) => cubit.loadFollowUps(),
+      verify: (_) {
+        verify(() => mockUserProfileRepository.getProfile(_ownerUid)).called(1);
+      },
+    );
+
+    blocTest<ControlCubit, ControlState>(
+      '[ERROR PATH] - GIVEN the repository returns a failure, '
+      'WHEN loadFollowUps is called, '
+      'THEN should emit [loading, followUpsFailure]',
+      build: () {
+        when(
+          () => mockGuardianSessionRepository.getContactsSessions(_uid),
+        ).thenAnswer((_) async => const Result.failure(_dummyFailure));
+        return controlCubit;
+      },
+      act: (cubit) => cubit.loadFollowUps(),
+      expect: () => [
+        const ControlState(isLoadingFollowUps: true),
+        const ControlState(followUpsFailure: _dummyFailure),
       ],
     );
   });
