@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:safe_beacon/core/extensions/context_extensions.dart';
 import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/presentation/features/control/routes/control_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 /// Helper to show the alert detail dialog.
@@ -16,6 +17,7 @@ class AlertDetailDialog {
     required String alertType,
     required bool isActive,
     required bool isGuardianMode,
+    String? guardianSessionId,
     required String date,
     required String time,
     required String battery,
@@ -142,9 +144,14 @@ class AlertDetailDialog {
                   vertical: 14,
                 ),
               ),
-              onPressed: () {
-                // TODO: Navigate to guardian mode follow-up detail - we need to send the id too.
-              },
+              onPressed: guardianSessionId != null
+                  ? () {
+                      Navigator.of(context).pop();
+                      FollowUpDetailRoute(
+                        sessionId: guardianSessionId,
+                      ).push(context);
+                    }
+                  : null,
               child: Row(
                 children: [
                   Expanded(
