@@ -131,6 +131,9 @@
   "guardianMode": "Modo guardián",
   "sensors": "Sensores",
   "panicButtonInfoContent": "Esta función envía alertas inmediatas a tus contactos de confianza con tu ubicación actual. Utilízala únicamente en situaciones de emergencia.",
+  "guardianModeInfoContent": "Activa esta función cuando quieras mayor seguridad durante un trayecto.\n\nLa app controla tu ruta y el tiempo estimado. Si hay desvíos o retrasos, tus contactos de confianza recibirán un aviso automáticamente.",
+  "guardianModeNoContactsContent": "El modo guardián necesita al menos un contacto de confianza para compartir tu ruta. Ve a la sección de contactos para añadir uno.",
+  "guardianModePermissionDeniedContent": "SafeBeacon necesita acceso a tu ubicación para supervisar tu ruta en modo guardián. Pulsa el botón para ir a los ajustes y conceder el permiso.",
   "addPanicButtonToDevice": "Añadir botón del pánico al dispositivo",
   "panicButtonStatusStandby": "En espera",
   "panicButtonStatusActive": "Activado",
@@ -153,6 +156,7 @@
   "customization": "Personalización",
   "featuresSettings": "Configuración de funcionalidades",
   "featuresSettingsDescription": "Habilita y deshabilita el botón del pánico o accede a las configuraciones de personalización.",
+  "guardianModeSettingsDescription": "Habilita y deshabilita el modo guardián o accede a las configuraciones de personalización.",
   "deactivationPin": "PIN de desactivación",
   "deactivationPinDescription": "Añade un PIN para desactivar el botón del pánico y así aumentar la seguridad.",
   "notAvailableYet": "No disponible todavía",
@@ -274,5 +278,133 @@
   "widgetSosLabel": "SOS",
   "widgetActivateLabel": "Activar botón del pánico",
   "widgetActiveTitle": "ALERTA ACTIVA",
-  "widgetOpenApp": "Abrir SafeBeacon"
+  "widgetOpenApp": "Abrir SafeBeacon",
+  "guardianModeRouteSection": "TRAYECTO / DESTINO",
+  "guardianModeEstimatedTimeSection": "TIEMPO ESTIMADO",
+  "guardianModeDescriptionSection": "DESCRIPCIÓN",
+  "guardianModeEstimatedTimeHint": "Tiempo estimado",
+  "guardianModeDescriptionHint": "Descripción del trayecto",
+  "guardianModeActivate": "Activar modo guardián",
+  "guardianModeConfirmArrival": "Confirmar llegada",
+  "guardianModeCancel": "Cancelar modo guardián",
+  "guardianModeSetDestination": "Toca el mapa para marcar el destino",
+  "durationDays": "días",
+  "durationHours": "horas",
+  "durationMinutes": "min",
+  "guardianModeActivated": "Modo Guardián activado",
+  "guardianModeActivatedDescription": "Se está supervisando tu trayecto y el tiempo estimado. Si te desvías del recorrido o se supera la duración prevista, se avisará automáticamente a tus contactos de confianza.",
+  "guardianModeArrivalDescription": "Si ya has llegado, puedes añadir una justificación opcional y finalizar el Modo Guardián.",
+  "guardianModeCancelDescription": "Si decides cancelar, puedes añadir una breve justificación antes de finalizar el Modo Guardián.",
+  "guardianModeJustification": "Justificación",
+  "guardianModeStatusActive": "Modo guardián activo",
+  "guardianModeStatusInactive": "Modo guardián inactivo",
+  "guardianModeAlertActiveBanner": "Alerta generada: {cause}",
+  "@guardianModeAlertActiveBanner": {
+    "placeholders": {
+      "cause": {
+        "type": "String"
+      }
+    }
+  },
+  "guardianModeAlertBannerContacts": "Tus contactos de confianza han sido notificados",
+  "guardianModeAlertCauseBoth": "desviación de la ruta y tiempo estimado superado",
+  "notificationGuardianBody": "Tu persona protegida {username} ha generado una alerta del modo guardián.",
+  "@notificationGuardianBody": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "guardianModeMissingDataTitle": "Faltan datos",
+  "guardianModeMissingDataContent": "Antes de activar el Modo Guardián, añade un destino o una duración estimada para poder supervisar tu recorrido.",
+  "guardianModeEstimatedTimeDialogTitle": "Tiempo estimado",
+  "guardianModeEstimatedTimeDialogContent": "No has indicado un tiempo estimado para este trayecto. Hemos calculado uno automáticamente en función del recorrido definido.",
+  "guardianModeEstimatedTimeLabel": "Tiempo estimado:",
+  "guardianModeAlreadyActiveTitle": "Ya tienes un modo guardián activo",
+  "guardianModeAlreadyActiveContent": "Solo puedes tener un modo guardián activo a la vez. Finaliza el actual antes de iniciar uno nuevo.",
+  "guardianModeActivateErrorTitle": "Error al activar el modo guardián",
+  "guardianModeActivateErrorContent": "No se ha podido activar el modo guardián. Por favor, comprueba tu conexión e inténtalo de nuevo.",
+  "guardianModeCompleteErrorTitle": "Error al finalizar el modo guardián",
+  "guardianModeCompleteErrorContent": "No se ha podido finalizar el modo guardián. Por favor, comprueba tu conexión e inténtalo de nuevo.",
+  "guardianModeCompleteSuccessTitle": "Modo guardián finalizado",
+  "guardianModeCompleteSuccessContent": "El modo guardián ha finalizado correctamente, ya no se está controlando tu trayecto. Puedes comenzar uno nuevo cuando quieras en la misma pantalla.",
+  "followUpGuardianModeOf": "Seguimiento del modo guardián de:",
+  "noFollowUpsTitle": "Aún no hay seguimientos",
+  "noFollowUpsDescription": "Cuando se realice un seguimiento del modo guardián de una de tus personas protegidas, aparecerá aquí para que puedas supervisarlo.",
+  "activeFollowUp": "Seguimiento activo",
+  "finishedFollowUp": "Seguimiento finalizado",
+  "activeFollowUps": "Seguimiento activo",
+  "finishedFollowUps": "Seguimiento finalizado",
+  "routeDeviationTag": "Desviación de la ruta",
+  "estimatedTimeExceededTag": "Tiempo estimado superado",
+  "completionByArrivalTag": "Finalización por llegada",
+  "completionByCancellationTag": "Finalización por cancelación",
+  "filterFollowUpsTitle": "Filtrar seguimientos",
+  "filterByEvent": "Por sucesos:",
+  "filterByCompletionType": "Por tipo de finalización:",
+  "followUpsCount": "Seguimientos: {count}",
+  "@followUpsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "activeFollowUpOfUser": "Seguimiento activo de {username}",
+  "@activeFollowUpOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "inactiveFollowUpOfUser": "Seguimiento finalizado de {username}",
+  "@inactiveFollowUpOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "followUpActivationDate": "Fecha de inicio del seguimiento: {date}",
+  "@followUpActivationDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "followUpDetailHeader": "Seguimiento de {username}",
+  "@followUpDetailHeader": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "followUpDataSection": "DATOS DEL SEGUIMIENTO",
+  "followUpDataTitle": "Datos del seguimiento",
+  "followUpGeneratorUser": "Usuario generador del seguimiento",
+  "followUpDescription": "Descripción",
+  "followUpEstimatedTime": "Tiempo estimado para la llegada",
+  "followUpElapsedTime": "Tiempo transcurrido",
+  "followUpCompletionSection": "Datos finalización",
+  "followUpCompletionCause": "Causa finalización del modo",
+  "followUpCompletionReason": "Motivo",
+  "followUpLocationSection": "ÚLTIMA UBICACIÓN DETECTADA Y DESTINO",
+  "followUpLastUpdate": "Última actualización: {datetime}",
+  "@followUpLastUpdate": {
+    "placeholders": {
+      "datetime": {
+        "type": "String"
+      }
+    }
+  },
+  "accessDetailedFollowUpSection": "Acceder al seguimiento detallado",
+  "accessDetailedFollowUpButton": "Acceder al seguimiento",
+  "followUpCurrentLocationLabel": "Ubicación actual",
+  "followUpLastLocationLabel": "Última ubicación",
+  "followUpOriginLabel": "Origen",
+  "followUpDestinationLabel": "Destino"
 }

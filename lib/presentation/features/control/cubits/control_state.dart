@@ -12,5 +12,10 @@ abstract class ControlState with _$ControlState {
     AppFailure? alertsFailure,
     @Default({}) Map<String, String> alertDisplayNames,
     @Default({}) Map<String, String> alertProfilePhotos,
+    @Default(false) bool isLoadingFollowUps,
+    @Default([]) List<GuardianSession> followUps,
+    AppFailure? followUpsFailure,
+    @Default({}) Map<String, String> followUpDisplayNames,
+    @Default({}) Map<String, String> followUpProfilePhotos,
   }) = _ControlState;
 }

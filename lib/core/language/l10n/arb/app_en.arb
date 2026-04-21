@@ -131,6 +131,9 @@
   "guardianMode": "Guardian mode",
   "sensors": "Sensors",
   "panicButtonInfoContent": "This feature sends immediate alerts to your trusted contacts with your current location. Use it only in emergency situations.",
+  "guardianModeInfoContent": "Activate this feature when you want increased safety during a journey.\n\nThe app monitors your route and estimated time. If there are deviations or delays, your trusted contacts will receive an automatic alert.",
+  "guardianModeNoContactsContent": "Guardian mode requires at least one trusted contact to share your route with. Go to the contacts section to add one.",
+  "guardianModePermissionDeniedContent": "SafeBeacon needs access to your location to monitor your route in guardian mode. Tap the button to go to settings and grant permission.",
   "addPanicButtonToDevice": "Add panic button to device",
   "panicButtonStatusStandby": "Standby",
   "panicButtonStatusActive": "Active",
@@ -153,6 +156,7 @@
   "customization": "Customization",
   "featuresSettings": "Features settings",
   "featuresSettingsDescription": "Enable and disable the panic button or access customization settings.",
+  "guardianModeSettingsDescription": "Enable and disable guardian mode or access customization settings.",
   "deactivationPin": "Deactivation PIN",
   "deactivationPinDescription": "Add a PIN to deactivate the panic button and increase security.",
   "notAvailableYet": "Not available yet",
@@ -274,5 +278,133 @@
   "widgetSosLabel": "SOS",
   "widgetActivateLabel": "Activate panic button",
   "widgetActiveTitle": "ALERT ACTIVE",
-  "widgetOpenApp": "Open SafeBeacon"
+  "widgetOpenApp": "Open SafeBeacon",
+  "guardianModeRouteSection": "ROUTE / DESTINATION",
+  "guardianModeEstimatedTimeSection": "ESTIMATED TIME",
+  "guardianModeDescriptionSection": "DESCRIPTION",
+  "guardianModeEstimatedTimeHint": "Estimated time",
+  "guardianModeDescriptionHint": "Route description",
+  "guardianModeActivate": "Activate guardian mode",
+  "guardianModeConfirmArrival": "Confirm arrival",
+  "guardianModeCancel": "Cancel guardian mode",
+  "guardianModeSetDestination": "Tap the map to set the destination",
+  "durationDays": "days",
+  "durationHours": "hours",
+  "durationMinutes": "min",
+  "guardianModeActivated": "Guardian Mode Activated",
+  "guardianModeActivatedDescription": "Your route and estimated time are being monitored. If you deviate from the route or exceed the estimated duration, your trusted contacts will be notified automatically.",
+  "guardianModeArrivalDescription": "If you have arrived, you can add an optional justification and end Guardian Mode.",
+  "guardianModeCancelDescription": "If you decide to cancel, you can add a brief justification before ending Guardian Mode.",
+  "guardianModeJustification": "Justification",
+  "guardianModeStatusActive": "Guardian Mode Active",
+  "guardianModeStatusInactive": "Guardian Mode Inactive",
+  "guardianModeAlertActiveBanner": "Alert generated: {cause}",
+  "@guardianModeAlertActiveBanner": {
+    "placeholders": {
+      "cause": {
+        "type": "String"
+      }
+    }
+  },
+  "guardianModeAlertBannerContacts": "Your trusted contacts have been notified",
+  "guardianModeAlertCauseBoth": "route deviation and estimated time exceeded",
+  "notificationGuardianBody": "Your protected person {username} has triggered a guardian mode alert.",
+  "@notificationGuardianBody": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "guardianModeMissingDataTitle": "Missing data",
+  "guardianModeMissingDataContent": "Before activating Guardian Mode, add a destination or an estimated duration to monitor your journey.",
+  "guardianModeEstimatedTimeDialogTitle": "Estimated time",
+  "guardianModeEstimatedTimeDialogContent": "You haven't provided an estimated time for this journey. We've automatically calculated one based on your defined route.",
+  "guardianModeEstimatedTimeLabel": "Estimated time:",
+  "guardianModeAlreadyActiveTitle": "You already have an active guardian mode",
+  "guardianModeAlreadyActiveContent": "You can only have one active guardian mode at a time. Finish the current one before starting a new one.",
+  "guardianModeActivateErrorTitle": "Error activating guardian mode",
+  "guardianModeActivateErrorContent": "Guardian mode could not be activated. Please check your connection and try again.",
+  "guardianModeCompleteErrorTitle": "Error completing guardian mode",
+  "guardianModeCompleteErrorContent": "Guardian mode could not be completed. Please check your connection and try again.",
+  "guardianModeCompleteSuccessTitle": "Guardian mode ended",
+  "guardianModeCompleteSuccessContent": "Guardian mode has ended successfully, your journey is no longer being monitored. You can start a new one anytime on the same screen.",
+  "followUpGuardianModeOf": "Guardian mode follow-up of:",
+  "noFollowUpsTitle": "No follow-ups yet",
+  "noFollowUpsDescription": "When a guardian mode follow-up from one of your protected people starts, it will appear here for you to monitor.",
+  "activeFollowUp": "Active follow-up",
+  "finishedFollowUp": "Finished follow-up",
+  "activeFollowUps": "Active follow-up",
+  "finishedFollowUps": "Finished follow-up",
+  "routeDeviationTag": "Route deviation",
+  "estimatedTimeExceededTag": "Estimated time exceeded",
+  "completionByArrivalTag": "Completed on arrival",
+  "completionByCancellationTag": "Completed by cancellation",
+  "filterFollowUpsTitle": "Filter follow-ups",
+  "filterByEvent": "By events:",
+  "filterByCompletionType": "By completion type:",
+  "followUpsCount": "Follow-ups: {count}",
+  "@followUpsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "activeFollowUpOfUser": "Active follow-up of {username}",
+  "@activeFollowUpOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "inactiveFollowUpOfUser": "Finished follow-up of {username}",
+  "@inactiveFollowUpOfUser": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "followUpActivationDate": "Follow-up started: {date}",
+  "@followUpActivationDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "followUpDetailHeader": "Follow-up of {username}",
+  "@followUpDetailHeader": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "followUpDataSection": "FOLLOW-UP DATA",
+  "followUpDataTitle": "Follow-up data",
+  "followUpGeneratorUser": "Follow-up generating user",
+  "followUpDescription": "Description",
+  "followUpEstimatedTime": "Estimated time to arrival",
+  "followUpElapsedTime": "Elapsed time",
+  "followUpCompletionSection": "Completion data",
+  "followUpCompletionCause": "Mode completion cause",
+  "followUpCompletionReason": "Reason",
+  "followUpLocationSection": "LAST DETECTED LOCATION AND DESTINATION",
+  "followUpLastUpdate": "Last update: {datetime}",
+  "@followUpLastUpdate": {
+    "placeholders": {
+      "datetime": {
+        "type": "String"
+      }
+    }
+  },
+  "accessDetailedFollowUpSection": "Access detailed follow-up",
+  "accessDetailedFollowUpButton": "Access follow-up",
+  "followUpCurrentLocationLabel": "Current location",
+  "followUpLastLocationLabel": "Last location",
+  "followUpOriginLabel": "Origin",
+  "followUpDestinationLabel": "Destination"
 }

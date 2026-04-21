@@ -3,6 +3,7 @@ import 'package:safe_beacon/app/monitoring/logging.dart';
 import 'package:safe_beacon/data/sources/firebase/alerts/alert_api.dart';
 import 'package:safe_beacon/data/sources/firebase/contacts/contact_api.dart';
 import 'package:safe_beacon/data/sources/firebase/contacts/dto/contact_dto.dart';
+import 'package:safe_beacon/data/sources/firebase/guardian_mode/guardian_session_api.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/domain/common/result.dart';
 import 'package:safe_beacon/domain/contacts/contact_repository.dart';
@@ -10,12 +11,17 @@ import 'package:safe_beacon/domain/contacts/entities/contact.dart';
 
 /// Repository for managing [Contact] entities in Firestore.
 class ContactRepositoryImpl implements ContactRepository {
-  ContactRepositoryImpl({required ContactApi api, required AlertApi alertApi})
-    : _api = api,
-      _alertApi = alertApi;
+  ContactRepositoryImpl({
+    required ContactApi api,
+    required AlertApi alertApi,
+    required GuardianSessionApi guardianSessionApi,
+  }) : _api = api,
+       _alertApi = alertApi,
+       _guardianSessionApi = guardianSessionApi;
 
   final ContactApi _api;
   final AlertApi _alertApi;
+  final GuardianSessionApi _guardianSessionApi;
 
   /// Creates a contact relationship between [protectedPersonUid] and [trustedContactUid].
   @override
@@ -123,6 +129,16 @@ class ContactRepositoryImpl implements ContactRepository {
       appLogger.fine(
         'Cascade complete: removed ${contact.dto.trustedContactUid} '
         'from alerts of ${contact.dto.protectedPersonUid}',
+      );
+
+      // Cascade: remove the trusted contact from all guardian sessions of the protected person.
+      await _guardianSessionApi.removeContactFromSessions(
+        ownerUid: contact.dto.protectedPersonUid,
+        trustedContactUid: contact.dto.trustedContactUid,
+      );
+      appLogger.fine(
+        'Cascade complete: removed ${contact.dto.trustedContactUid} '
+        'from guardian sessions of ${contact.dto.protectedPersonUid}',
       );
 
       return const Result.success(null);

@@ -71,7 +71,10 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
       return;
     }
 
-    final alertResult = await _alertRepository.getActiveAlert(_uid);
+    final alertResult = await _alertRepository.getActiveAlert(
+      _uid,
+      alertType: AlertType.panic,
+    );
 
     if (alertResult is Failure<Alert?>) {
       emit(state.copyWith(isLoading: false, failure: alertResult.failure));
@@ -185,7 +188,10 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
     }
 
     // Fetch the newly created alert to get the embedded trustedContactUids and alertId.
-    final activeAlertResult = await _alertRepository.getActiveAlert(_uid);
+    final activeAlertResult = await _alertRepository.getActiveAlert(
+      _uid,
+      alertType: AlertType.panic,
+    );
     final trustedContactUids = activeAlertResult.when(
       success: (alert) => alert?.trustedContactUids ?? <String>[],
       failure: (_) => <String>[],
@@ -242,6 +248,7 @@ class PanicButtonCubit extends Cubit<PanicButtonCubitState> {
 
     final result = await _alertRepository.deactivateAlert(
       ownerUid: _uid,
+      alertType: AlertType.panic,
       cancellationReason: (reason?.trim().isNotEmpty == true) ? reason : null,
     );
 

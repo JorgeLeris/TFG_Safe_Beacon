@@ -6,6 +6,7 @@ import 'package:safe_beacon/presentation/features/chat/routes/chat_routes.dart';
 import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
 import 'package:safe_beacon/presentation/features/control/routes/control_routes.dart';
 import 'package:safe_beacon/presentation/features/dashboard/dashboard_shell.dart';
+import 'package:safe_beacon/presentation/features/guardian_mode/routes/guardian_mode_routes.dart';
 import 'package:safe_beacon/presentation/features/home/routes/home_routes.dart';
 import 'package:safe_beacon/presentation/features/panic_button/routes/panic_button_routes.dart';
 import 'package:safe_beacon/presentation/features/profile/routes/profile_routes.dart';
@@ -126,7 +127,9 @@ GoRouter buildAppRouter() {
       $trustedContactsRoute,
       $protectedPeopleRoute,
       $panicButtonRoute,
+      $guardianModeRoute,
       $alertDetailRoute,
+      $followUpDetailRoute,
       ...mockRoutes,
     ],
   );

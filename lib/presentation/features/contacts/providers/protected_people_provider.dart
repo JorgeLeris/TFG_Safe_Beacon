@@ -7,6 +7,7 @@ import 'package:safe_beacon/data/repositories/user_profile_repository_impl.dart'
 import 'package:safe_beacon/data/sources/firebase/alerts/alert_api.dart';
 import 'package:safe_beacon/data/sources/firebase/contacts/contact_api.dart';
 import 'package:safe_beacon/data/sources/firebase/contacts/contact_request_api.dart';
+import 'package:safe_beacon/data/sources/firebase/guardian_mode/guardian_session_api.dart';
 import 'package:safe_beacon/data/sources/firebase/profile/user_profile_api.dart';
 import 'package:safe_beacon/domain/contacts/contact_repository.dart';
 import 'package:safe_beacon/domain/contacts/contact_request_repository.dart';
@@ -31,8 +32,11 @@ class ProtectedPeopleProvider extends StatelessWidget {
           create: (_) => ContactRequestRepositoryImpl(api: ContactRequestApi()),
         ),
         RepositoryProvider<ContactRepository>(
-          create: (_) =>
-              ContactRepositoryImpl(api: ContactApi(), alertApi: AlertApi()),
+          create: (_) => ContactRepositoryImpl(
+            api: ContactApi(),
+            alertApi: AlertApi(),
+            guardianSessionApi: GuardianSessionApi(),
+          ),
         ),
       ],
       child: BlocProvider(

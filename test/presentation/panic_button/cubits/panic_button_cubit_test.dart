@@ -72,6 +72,7 @@ void main() {
 
   setUpAll(() {
     registerFallbackValue(AlertType.panic);
+    registerFallbackValue(AlertStatus.active);
 
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(geolocatorChannel, (
@@ -128,7 +129,10 @@ void main() {
       '[HAPPY PATH] - active alert',
       build: () {
         when(
-          () => alertRepository.getActiveAlert(_uid),
+          () => alertRepository.getActiveAlert(
+            _uid,
+            alertType: any(named: 'alertType'),
+          ),
         ).thenAnswer((_) async => Result<Alert?>.success(_dummyAlert));
         return cubit;
       },
@@ -153,7 +157,10 @@ void main() {
       '[HAPPY PATH] - no alert + has contacts',
       build: () {
         when(
-          () => alertRepository.getActiveAlert(_uid),
+          () => alertRepository.getActiveAlert(
+            _uid,
+            alertType: any(named: 'alertType'),
+          ),
         ).thenAnswer((_) async => const Result<Alert?>.success(null));
         when(
           () => contactRepository.getTrustedContacts(_uid),
@@ -175,7 +182,10 @@ void main() {
       '[EDGE] - no alert + no contacts',
       build: () {
         when(
-          () => alertRepository.getActiveAlert(_uid),
+          () => alertRepository.getActiveAlert(
+            _uid,
+            alertType: any(named: 'alertType'),
+          ),
         ).thenAnswer((_) async => const Result<Alert?>.success(null));
         when(
           () => contactRepository.getTrustedContacts(_uid),
@@ -199,7 +209,10 @@ void main() {
       '[ERROR PATH] - alert failure',
       build: () {
         when(
-          () => alertRepository.getActiveAlert(_uid),
+          () => alertRepository.getActiveAlert(
+            _uid,
+            alertType: any(named: 'alertType'),
+          ),
         ).thenAnswer((_) async => const Result.failure(_dummyFailure));
         return cubit;
       },
@@ -239,7 +252,10 @@ void main() {
         ).thenAnswer((_) async => const Result.success(null));
 
         when(
-          () => alertRepository.getActiveAlert(_uid),
+          () => alertRepository.getActiveAlert(
+            _uid,
+            alertType: any(named: 'alertType'),
+          ),
         ).thenAnswer((_) async => Result<Alert?>.success(_dummyAlert));
 
         when(
@@ -357,6 +373,7 @@ void main() {
         when(
           () => alertRepository.deactivateAlert(
             ownerUid: any(named: 'ownerUid'),
+            alertType: any(named: 'alertType'),
             cancellationReason: any(named: 'cancellationReason'),
           ),
         ).thenAnswer((_) async => const Result.success(null));
@@ -380,6 +397,7 @@ void main() {
         when(
           () => alertRepository.deactivateAlert(
             ownerUid: any(named: 'ownerUid'),
+            alertType: any(named: 'alertType'),
             cancellationReason: any(named: 'cancellationReason'),
           ),
         ).thenAnswer((_) async => const Result.failure(_dummyFailure));
@@ -483,7 +501,10 @@ void main() {
       '[HAPPY PATH] - calls loadAlertState after settings',
       build: () {
         when(
-          () => alertRepository.getActiveAlert(_uid),
+          () => alertRepository.getActiveAlert(
+            _uid,
+            alertType: any(named: 'alertType'),
+          ),
         ).thenAnswer((_) async => Result<Alert?>.success(_dummyAlert));
         return cubit;
       },

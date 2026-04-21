@@ -4,10 +4,12 @@ import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/core/helpers/helpers.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/alerts/entities/alert.dart';
+import 'package:safe_beacon/domain/guardian_mode/entities/guardian_session.dart';
 import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
 import 'package:safe_beacon/presentation/features/control/cubits/control_cubit.dart';
 import 'package:safe_beacon/presentation/features/control/routes/control_routes.dart';
 import 'package:safe_beacon/presentation/features/control/widgets/alert_list_header.dart';
+import 'package:safe_beacon/presentation/features/control/widgets/follow_up_list_header.dart';
 import 'package:safe_beacon/presentation/features/profile/routes/profile_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
@@ -25,6 +27,12 @@ class _ControlScreenState extends State<ControlScreen> {
   // Current filters applied to the alerts list
   AlertFilters _alertFilters = const AlertFilters();
 
+  Key _followUpsSearchKey = UniqueKey();
+  String _followUpsQuery = '';
+
+  // Current filters applied to the follow-ups list
+  FollowUpFilters _followUpFilters = const FollowUpFilters();
+
   // ---------------------------------------------------------------------------
   // Lifecycle
   // ---------------------------------------------------------------------------
@@ -35,12 +43,15 @@ class _ControlScreenState extends State<ControlScreen> {
     final cubit = context.read<ControlCubit>();
     cubit.loadReceivedRequestsCount();
     cubit.loadAlerts();
+    cubit.loadFollowUps();
   }
 
   void _onTabChanged(int index) {
     setState(() {
       _alertsSearchKey = UniqueKey();
       _alertsQuery = '';
+      _followUpsSearchKey = UniqueKey();
+      _followUpsQuery = '';
     });
     FocusManager.instance.primaryFocus?.unfocus();
   }
@@ -198,6 +209,179 @@ class _ControlScreenState extends State<ControlScreen> {
   }
 
   // ---------------------------------------------------------------------------
+  // Tab — Follow-ups
+  // ---------------------------------------------------------------------------
+
+  List<FollowUpItem> _applyFollowUpFilters(List<FollowUpItem> followUps) {
+    return followUps.where((f) {
+      final passesStatus = switch (_followUpFilters.status) {
+        FollowUpStatusFilter.all => true,
+        FollowUpStatusFilter.active => f.isActive,
+        FollowUpStatusFilter.finished => !f.isActive,
+      };
+
+      final passesEvent = switch (_followUpFilters.event) {
+        FollowUpEventFilter.all => true,
+        FollowUpEventFilter.routeDeviation => f.secondaryTags.contains(
+          FollowUpSecondaryTag.routeDeviation,
+        ),
+        FollowUpEventFilter.estimatedTimeExceeded => f.secondaryTags.contains(
+          FollowUpSecondaryTag.estimatedTimeExceeded,
+        ),
+      };
+
+      final passesCompletion = switch (_followUpFilters.completion) {
+        FollowUpCompletionFilter.all => true,
+        FollowUpCompletionFilter.completionByArrival =>
+          f.secondaryTags.contains(FollowUpSecondaryTag.completionByArrival),
+        FollowUpCompletionFilter.completionByCancellation =>
+          f.secondaryTags.contains(
+            FollowUpSecondaryTag.completionByCancellation,
+          ),
+      };
+
+      return passesStatus && passesEvent && passesCompletion;
+    }).toList();
+  }
+
+  Future<void> _applyFollowUpFiltersWithLoading(FollowUpFilters filters) async {
+    setState(() => _followUpFilters = filters);
+  }
+
+  void _openFollowUpFilterDialog() {
+    FollowUpFilterDialog.show(
+      context: context,
+      initialFilters: _followUpFilters,
+      onApply: _applyFollowUpFiltersWithLoading,
+    );
+  }
+
+  FollowUpSecondaryTag _mapSecondaryStatus(
+    GuardianSessionSecondaryStatus status,
+  ) {
+    return switch (status) {
+      GuardianSessionSecondaryStatus.routeDeviation =>
+        FollowUpSecondaryTag.routeDeviation,
+      GuardianSessionSecondaryStatus.estimatedTimeExceeded =>
+        FollowUpSecondaryTag.estimatedTimeExceeded,
+      GuardianSessionSecondaryStatus.completedByArrival =>
+        FollowUpSecondaryTag.completionByArrival,
+      GuardianSessionSecondaryStatus.completedByCancellation =>
+        FollowUpSecondaryTag.completionByCancellation,
+    };
+  }
+
+  Widget _buildFollowUpsList(
+    BuildContext context,
+    AppLocalizations l10n,
+    ControlState state,
+  ) {
+    if (state.isLoadingFollowUps) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state.followUpsFailure != null) {
+      return EmptyStateView(
+        type: EmptyStateType.error,
+        title: l10n.errorTitle,
+        description: l10n.errorDescription,
+      );
+    }
+
+    if (state.followUps.isEmpty) {
+      return EmptyStateView(
+        type: EmptyStateType.empty,
+        title: l10n.noFollowUpsTitle,
+        description: l10n.noFollowUpsDescription,
+      );
+    }
+
+    final followUpItems = state.followUps.map((session) {
+      return FollowUpItem(
+        sessionId: session.id,
+        uid: session.ownerUid,
+        username:
+            state.followUpDisplayNames[session.ownerUid] ?? session.ownerUid,
+        profilePhoto: state.followUpProfilePhotos[session.ownerUid],
+        isActive: session.status == GuardianSessionStatus.active,
+        secondaryTags: session.secondaryStatuses
+            .map(_mapSecondaryStatus)
+            .toList(),
+        dateTime: session.activatedAt,
+      );
+    }).toList();
+
+    final afterFilters = _applyFollowUpFilters(followUpItems);
+    final filtered = _followUpsQuery.isEmpty
+        ? afterFilters
+        : afterFilters
+              .where(
+                (f) => f.username.toLowerCase().contains(
+                  _followUpsQuery.toLowerCase(),
+                ),
+              )
+              .toList();
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      child: Column(
+        children: [
+          // Counter + filter button
+          FollowUpsListHeader(
+            followUpCount: afterFilters.length,
+            activeFilterCount: _followUpFilters.activeCount,
+            onFilterTap: _openFollowUpFilterDialog,
+          ),
+
+          const SizedBox(height: 12),
+
+          // Search field
+          SearchInputField(
+            key: _followUpsSearchKey,
+            hint: l10n.searchContact,
+            onChanged: (q) => setState(() => _followUpsQuery = q),
+          ),
+
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4),
+            child: Divider(height: 30),
+          ),
+
+          if (state.followUps.isEmpty)
+            EmptyStateView(
+              type: EmptyStateType.empty,
+              title: l10n.noFollowUpsTitle,
+              description: l10n.noFollowUpsDescription,
+            )
+          else if (filtered.isEmpty)
+            EmptyStateView(
+              type: EmptyStateType.noResults,
+              title: l10n.noResultsTitle,
+              description: l10n.noResultsDescription,
+            )
+          else
+            ...filtered.map((followUp) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 10),
+                child: FollowUpListItem(
+                  followUp: followUp,
+                  onTap: () {
+                    FollowUpDetailRoute(
+                      sessionId: followUp.sessionId,
+                    ).push(context);
+                  },
+                  onProfileTap: () {
+                    OtherProfileRoute(uid: followUp.uid).push(context);
+                  },
+                ),
+              );
+            }),
+        ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
   // Build
   // ---------------------------------------------------------------------------
 
@@ -222,6 +406,7 @@ class _ControlScreenState extends State<ControlScreen> {
                     await Future.wait([
                       context.read<ControlCubit>().loadReceivedRequestsCount(),
                       context.read<ControlCubit>().loadAlerts(),
+                      context.read<ControlCubit>().loadFollowUps(),
                     ]);
                   },
                 ),
@@ -268,7 +453,7 @@ class _ControlScreenState extends State<ControlScreen> {
                     onTabChanged: _onTabChanged,
                     children: [
                       _buildAlertsList(context, l10n, state),
-                      const Placeholder(),
+                      _buildFollowUpsList(context, l10n, state),
                       const Placeholder(),
                     ],
                   ),
