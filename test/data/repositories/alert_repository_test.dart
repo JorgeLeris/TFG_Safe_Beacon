@@ -580,4 +580,122 @@ void main() {
       },
     );
   });
+
+  // ---------------------------------------------------------------------------
+  // deactivateAlertByGuardianSession
+  // ---------------------------------------------------------------------------
+
+  const dummyGuardianSessionId = 'session-xyz';
+
+  group('AlertRepositoryImpl.deactivateAlertByGuardianSession', () {
+    test(
+      '[HAPPY PATH] - GIVEN an active alert linked to a guardian session, '
+      'WHEN deactivateAlertByGuardianSession is called, '
+      'THEN should call api.deactivateAlertByGuardianSession once and return Result.success',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.deactivateAlertByGuardianSession(
+            guardianSessionId: dummyGuardianSessionId,
+            cancellationReason: any(named: 'cancellationReason'),
+          ),
+        ).thenAnswer((_) async {});
+
+        // Act.
+        final result = await repository.deactivateAlertByGuardianSession(
+          guardianSessionId: dummyGuardianSessionId,
+        );
+
+        // Assert.
+        expect(result.isSuccess, isTrue);
+        verify(
+          () => mockApi.deactivateAlertByGuardianSession(
+            guardianSessionId: dummyGuardianSessionId,
+            cancellationReason: any(named: 'cancellationReason'),
+          ),
+        ).called(1);
+      },
+    );
+
+    test(
+      '[ERROR PATH] - GIVEN no active alert is linked to the guardian session, '
+      'WHEN deactivateAlertByGuardianSession is called, '
+      'THEN should return Result.failure with AppFailure.notFound()',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.deactivateAlertByGuardianSession(
+            guardianSessionId: any(named: 'guardianSessionId'),
+            cancellationReason: any(named: 'cancellationReason'),
+          ),
+        ).thenThrow(Exception('no_active_alert'));
+
+        // Act.
+        final result = await repository.deactivateAlertByGuardianSession(
+          guardianSessionId: dummyGuardianSessionId,
+        );
+
+        // Assert.
+        expect(result.isFailure, isTrue);
+        expect(
+          result,
+          equals(const Result<void>.failure(AppFailure.notFound('alert'))),
+        );
+      },
+    );
+
+    test(
+      '[ERROR PATH] - GIVEN a permission-denied FirebaseException, '
+      'WHEN deactivateAlertByGuardianSession is called, '
+      'THEN should return Result.failure with AppFailure.forbidden()',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.deactivateAlertByGuardianSession(
+            guardianSessionId: any(named: 'guardianSessionId'),
+            cancellationReason: any(named: 'cancellationReason'),
+          ),
+        ).thenThrow(_firebaseException('permission-denied'));
+
+        // Act.
+        final result = await repository.deactivateAlertByGuardianSession(
+          guardianSessionId: dummyGuardianSessionId,
+        );
+
+        // Assert.
+        expect(result.isFailure, isTrue);
+        expect(
+          result,
+          equals(const Result<void>.failure(AppFailure.forbidden())),
+        );
+      },
+    );
+
+    test(
+      '[ERROR PATH] - GIVEN an unavailable FirebaseException, '
+      'WHEN deactivateAlertByGuardianSession is called, '
+      'THEN should return Result.failure with AppFailure.network()',
+      () async {
+        // Arrange.
+        when(
+          () => mockApi.deactivateAlertByGuardianSession(
+            guardianSessionId: any(named: 'guardianSessionId'),
+            cancellationReason: any(named: 'cancellationReason'),
+          ),
+        ).thenThrow(_firebaseException('unavailable'));
+
+        // Act.
+        final result = await repository.deactivateAlertByGuardianSession(
+          guardianSessionId: dummyGuardianSessionId,
+        );
+
+        // Assert.
+        expect(result.isFailure, isTrue);
+        expect(
+          result,
+          equals(const Result<void>.failure(AppFailure.network())),
+        );
+      },
+    );
+  });
 }

@@ -19,6 +19,7 @@ abstract class Alert with _$Alert {
     required AlertStatus status,
     required List<String> trustedContactUids,
     String? cancellationReason,
+    String? guardianSessionId,
     required DateTime activatedAt,
     DateTime? deactivatedAt,
   }) = _Alert;

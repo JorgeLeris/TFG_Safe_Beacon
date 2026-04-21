@@ -10,6 +10,7 @@ lcov --remove coverage/lcov.info \
   'lib/domain/*' \
   'lib/notification_service.dart' \
   'lib/presentation/features/panic_button/widget/*' \
+  'lib/presentation/features/guardian_mode/services/*' \
   'lib/presentation/shared/widgets/*' \
   -o coverage/lcov.info
 genhtml coverage/lcov.info --output=coverage

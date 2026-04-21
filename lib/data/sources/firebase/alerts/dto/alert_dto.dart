@@ -11,6 +11,7 @@ class AlertDto {
     required this.status,
     required this.trustedContactUids,
     this.cancellationReason,
+    this.guardianSessionId,
     required this.activatedAt,
     this.deactivatedAt,
   });
@@ -32,6 +33,10 @@ class AlertDto {
   final List<String> trustedContactUids;
 
   final String? cancellationReason;
+
+  /// ID of the associated [GuardianSession].
+  final String? guardianSessionId;
+
   final DateTime activatedAt;
   final DateTime? deactivatedAt;
 
@@ -49,6 +54,7 @@ class AlertDto {
         data['trustedContactUids'] as List? ?? [],
       ),
       cancellationReason: data['cancellationReason'] as String?,
+      guardianSessionId: data['guardianSessionId'] as String?,
       activatedAt:
           (data['activatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       deactivatedAt: (data['deactivatedAt'] as Timestamp?)?.toDate(),
@@ -68,6 +74,7 @@ class AlertDto {
       'longitude': longitude,
       'batteryLevel': batteryLevel,
       'status': status,
+      if (guardianSessionId != null) 'guardianSessionId': guardianSessionId,
     };
   }
 }

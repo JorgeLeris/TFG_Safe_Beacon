@@ -8,6 +8,7 @@ class InputField extends StatefulWidget {
   final String? errorText;
   final ValueChanged<String>? onChanged;
   final String? initialValue;
+  final bool readOnly;
 
   const InputField({
     super.key,
@@ -17,6 +18,7 @@ class InputField extends StatefulWidget {
     this.errorText,
     this.onChanged,
     this.initialValue,
+    this.readOnly = false,
   });
 
   @override
@@ -34,7 +36,17 @@ class _InputFieldState extends State<InputField> {
     super.initState();
     _hasText = (widget.initialValue ?? '').isNotEmpty;
     _controller = TextEditingController(text: widget.initialValue);
+    _focusNode.canRequestFocus = !widget.readOnly;
     _focusNode.addListener(() => setState(() {}));
+  }
+
+  @override
+  void didUpdateWidget(covariant InputField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.readOnly != oldWidget.readOnly) {
+      _focusNode.canRequestFocus = !widget.readOnly;
+      if (widget.readOnly && _focusNode.hasFocus) _focusNode.unfocus();
+    }
   }
 
   @override
@@ -44,7 +56,7 @@ class _InputFieldState extends State<InputField> {
     super.dispose();
   }
 
-  bool get _isActive => _focusNode.hasFocus || _hasText;
+  bool get _isActive => (!widget.readOnly && _focusNode.hasFocus) || _hasText;
 
   @override
   Widget build(BuildContext context) {
@@ -57,78 +69,86 @@ class _InputFieldState extends State<InputField> {
         Material(
           elevation: 4,
           borderRadius: BorderRadius.circular(14),
-          child: Stack(
-            children: [
-              TextField(
-                controller: _controller,
-                focusNode: _focusNode,
-                onChanged: (value) {
-                  setState(() => _hasText = value.isNotEmpty);
-                  widget.onChanged?.call(value);
-                },
-                obscureText: widget.isPassword && _obscureText,
-                maxLines: widget.isPassword ? 1 : widget.maxLines,
-                minLines: widget.isPassword ? 1 : widget.maxLines,
-                style: const TextStyle(color: Colors.black),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.fromLTRB(12, 24, 12, 8),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: hasError
-                        ? BorderSide(color: Colors.red.shade700, width: 1.25)
-                        : BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: hasError
-                        ? BorderSide(color: Colors.red.shade700, width: 1.25)
-                        : BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: hasError
-                        ? BorderSide(color: Colors.red.shade700, width: 1.25)
-                        : BorderSide(
-                            color: colorScheme.tertiary.withValues(alpha: 0.4),
-                          ),
-                  ),
-                  suffixIcon: widget.isPassword
-                      ? IconButton(
-                          icon: Icon(
-                            _obscureText
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility_outlined,
-                            color: Colors.black.withValues(alpha: 0.5),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscureText = !_obscureText;
-                            });
-                          },
-                        )
-                      : null,
-                ),
-              ),
-              AnimatedPositioned(
-                duration: const Duration(milliseconds: 180),
-                curve: Curves.easeInOut,
-                left: 15,
-                top: _isActive ? 6 : 16,
-                child: GestureDetector(
-                  onTap: () => FocusScope.of(context).requestFocus(_focusNode),
-                  child: AnimatedDefaultTextStyle(
-                    duration: const Duration(milliseconds: 180),
-                    style: TextStyle(
-                      fontSize: _isActive ? 11 : 16,
-                      color: Colors.black.withValues(alpha: 0.4),
+          child: AbsorbPointer(
+            absorbing: widget.readOnly,
+            child: Stack(
+              children: [
+                TextField(
+                  controller: _controller,
+                  focusNode: _focusNode,
+                  readOnly: widget.readOnly,
+                  onChanged: (value) {
+                    setState(() => _hasText = value.isNotEmpty);
+                    widget.onChanged?.call(value);
+                  },
+                  obscureText: widget.isPassword && _obscureText,
+                  maxLines: widget.isPassword ? 1 : widget.maxLines,
+                  minLines: widget.isPassword ? 1 : widget.maxLines,
+                  style: const TextStyle(color: Colors.black),
+                  decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.fromLTRB(12, 24, 12, 8),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: hasError
+                          ? BorderSide(color: Colors.red.shade700, width: 1.25)
+                          : BorderSide.none,
                     ),
-                    child: Text(widget.hint),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: hasError
+                          ? BorderSide(color: Colors.red.shade700, width: 1.25)
+                          : BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: hasError
+                          ? BorderSide(color: Colors.red.shade700, width: 1.25)
+                          : BorderSide(
+                              color: colorScheme.tertiary.withValues(
+                                alpha: 0.4,
+                              ),
+                            ),
+                    ),
+                    suffixIcon: widget.isPassword
+                        ? IconButton(
+                            icon: Icon(
+                              _obscureText
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                              color: Colors.black.withValues(alpha: 0.5),
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _obscureText = !_obscureText;
+                              });
+                            },
+                          )
+                        : null,
                   ),
                 ),
-              ),
-            ],
+                AnimatedPositioned(
+                  duration: const Duration(milliseconds: 180),
+                  curve: Curves.easeInOut,
+                  left: 15,
+                  top: _isActive ? 6 : 16,
+                  child: GestureDetector(
+                    onTap: widget.readOnly
+                        ? null
+                        : () => FocusScope.of(context).requestFocus(_focusNode),
+                    child: AnimatedDefaultTextStyle(
+                      duration: const Duration(milliseconds: 180),
+                      style: TextStyle(
+                        fontSize: _isActive ? 11 : 16,
+                        color: Colors.black.withValues(alpha: 0.4),
+                      ),
+                      child: Text(widget.hint),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
 

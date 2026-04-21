@@ -5,6 +5,8 @@ import 'package:safe_beacon/domain/alerts/entities/alert.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/domain/common/result.dart';
 import 'package:safe_beacon/domain/contacts/contact_request_repository.dart';
+import 'package:safe_beacon/domain/guardian_mode/entities/guardian_session.dart';
+import 'package:safe_beacon/domain/guardian_mode/guardian_session_repository.dart';
 import 'package:safe_beacon/domain/profile/user_profile_repository.dart';
 
 part 'control_state.dart';
@@ -16,16 +18,19 @@ class ControlCubit extends Cubit<ControlState> {
     required ContactRequestRepository contactRequestRepository,
     required AlertRepository alertRepository,
     required UserProfileRepository userProfileRepository,
+    required GuardianSessionRepository guardianSessionRepository,
   }) : _uid = uid,
        _contactRequestRepository = contactRequestRepository,
        _alertRepository = alertRepository,
        _userProfileRepository = userProfileRepository,
+       _guardianSessionRepository = guardianSessionRepository,
        super(const ControlState());
 
   final String _uid;
   final ContactRequestRepository _contactRequestRepository;
   final AlertRepository _alertRepository;
   final UserProfileRepository _userProfileRepository;
+  final GuardianSessionRepository _guardianSessionRepository;
 
   /// Simulates a short loading state while applying alert filters.
   Future<void> applyFiltersWithLoading() async {
@@ -48,6 +53,50 @@ class ControlCubit extends Cubit<ControlState> {
       ),
       failure: (failure) =>
           emit(state.copyWith(isLoadingCount: false, countFailure: failure)),
+    );
+  }
+
+  /// Loads guardian mode sessions where the current user is a trusted contact.
+  Future<void> loadFollowUps() async {
+    emit(state.copyWith(isLoadingFollowUps: true, followUpsFailure: null));
+
+    final result = await _guardianSessionRepository.getContactsSessions(_uid);
+
+    await result.when(
+      success: (sessions) async {
+        final displayNames = <String, String>{};
+        final profilePhotos = <String, String>{};
+        final uniqueUids = sessions.map((s) => s.ownerUid).toSet();
+
+        await Future.wait(
+          uniqueUids.map((uid) async {
+            final profileResult = await _userProfileRepository.getProfile(uid);
+            profileResult.when(
+              success: (profile) {
+                final name = profile.name;
+                final surname = profile.surname ?? '';
+                displayNames[uid] = '$name $surname'.trim();
+                if (profile.profilePhoto != null) {
+                  profilePhotos[uid] = profile.profilePhoto!;
+                }
+              },
+              failure: (_) {},
+            );
+          }),
+        );
+
+        emit(
+          state.copyWith(
+            isLoadingFollowUps: false,
+            followUps: sessions,
+            followUpDisplayNames: displayNames,
+            followUpProfilePhotos: profilePhotos,
+          ),
+        );
+      },
+      failure: (failure) async => emit(
+        state.copyWith(isLoadingFollowUps: false, followUpsFailure: failure),
+      ),
     );
   }
 

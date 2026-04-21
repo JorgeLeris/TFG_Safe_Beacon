@@ -9,7 +9,7 @@ import 'package:safe_beacon/presentation/features/panic_button/cubits/panic_butt
 import 'package:safe_beacon/presentation/features/panic_button/widget/panic_widget_service.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
-// TODO: manage disable case in feature configuration (also in home screen)
+// TODO: manage disable case in feature configuration (also in home screen) - add to state other disabled cases
 
 class PanicButtonScreen extends StatefulWidget {
   const PanicButtonScreen({super.key});
@@ -458,7 +458,7 @@ class _PanicButtonCard extends StatelessWidget {
       case PanicButtonState.active:
         return Colors.green;
       case PanicButtonState.disabled:
-        return Colors.orange;
+        return Colors.grey;
     }
   }
 

@@ -29,6 +29,12 @@ class AlertMapState extends State<AlertMap> {
   final MapController _mapController = MapController();
 
   @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final point = LatLng(widget.alert.latitude, widget.alert.longitude);
 
@@ -100,14 +106,23 @@ class AlertMapState extends State<AlertMap> {
                         elevation: 2,
                         child: InkWell(
                           borderRadius: BorderRadius.circular(8),
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute<void>(
-                              builder: (_) => _FullscreenMapPage(
-                                point: point,
-                                colorScheme: widget.colorScheme,
-                              ),
-                            ),
-                          ),
+                          onTap: () async {
+                            final result = await Navigator.of(context)
+                                .push<(LatLng, double)>(
+                                  MaterialPageRoute<(LatLng, double)>(
+                                    builder: (_) => _FullscreenMapPage(
+                                      point: point,
+                                      colorScheme: widget.colorScheme,
+                                      initialCenter:
+                                          _mapController.camera.center,
+                                      initialZoom: _mapController.camera.zoom,
+                                    ),
+                                  ),
+                                );
+                            if (result != null) {
+                              _mapController.move(result.$1, result.$2);
+                            }
+                          },
                           child: Padding(
                             padding: const EdgeInsets.all(8),
                             child: Icon(
@@ -181,8 +196,15 @@ class AlertMapState extends State<AlertMap> {
 class _FullscreenMapPage extends StatefulWidget {
   final LatLng point;
   final ColorScheme colorScheme;
+  final LatLng initialCenter;
+  final double initialZoom;
 
-  const _FullscreenMapPage({required this.point, required this.colorScheme});
+  const _FullscreenMapPage({
+    required this.point,
+    required this.colorScheme,
+    required this.initialCenter,
+    required this.initialZoom,
+  });
 
   @override
   State<_FullscreenMapPage> createState() => _FullscreenMapPageState();
@@ -192,6 +214,12 @@ class _FullscreenMapPageState extends State<_FullscreenMapPage> {
   final MapController _mapController = MapController();
 
   @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
@@ -199,8 +227,8 @@ class _FullscreenMapPageState extends State<_FullscreenMapPage> {
           FlutterMap(
             mapController: _mapController,
             options: MapOptions(
-              initialCenter: widget.point,
-              initialZoom: 15,
+              initialCenter: widget.initialCenter,
+              initialZoom: widget.initialZoom,
               minZoom: 4,
               maxZoom: 19,
               interactionOptions: const InteractionOptions(
@@ -246,7 +274,10 @@ class _FullscreenMapPageState extends State<_FullscreenMapPage> {
               elevation: 2,
               child: InkWell(
                 borderRadius: BorderRadius.circular(8),
-                onTap: () => Navigator.of(context).pop(),
+                onTap: () => Navigator.of(context).pop((
+                  _mapController.camera.center,
+                  _mapController.camera.zoom,
+                )),
                 child: Padding(
                   padding: const EdgeInsets.all(8),
                   child: Icon(
