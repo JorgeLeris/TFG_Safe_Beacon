@@ -3,7 +3,7 @@
   "appTitle": "safe_beacon",
   "tabHome": "Inicio",
   "tabControl": "Panel",
-  "tabChat": "Chat",
+  "tabChat": "Chats",
   "tabSettings": "Ajustes",
   "tabProfile": "Perfil",
   "appName": "SafeBeacon",
@@ -406,5 +406,9 @@
   "followUpCurrentLocationLabel": "Ubicación actual",
   "followUpLastLocationLabel": "Última ubicación",
   "followUpOriginLabel": "Origen",
-  "followUpDestinationLabel": "Destino"
+  "followUpDestinationLabel": "Destino",
+  "noChatsTitle": "Aún no hay chats",
+  "noChatsDescription": "Todavía no tienes ninguna conversación. Puedes iniciar un chat desde el perfil de un contacto o desde los detalles de una alerta o seguimiento de tus personas protegidas.",
+  "searchChat": "Buscar chat",
+  "youPrefix": "Tú"
 }
