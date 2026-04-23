@@ -419,5 +419,6 @@
       }
     }
   },
-  "typeMessageHint": "Type a message"
+  "typeMessageHint": "Type a message",
+  "noMessagesYet": "No messages yet."
 }

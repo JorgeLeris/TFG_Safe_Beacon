@@ -68,5 +68,5 @@ class OtherProfileRoute extends GoRouteData with $OtherProfileRoute {
 
   @override
   Widget build(BuildContext context, GoRouterState state) =>
-      OtherProfileProvider(uid: uid, child: const OtherProfileScreen());
+      OtherProfileProvider(uid: uid, child: OtherProfileScreen(uid: uid));
 }

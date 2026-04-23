@@ -33,6 +33,7 @@ class AlertDetailCubit extends Cubit<AlertDetailState> {
       success: (alert) async {
         // Resolve owner profile for display name.
         String displayName = alert.ownerUsername;
+        String? displayProfilePhoto;
 
         final profileResult = await _userProfileRepository.getProfile(
           alert.ownerUid,
@@ -42,6 +43,7 @@ class AlertDetailCubit extends Cubit<AlertDetailState> {
             final name = profile.name;
             final surname = profile.surname ?? '';
             displayName = '$name $surname'.trim();
+            displayProfilePhoto = profile.profilePhoto;
           },
           failure: (_) {},
         );
@@ -51,6 +53,7 @@ class AlertDetailCubit extends Cubit<AlertDetailState> {
             isLoading: false,
             alert: alert,
             displayName: displayName,
+            displayProfilePhoto: displayProfilePhoto,
           ),
         );
       },

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:safe_beacon/presentation/features/chat/providers/chat_list_provider.dart';
+import 'package:safe_beacon/presentation/features/chat/providers/conversation_provider.dart';
 import 'package:safe_beacon/presentation/features/chat/screens/chat_screen.dart';
 import 'package:safe_beacon/presentation/features/chat/screens/conversation_screen.dart';
 
@@ -14,7 +16,8 @@ class ChatRoute extends GoRouteData with $ChatRoute {
   const ChatRoute();
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => const ChatScreen();
+  Widget build(BuildContext context, GoRouterState state) =>
+      const ChatListProvider(child: ChatScreen());
 }
 
 @TypedGoRoute<ConversationRoute>(
@@ -32,9 +35,13 @@ class ConversationRoute extends GoRouteData with $ConversationRoute {
   final String? profilePhoto;
 
   @override
-  Widget build(BuildContext context, GoRouterState state) => ConversationScreen(
+  Widget build(BuildContext context, GoRouterState state) =>
+      ConversationProvider(
         chatId: chatId,
-        username: username,
-        profilePhoto: profilePhoto,
+        child: ConversationScreen(
+          chatId: chatId,
+          username: username,
+          profilePhoto: profilePhoto,
+        ),
       );
 }

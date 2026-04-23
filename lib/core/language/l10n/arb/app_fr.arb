@@ -419,5 +419,6 @@
       }
     }
   },
-  "typeMessageHint": "Tapez un message"
+  "typeMessageHint": "Tapez un message",
+  "noMessagesYet": "Pas encore de messages."
 }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/presentation/features/chat/cubits/chat_list_cubit.dart';
 import 'package:safe_beacon/presentation/features/chat/routes/chat_routes.dart';
+import 'package:safe_beacon/presentation/features/profile/routes/profile_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
-
-// TODO: this screen has to update automatically when a new chat is created or a new message is received.
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -17,47 +19,16 @@ class _ChatScreenState extends State<ChatScreen> {
   String _query = '';
 
   // ---------------------------------------------------------------------------
-  //  TODO:replace MOCKS with real Cubit state
-  // ---------------------------------------------------------------------------
-
-  static const bool _mockHasError = false;
-
-  static final List<ChatItem> _mockChats = [
-    const ChatItem(
-      chatId: '1',
-      username: 'Ana García',
-      lastMessage: '¿Todo bien por ahí?',
-      lastMessageIsFromMe: false,
-      unreadCount: 3,
-    ),
-    const ChatItem(
-      chatId: '2',
-      username: 'Carlos López',
-      lastMessage: 'Sí, ya llegué a casa.',
-      lastMessageIsFromMe: true,
-    ),
-    const ChatItem(
-      chatId: '3',
-      username: 'María Fernández',
-      lastMessage: 'Te aviso cuando salga.',
-      lastMessageIsFromMe: false,
-      unreadCount: 1,
-    ),
-    const ChatItem(
-      chatId: '4',
-      username: 'Pedro Martínez',
-      lastMessage: 'Gracias por el aviso.',
-      lastMessageIsFromMe: true,
-    ),
-  ];
-
-  // ---------------------------------------------------------------------------
   // Build helpers
   // ---------------------------------------------------------------------------
 
-  Widget _buildContent(BuildContext context, AppLocalizations l10n) {
+  Widget _buildContent(
+    BuildContext context,
+    AppLocalizations l10n,
+    ChatListState state,
+  ) {
     // Error state
-    if (_mockHasError) {
+    if (state.failure != null) {
       return Expanded(
         child: EmptyStateView(
           type: EmptyStateType.error,
@@ -67,8 +38,15 @@ class _ChatScreenState extends State<ChatScreen> {
       );
     }
 
+    // Loading
+    if (state.isLoading && state.chats.isEmpty) {
+      return const Expanded(
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     // No chats at all
-    if (_mockChats.isEmpty) {
+    if (state.chats.isEmpty) {
       return Expanded(
         child: EmptyStateView(
           type: EmptyStateType.empty,
@@ -79,18 +57,20 @@ class _ChatScreenState extends State<ChatScreen> {
     }
 
     // Apply search filter
+    final chats = state.chats;
     final filtered = _query.isEmpty
-        ? _mockChats
-        : _mockChats
+        ? chats
+        : chats
             .where(
-              (c) => c.username.toLowerCase().contains(_query.toLowerCase()),
+              (c) =>
+                  c.displayName.toLowerCase().contains(_query.toLowerCase()),
             )
             .toList();
 
     return Expanded(
       child: Column(
         children: [
-          // Ssearch field + divider
+          // Search field + divider
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 25, 16, 12),
             child: SearchInputField(
@@ -119,20 +99,28 @@ class _ChatScreenState extends State<ChatScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
                 itemCount: filtered.length,
                 itemBuilder: (context, index) {
-                  final chat = filtered[index];
+                  final entry = filtered[index];
+                  final chatItem = ChatItem(
+                    chatId: entry.chatId,
+                    username: entry.displayName.capitalized(),
+                    profilePhoto: entry.profilePhoto,
+                    lastMessage: entry.lastMessage,
+                    lastMessageIsFromMe: entry.lastMessageIsFromMe,
+                    unreadCount: entry.unreadCount,
+                  );
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 10),
                     child: ChatListItem(
-                      chat: chat,
+                      chat: chatItem,
                       youLabel: l10n.youPrefix,
                       onProfileTap: () {
-                        // TODO: navigate to contact profile
+                        OtherProfileRoute(uid: entry.otherUid).push(context);
                       },
                       onTap: () {
                         ConversationRoute(
-                          chatId: chat.chatId,
-                          username: chat.username,
-                          profilePhoto: chat.profilePhoto,
+                          chatId: entry.chatId,
+                          username: entry.displayName,
+                          profilePhoto: entry.profilePhoto,
                         ).push(context);
                       },
                     ),
@@ -160,12 +148,16 @@ class _ChatScreenState extends State<ChatScreen> {
       child: Scaffold(
         backgroundColor: colorScheme.surface,
         appBar: const CustomAppBar(),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SectionHeader(text: l10n.tabChat),
-            _buildContent(context, l10n),
-          ],
+        body: BlocBuilder<ChatListCubit, ChatListState>(
+          builder: (context, state) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SectionHeader(text: l10n.tabChat),
+                _buildContent(context, l10n, state),
+              ],
+            );
+          },
         ),
       ),
     );

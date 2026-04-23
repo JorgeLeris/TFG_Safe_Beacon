@@ -1,26 +1,14 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safe_beacon/core/assets/assets.dart';
 import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/domain/chat/entities/message.dart';
+import 'package:safe_beacon/presentation/features/chat/cubits/conversation_cubit.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
-
-// ---------------------------------------------------------------------------
-// TODO: replace MOCKS with real domain entity
-// ---------------------------------------------------------------------------
-
-class _ChatMessage {
-  final String id;
-  final String text;
-  final bool isFromMe;
-
-  const _ChatMessage({
-    required this.id,
-    required this.text,
-    required this.isFromMe,
-  });
-}
 
 // ---------------------------------------------------------------------------
 // Screen
@@ -46,17 +34,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  // TODO: replace mock messages with real Cubit state
-  final List<_ChatMessage> _mockMessages = [
-    const _ChatMessage(id: '1', text: 'Hola, ¿cómo estás?', isFromMe: false),
-    const _ChatMessage(id: '2', text: 'Bien, ¿y tú?', isFromMe: true),
-    const _ChatMessage(
-      id: '3',
-      text: '¿Todo bien por ahí?',
-      isFromMe: false,
-    ),
-    const _ChatMessage(id: '4', text: 'Sí, ya llegué a casa.', isFromMe: true),
-  ];
+  String get _currentUid => FirebaseAuth.instance.currentUser!.uid;
 
   @override
   void dispose() {
@@ -69,17 +47,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
 
-    setState(() {
-      _mockMessages.add(
-        _ChatMessage(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          text: text,
-          isFromMe: true,
-        ),
-      );
-      _controller.clear();
-    });
+    context.read<ConversationCubit>().sendMessage(text);
+    _controller.clear();
 
+    _scrollToBottom();
+  }
+
+  void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
@@ -110,11 +84,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   Widget _buildBubble(
     BuildContext context,
-    _ChatMessage message,
+    Message message,
     ColorScheme colorScheme,
     TextTheme textTheme,
   ) {
-    final isMe = message.isFromMe;
+    final isMe = message.senderUid == _currentUid;
 
     if (isMe) {
       return Align(
@@ -152,15 +126,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            GestureDetector(
-              onTap: () {
-                // TODO: navigate to contact profile
-              },
-              child: CircleAvatar(
-                radius: 16,
-                backgroundColor: colorScheme.surfaceContainerHighest,
-                backgroundImage: _resolveAvatar(),
-              ),
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: colorScheme.surfaceContainerHighest,
+              backgroundImage: _resolveAvatar(),
             ),
             const SizedBox(width: 8),
             ConstrainedBox(
@@ -296,16 +265,46 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
             // Messages list
             Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-                itemCount: _mockMessages.length,
-                itemBuilder: (context, index) => _buildBubble(
-                  context,
-                  _mockMessages[index],
-                  colorScheme,
-                  textTheme,
-                ),
+              child: BlocConsumer<ConversationCubit, ConversationState>(
+                listener: (context, state) {
+                  // Auto-scroll when new messages arrive.
+                  if (state.messages.isNotEmpty) {
+                    _scrollToBottom();
+                  }
+                },
+                builder: (context, state) {
+                  if (state.isLoading && state.messages.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  if (state.messages.isEmpty) {
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(32),
+                        child: Text(
+                          l10n.noMessagesYet,
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: colorScheme.onSurface
+                                .withValues(alpha: 0.5),
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  }
+
+                  return ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                    itemCount: state.messages.length,
+                    itemBuilder: (context, index) => _buildBubble(
+                      context,
+                      state.messages[index],
+                      colorScheme,
+                      textTheme,
+                    ),
+                  );
+                },
               ),
             ),
 

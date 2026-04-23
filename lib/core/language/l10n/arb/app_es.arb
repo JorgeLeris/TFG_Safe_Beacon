@@ -419,5 +419,6 @@
       }
     }
   },
-  "typeMessageHint": "Escribe un mensaje"
+  "typeMessageHint": "Escribe un mensaje",
+  "noMessagesYet": "Todavía no hay mensajes."
 }
