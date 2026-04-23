@@ -213,8 +213,8 @@ class ChatListItem extends StatelessWidget {
                 color: Colors.red,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.surface,
-                  width: 0.75,
+                  color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.75),
+                  width: 1.25,
                 ),
               ),
               constraints: const BoxConstraints(minWidth: 22, minHeight: 22),

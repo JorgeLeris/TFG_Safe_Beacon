@@ -126,10 +126,18 @@ class _ConversationScreenState extends State<ConversationScreen> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            CircleAvatar(
-              radius: 16,
-              backgroundColor: colorScheme.surfaceContainerHighest,
-              backgroundImage: _resolveAvatar(),
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                ),
+              ),
+              child: CircleAvatar(
+                radius: 16,
+                backgroundColor: colorScheme.surfaceContainerHighest,
+                backgroundImage: _resolveAvatar(),
+              ),
             ),
             const SizedBox(width: 8),
             ConstrainedBox(
