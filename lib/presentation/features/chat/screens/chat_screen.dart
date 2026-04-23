@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/presentation/features/chat/routes/chat_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 // TODO: this screen has to update automatically when a new chat is created or a new message is received.
@@ -128,7 +129,11 @@ class _ChatScreenState extends State<ChatScreen> {
                         // TODO: navigate to contact profile
                       },
                       onTap: () {
-                        // TODO: navigate to chat conversation
+                        ConversationRoute(
+                          chatId: chat.chatId,
+                          username: chat.username,
+                          profilePhoto: chat.profilePhoto,
+                        ).push(context);
                       },
                     ),
                   );

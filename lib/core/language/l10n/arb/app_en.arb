@@ -410,5 +410,14 @@
   "noChatsTitle": "No chats yet",
   "noChatsDescription": "You don't have any conversations yet. You can start a chat from a contact's profile or from the details of an alert or follow-up of your protected people.",
   "searchChat": "Search chat",
-  "youPrefix": "You"
+  "youPrefix": "You",
+  "chatWithHeader": "Chat with {username}",
+  "@chatWithHeader": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "typeMessageHint": "Type a message"
 }

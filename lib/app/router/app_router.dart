@@ -130,6 +130,7 @@ GoRouter buildAppRouter() {
       $guardianModeRoute,
       $alertDetailRoute,
       $followUpDetailRoute,
+      $conversationRoute,
       ...mockRoutes,
     ],
   );
