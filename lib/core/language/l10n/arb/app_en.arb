@@ -34,7 +34,7 @@
   "logout": "Logout",
   "save": "Save",
   "finishRegistration": "Finish Registration",
-  "initChatWith": "Initiate chat with ",
+  "initChatWith": "Initiate chat with",
   "emailRequired": "Email is required",
   "emailInvalid": "Please enter a valid email",
   "passwordRequired": "Password is required",

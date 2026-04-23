@@ -34,7 +34,7 @@
   "logout": "Cerrar sesión",
   "save": "Guardar",
   "finishRegistration": "Finalizar registro",
-  "initChatWith": "Iniciar chat con ",
+  "initChatWith": "Iniciar chat con",
   "emailRequired": "El correo es obligatorio",
   "emailInvalid": "Introduce un correo válido",
   "passwordRequired": "La contraseña es obligatoria",
