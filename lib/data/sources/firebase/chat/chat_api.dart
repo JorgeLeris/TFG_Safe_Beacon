@@ -165,4 +165,34 @@ class ChatApi {
     }
     await batch.commit();
   }
+
+  // ==============================================
+  // MARK: - Delete
+  // ==============================================
+
+  /// Deletes the chat between [uid1] and [uid2] and all its messages.
+  ///
+  /// Does nothing if no chat exists between the two users.
+  Future<void> deleteChatBetween(String uid1, String uid2) async {
+    final existing = await findChat(uid1, uid2);
+    if (existing == null) return;
+
+    final chatRef = _chats.doc(existing.id);
+
+    // Delete all messages in batches.
+    QuerySnapshot<Map<String, dynamic>> msgSnap;
+    do {
+      msgSnap = await _messages(existing.id).limit(500).get();
+      if (msgSnap.docs.isEmpty) break;
+
+      final batch = _firestore.batch();
+      for (final doc in msgSnap.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+    } while (msgSnap.docs.length == 500);
+
+    // Delete the parent chat document.
+    await chatRef.delete();
+  }
 }

@@ -4,6 +4,7 @@ import 'package:mocktail/mocktail.dart';
 
 import 'package:safe_beacon/data/repositories/contact_repository_impl.dart';
 import 'package:safe_beacon/data/sources/firebase/alerts/alert_api.dart';
+import 'package:safe_beacon/data/sources/firebase/chat/chat_api.dart';
 import 'package:safe_beacon/data/sources/firebase/contacts/contact_api.dart';
 import 'package:safe_beacon/data/sources/firebase/contacts/dto/contact_dto.dart';
 import 'package:safe_beacon/data/sources/firebase/guardian_mode/guardian_session_api.dart';
@@ -18,6 +19,8 @@ class MockContactApi extends Mock implements ContactApi {}
 class MockAlertApi extends Mock implements AlertApi {}
 
 class MockGuardianSessionApi extends Mock implements GuardianSessionApi {}
+
+class MockChatApi extends Mock implements ChatApi {}
 
 class FakeContactDto extends Fake implements ContactDto {}
 
@@ -49,16 +52,19 @@ void main() {
   late MockContactApi mockApi;
   late MockAlertApi mockAlertApi;
   late MockGuardianSessionApi mockGuardianSessionApi;
+  late MockChatApi mockChatApi;
   late ContactRepositoryImpl repository;
 
   setUp(() {
     mockApi = MockContactApi();
     mockAlertApi = MockAlertApi();
     mockGuardianSessionApi = MockGuardianSessionApi();
+    mockChatApi = MockChatApi();
     repository = ContactRepositoryImpl(
       api: mockApi,
       alertApi: mockAlertApi,
       guardianSessionApi: mockGuardianSessionApi,
+      chatApi: mockChatApi,
     );
     registerFallbackValue(FakeContactDto());
   });
@@ -276,6 +282,9 @@ void main() {
             trustedContactUid: any(named: 'trustedContactUid'),
           ),
         ).thenAnswer((_) async {});
+        when(
+          () => mockChatApi.deleteChatBetween(any(), any()),
+        ).thenAnswer((_) async {});
 
         final result = await repository.deleteContact(
           contactId: 'contact_1',
@@ -290,6 +299,9 @@ void main() {
             ownerUid: 'uid_alice',
             trustedContactUid: 'uid_bob',
           ),
+        ).called(1);
+        verify(
+          () => mockChatApi.deleteChatBetween('uid_alice', 'uid_bob'),
         ).called(1);
       },
     );
