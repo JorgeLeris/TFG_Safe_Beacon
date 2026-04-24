@@ -40,9 +40,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     // Loading
     if (state.isLoading && state.chats.isEmpty) {
-      return const Expanded(
-        child: Center(child: CircularProgressIndicator()),
-      );
+      return const Expanded(child: Center(child: CircularProgressIndicator()));
     }
 
     // No chats at all
@@ -61,11 +59,11 @@ class _ChatScreenState extends State<ChatScreen> {
     final filtered = _query.isEmpty
         ? chats
         : chats
-            .where(
-              (c) =>
-                  c.displayName.toLowerCase().contains(_query.toLowerCase()),
-            )
-            .toList();
+              .where(
+                (c) =>
+                    c.displayName.toLowerCase().contains(_query.toLowerCase()),
+              )
+              .toList();
 
     return Expanded(
       child: Column(
@@ -163,5 +161,3 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 }
-
-

@@ -18,10 +18,7 @@ class ChatApi {
   /// Finds an existing chat between [uid1] and [uid2].
   ///
   /// Uses sorted participant UIDs.
-  Future<({String id, ChatDto dto})?> findChat(
-    String uid1,
-    String uid2,
-  ) async {
+  Future<({String id, ChatDto dto})?> findChat(String uid1, String uid2) async {
     final sorted = [uid1, uid2]..sort();
 
     final snap = await _chats
@@ -67,10 +64,9 @@ class ChatApi {
   /// Returns a real-time stream of all chats where [uid] is a participant,
   /// ordered by the most recent message.
   Stream<List<({String id, ChatDto dto})>> watchChats(String uid) {
-    return _chats
-        .where('participantUids', arrayContains: uid)
-        .snapshots()
-        .map((snap) {
+    return _chats.where('participantUids', arrayContains: uid).snapshots().map((
+      snap,
+    ) {
       final results = snap.docs.map((doc) {
         return (id: doc.id, dto: ChatDto.fromFirestore(doc.data()));
       }).toList();
@@ -89,10 +85,9 @@ class ChatApi {
   /// Returns a real-time stream of messages in [chatId],
   /// ordered by creation time ascending.
   Stream<List<({String id, MessageDto dto})>> watchMessages(String chatId) {
-    return _messages(chatId)
-        .orderBy('createdAt', descending: false)
-        .snapshots()
-        .map((snap) {
+    return _messages(
+      chatId,
+    ).orderBy('createdAt', descending: false).snapshots().map((snap) {
       return snap.docs.map((doc) {
         return (id: doc.id, dto: MessageDto.fromFirestore(doc.data()));
       }).toList();
@@ -140,17 +135,14 @@ class ChatApi {
 
   /// Marks all unread messages in [chatId] as read for [uid]
   /// and resets that user's unread counter.
-  Future<void> markAsRead({
-    required String chatId,
-    required String uid,
-  }) async {
+  Future<void> markAsRead({required String chatId, required String uid}) async {
     // Reset the unread counter.
     await _chats.doc(chatId).update({'unreadCount_$uid': 0});
 
     // Mark individual messages as read.
-    final unreadSnap = await _messages(chatId)
-        .where('senderUid', isNotEqualTo: uid)
-        .get();
+    final unreadSnap = await _messages(
+      chatId,
+    ).where('senderUid', isNotEqualTo: uid).get();
 
     if (unreadSnap.docs.isEmpty) return;
 

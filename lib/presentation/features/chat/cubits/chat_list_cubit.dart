@@ -16,10 +16,10 @@ class ChatListCubit extends Cubit<ChatListState> {
     required String uid,
     required ChatRepository chatRepository,
     required UserProfileRepository userProfileRepository,
-  })  : _uid = uid,
-        _chatRepository = chatRepository,
-        _userProfileRepository = userProfileRepository,
-        super(const ChatListState());
+  }) : _uid = uid,
+       _chatRepository = chatRepository,
+       _userProfileRepository = userProfileRepository,
+       super(const ChatListState());
 
   final String _uid;
   final ChatRepository _chatRepository;
@@ -29,22 +29,26 @@ class ChatListCubit extends Cubit<ChatListState> {
 
   /// Cache of resolved user profiles.
   final Map<String, ({String displayName, String? profilePhoto})>
-      _profileCache = {};
+  _profileCache = {};
 
   /// Start listening to the user's chats in real time.
   void watchChats() {
     emit(state.copyWith(isLoading: true, failure: null));
 
     _chatsSub?.cancel();
-    _chatsSub = _chatRepository.watchChats(_uid).listen(
-      _onChatsUpdated,
-      onError: (Object error) {
-        emit(state.copyWith(
-          isLoading: false,
-          failure: const AppFailure.unknown(),
-        ));
-      },
-    );
+    _chatsSub = _chatRepository
+        .watchChats(_uid)
+        .listen(
+          _onChatsUpdated,
+          onError: (Object error) {
+            emit(
+              state.copyWith(
+                isLoading: false,
+                failure: const AppFailure.unknown(),
+              ),
+            );
+          },
+        );
   }
 
   Future<void> _onChatsUpdated(List<Chat> chats) async {
@@ -60,8 +64,7 @@ class ChatListCubit extends Cubit<ChatListState> {
       // Resolve profile cached.
       var cached = _profileCache[otherUid];
       if (cached == null) {
-        final profileResult =
-            await _userProfileRepository.getProfile(otherUid);
+        final profileResult = await _userProfileRepository.getProfile(otherUid);
         profileResult.when(
           success: (profile) {
             final name = profile.name;
@@ -78,15 +81,17 @@ class ChatListCubit extends Cubit<ChatListState> {
         _profileCache[otherUid] = cached!;
       }
 
-      entries.add(ChatListEntry(
-        chatId: chat.id,
-        otherUid: otherUid,
-        displayName: cached!.displayName,
-        profilePhoto: cached!.profilePhoto,
-        lastMessage: chat.lastMessage,
-        lastMessageIsFromMe: chat.lastMessageSenderUid == _uid,
-        unreadCount: chat.unreadCounts[_uid] ?? 0,
-      ));
+      entries.add(
+        ChatListEntry(
+          chatId: chat.id,
+          otherUid: otherUid,
+          displayName: cached!.displayName,
+          profilePhoto: cached!.profilePhoto,
+          lastMessage: chat.lastMessage,
+          lastMessageIsFromMe: chat.lastMessageSenderUid == _uid,
+          unreadCount: chat.unreadCounts[_uid] ?? 0,
+        ),
+      );
     }
 
     if (!isClosed) {

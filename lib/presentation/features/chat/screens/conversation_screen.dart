@@ -201,10 +201,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 textCapitalization: TextCapitalization.sentences,
                 minLines: 1,
                 maxLines: 4,
-                style: TextStyle(
-                  color: colorScheme.onSurface,
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: colorScheme.onSurface, fontSize: 14),
                 decoration: InputDecoration(
                   hintText: l10n.typeMessageHint,
                   hintStyle: TextStyle(
@@ -212,8 +209,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
                     fontSize: 14,
                   ),
                   filled: true,
-                  fillColor: colorScheme.surfaceContainerHighest
-                      .withValues(alpha: 0.5),
+                  fillColor: colorScheme.surfaceContainerHighest.withValues(
+                    alpha: 0.5,
+                  ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16,
                     vertical: 10,
@@ -292,8 +290,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         child: Text(
                           l10n.noMessagesYet,
                           style: textTheme.bodyMedium?.copyWith(
-                            color: colorScheme.onSurface
-                                .withValues(alpha: 0.5),
+                            color: colorScheme.onSurface.withValues(alpha: 0.5),
                           ),
                           textAlign: TextAlign.center,
                         ),

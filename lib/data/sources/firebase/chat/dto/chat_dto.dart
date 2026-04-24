@@ -36,8 +36,7 @@ class ChatDto {
       lastMessage: data['lastMessage'] as String?,
       lastMessageSenderUid: data['lastMessageSenderUid'] as String?,
       lastMessageAt: (data['lastMessageAt'] as Timestamp?)?.toDate(),
-      createdAt:
-          (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       unreadCounts: unreadCounts,
     );
   }

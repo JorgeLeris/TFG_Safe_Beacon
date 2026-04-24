@@ -24,9 +24,7 @@ class ChatRepositoryImpl implements ChatRepository {
     required String currentUid,
     required String otherUid,
   }) async {
-    appLogger.fine(
-      'getOrCreateChat between $currentUid and $otherUid',
-    );
+    appLogger.fine('getOrCreateChat between $currentUid and $otherUid');
     try {
       final existing = await _api.findChat(currentUid, otherUid);
       if (existing != null) {

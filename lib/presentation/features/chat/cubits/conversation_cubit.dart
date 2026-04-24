@@ -15,10 +15,10 @@ class ConversationCubit extends Cubit<ConversationState> {
     required String chatId,
     required String currentUid,
     required ChatRepository chatRepository,
-  })  : _chatId = chatId,
-        _currentUid = currentUid,
-        _chatRepository = chatRepository,
-        super(const ConversationState());
+  }) : _chatId = chatId,
+       _currentUid = currentUid,
+       _chatRepository = chatRepository,
+       super(const ConversationState());
 
   final String _chatId;
   final String _currentUid;
@@ -34,24 +34,28 @@ class ConversationCubit extends Cubit<ConversationState> {
     _chatRepository.markAsRead(chatId: _chatId, uid: _currentUid);
 
     _messagesSub?.cancel();
-    _messagesSub = _chatRepository.watchMessages(_chatId).listen(
-      (messages) {
-        if (!isClosed) {
-          emit(state.copyWith(isLoading: false, messages: messages));
+    _messagesSub = _chatRepository
+        .watchMessages(_chatId)
+        .listen(
+          (messages) {
+            if (!isClosed) {
+              emit(state.copyWith(isLoading: false, messages: messages));
 
-          // Mark new messages as read automatically while the chat is open.
-          _chatRepository.markAsRead(chatId: _chatId, uid: _currentUid);
-        }
-      },
-      onError: (Object error) {
-        if (!isClosed) {
-          emit(state.copyWith(
-            isLoading: false,
-            failure: const AppFailure.unknown(),
-          ));
-        }
-      },
-    );
+              // Mark new messages as read automatically while the chat is open.
+              _chatRepository.markAsRead(chatId: _chatId, uid: _currentUid);
+            }
+          },
+          onError: (Object error) {
+            if (!isClosed) {
+              emit(
+                state.copyWith(
+                  isLoading: false,
+                  failure: const AppFailure.unknown(),
+                ),
+              );
+            }
+          },
+        );
   }
 
   /// Sends a text message in the current chat.

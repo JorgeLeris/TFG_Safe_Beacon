@@ -17,17 +17,12 @@ class MessageDto {
     return MessageDto(
       senderUid: data['senderUid'] as String,
       text: data['text'] as String,
-      createdAt:
-          (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       readBy: List<String>.from(data['readBy'] as List? ?? []),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'senderUid': senderUid,
-      'text': text,
-      'readBy': readBy,
-    };
+    return {'senderUid': senderUid, 'text': text, 'readBy': readBy};
   }
 }
