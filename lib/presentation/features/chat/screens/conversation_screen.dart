@@ -33,6 +33,7 @@ class ConversationScreen extends StatefulWidget {
 class _ConversationScreenState extends State<ConversationScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  bool _initialScrollDone = false;
 
   String get _currentUid => FirebaseAuth.instance.currentUser!.uid;
 
@@ -53,14 +54,19 @@ class _ConversationScreenState extends State<ConversationScreen> {
     _scrollToBottom();
   }
 
-  void _scrollToBottom() {
+  void _scrollToBottom({bool jump = false}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
+        final target = _scrollController.position.maxScrollExtent;
+        if (jump) {
+          _scrollController.jumpTo(target);
+        } else {
+          _scrollController.animateTo(
+            target,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
       }
     });
   }
@@ -278,7 +284,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 listener: (context, state) {
                   // Auto-scroll when new messages arrive.
                   if (state.messages.isNotEmpty) {
-                    _scrollToBottom();
+                    if (!_initialScrollDone) {
+                      _initialScrollDone = true;
+                      _scrollToBottom(jump: true);
+                    } else {
+                      _scrollToBottom();
+                    }
                   }
                 },
                 builder: (context, state) {
