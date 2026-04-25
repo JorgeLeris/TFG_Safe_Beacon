@@ -7,5 +7,6 @@ abstract class ConversationState with _$ConversationState {
     @Default([]) List<Message> messages,
     @Default(false) bool isSending,
     AppFailure? failure,
+    String? otherProfilePhoto,
   }) = _ConversationState;
 }

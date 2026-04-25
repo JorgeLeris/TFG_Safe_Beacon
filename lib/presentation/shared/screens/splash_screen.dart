@@ -6,6 +6,7 @@ import 'package:local_auth_darwin/local_auth_darwin.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/notification_service.dart';
 import 'package:safe_beacon/presentation/features/auth/routes/auth_routes.dart';
+import 'package:safe_beacon/presentation/features/chat/routes/chat_routes.dart';
 import 'package:safe_beacon/presentation/features/control/routes/control_routes.dart';
 import 'package:safe_beacon/presentation/features/home/routes/home_routes.dart';
 
@@ -34,6 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
     }
 
     final pendingAlertId = NotificationService.consumeInitialAlertId();
+    final pendingChatData = NotificationService.consumeInitialChatData();
 
     final localAuth = LocalAuthentication();
     final canCheckBiometrics = await localAuth.canCheckBiometrics;
@@ -44,6 +46,13 @@ class _SplashScreenState extends State<SplashScreen> {
         const HomeRoute().go(context);
         if (pendingAlertId != null && pendingAlertId.isNotEmpty) {
           await AlertDetailRoute(alertId: pendingAlertId).push(context);
+        }
+        if (pendingChatData != null) {
+          await ConversationRoute(
+            chatId: pendingChatData['chatId']!,
+            username: pendingChatData['username'] ?? '',
+            // ignore: use_build_context_synchronously
+          ).push(context);
         }
       }
       return;
@@ -70,6 +79,13 @@ class _SplashScreenState extends State<SplashScreen> {
         const HomeRoute().go(context);
         if (pendingAlertId != null && pendingAlertId.isNotEmpty) {
           await AlertDetailRoute(alertId: pendingAlertId).push(context);
+        }
+        if (pendingChatData != null) {
+          await ConversationRoute(
+            chatId: pendingChatData['chatId']!,
+            username: pendingChatData['username'] ?? '',
+            // ignore: use_build_context_synchronously
+          ).push(context);
         }
       } else {
         await FirebaseAuth.instance.signOut();

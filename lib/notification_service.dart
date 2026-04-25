@@ -30,11 +30,30 @@ class NotificationService {
     return id;
   }
 
+  /// Chat deep-link data extracted from the notification that launched the app
+  /// from a terminated state.
+  static Map<String, String>? _pendingInitialChatData;
+
+  static void setPendingInitialChatData(Map<String, String> data) {
+    _pendingInitialChatData = data;
+  }
+
+  static Map<String, String>? consumeInitialChatData() {
+    final data = _pendingInitialChatData;
+    _pendingInitialChatData = null;
+    return data;
+  }
+
   /// Initialises the notification service.
   ///
   /// [onNotificationTap] is called with the `alertId` whenever the user taps a
   /// notification while the app is in the foreground or background (but not terminated).
-  Future<void> init({void Function(String alertId)? onNotificationTap}) async {
+  /// [onChatNotificationTap] is called with the chat data when the user taps a
+  /// chat notification.
+  Future<void> init({
+    void Function(String alertId)? onNotificationTap,
+    void Function(Map<String, String> chatData)? onChatNotificationTap,
+  }) async {
     await _firebaseMessaging.requestPermission();
 
     // Background: app is open but not visible — user tapped the notification
@@ -45,6 +64,15 @@ class NotificationService {
       final alertId = message.data['alertId'] as String?;
       if (alertId != null && alertId.isNotEmpty && onNotificationTap != null) {
         onNotificationTap(alertId);
+      }
+      final chatId = message.data['chatId'] as String?;
+      if (chatId != null &&
+          chatId.isNotEmpty &&
+          onChatNotificationTap != null) {
+        onChatNotificationTap({
+          'chatId': chatId,
+          'username': message.data['username'] as String? ?? '',
+        });
       }
     });
 
@@ -58,6 +86,13 @@ class NotificationService {
       // TODO: handle iOS (in this case always android is going to be null)
       if (notification != null && android != null) {
         final alertId = message.data['alertId'] as String?;
+        final chatId = message.data['chatId'] as String?;
+
+        // Suppress chat notifications when the app is in the foreground.
+        if (chatId != null && chatId.isNotEmpty) return;
+
+        final payload = alertId;
+
         flutterLocalNotificationsPlugin.show(
           id: notification.hashCode,
           title: notification.title,
@@ -72,7 +107,7 @@ class NotificationService {
               icon: '@mipmap/ic_launcher',
             ),
           ),
-          payload: alertId,
+          payload: payload,
         );
       }
     });
@@ -93,11 +128,28 @@ class NotificationService {
       settings: initializationSettings,
       onDidReceiveNotificationResponse: (details) {
         appLogger.info('Notification tapped — payload: ${details.payload}');
-        final alertId = details.payload;
-        if (alertId != null &&
-            alertId.isNotEmpty &&
-            onNotificationTap != null) {
-          onNotificationTap(alertId);
+        final raw = details.payload;
+        if (raw == null || raw.isEmpty) return;
+
+        // Try to parse as JSON (chat notification).
+        try {
+          final decoded = jsonDecode(raw) as Map<String, dynamic>;
+          final chatId = decoded['chatId'] as String?;
+          if (chatId != null &&
+              chatId.isNotEmpty &&
+              onChatNotificationTap != null) {
+            onChatNotificationTap({
+              'chatId': chatId,
+              'username': decoded['username'] as String? ?? '',
+            });
+            return;
+          }
+        } catch (_) {
+          // Not JSON — treat as alertId.
+        }
+
+        if (onNotificationTap != null) {
+          onNotificationTap(raw);
         }
       },
     );

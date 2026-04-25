@@ -69,8 +69,10 @@ class _ConversationScreenState extends State<ConversationScreen> {
   // Bubble helpers
   // ---------------------------------------------------------------------------
 
-  ImageProvider _resolveAvatar() {
-    final photo = widget.profilePhoto;
+  ImageProvider _resolveAvatar(String? statePhoto) {
+    final photo = (statePhoto != null && statePhoto.isNotEmpty)
+        ? statePhoto
+        : widget.profilePhoto;
     if (photo != null && photo.isNotEmpty) {
       if (photo.startsWith('http://') || photo.startsWith('https://')) {
         return NetworkImage(photo);
@@ -87,6 +89,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     Message message,
     ColorScheme colorScheme,
     TextTheme textTheme,
+    String? otherProfilePhoto,
   ) {
     final isMe = message.senderUid == _currentUid;
 
@@ -136,7 +139,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
               child: CircleAvatar(
                 radius: 16,
                 backgroundColor: colorScheme.surfaceContainerHighest,
-                backgroundImage: _resolveAvatar(),
+                backgroundImage: _resolveAvatar(otherProfilePhoto),
               ),
             ),
             const SizedBox(width: 8),
@@ -307,6 +310,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       state.messages[index],
                       colorScheme,
                       textTheme,
+                      state.otherProfilePhoto,
                     ),
                   );
                 },
