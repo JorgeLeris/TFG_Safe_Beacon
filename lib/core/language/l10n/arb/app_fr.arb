@@ -3,7 +3,7 @@
   "appTitle": "safe_beacon",
   "tabHome": "Accueil",
   "tabControl": "Tableau",
-  "tabChat": "Chat",
+  "tabChat": "Chats",
   "tabSettings": "Paramètres",
   "tabProfile": "Profil",
   "appName": "SafeBeacon",
@@ -34,7 +34,7 @@
   "logout": "Déconnexion",
   "save": "Sauvegarder",
   "finishRegistration": "Finaliser l'inscription",
-  "initChatWith": "Commencer une conversation avec ",
+  "initChatWith": "Commencer une conversation avec",
   "emailRequired": "L'adresse e-mail est requise",
   "emailInvalid": "Veuillez entrer une adresse e-mail valide",
   "passwordRequired": "Le mot de passe est requis",
@@ -406,5 +406,19 @@
   "followUpCurrentLocationLabel": "Localisation actuelle",
   "followUpLastLocationLabel": "Dernière localisation",
   "followUpOriginLabel": "Origine",
-  "followUpDestinationLabel": "Destination"
+  "followUpDestinationLabel": "Destination",
+  "noChatsTitle": "Aucune conversation",
+  "noChatsDescription": "Vous n'avez pas encore de conversations. Vous pouvez en démarrer une depuis le profil d'un contact ou depuis les détails d'une alerte ou d'un suivi de vos personnes protégées.",
+  "searchChat": "Rechercher un chat",
+  "youPrefix": "Vous",
+  "chatWithHeader": "Chat avec {username}",
+  "@chatWithHeader": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "typeMessageHint": "Tapez un message",
+  "noMessagesYet": "Pas encore de messages."
 }

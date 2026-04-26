@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:safe_beacon/app/app.dart';
 import 'package:safe_beacon/app/config/app_dependencies.dart';
@@ -39,27 +40,14 @@ Future<void> mainCommon(Environment environment) async {
   // Initialize home-screen widget service.
   await PanicWidgetService.init();
 
-  // Check if the app was launched by tapping a notification (terminated state).
-  final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-  final initialAlertId = initialMessage?.data['alertId'] as String?;
-  if (initialAlertId != null && initialAlertId.isNotEmpty) {
-    NotificationService.setPendingInitialAlertId(initialAlertId);
-  }
+  // Capture any deep-link data from the notification that cold-started the app.
+  await _capturePendingNotificationData();
 
   // Build the app router with dependencies
   final router = buildAppRouter();
 
   // Initialize notification service
-  final notificationService = NotificationService();
-  await notificationService.init(
-    onNotificationTap: (alertId) => router.push('/alert-detail/$alertId'),
-  );
-  notificationService.listenToTokenRefresh((uid, token) async {
-    await UserProfileRepositoryImpl(
-      api: UserProfileApi(),
-    ).saveFcmToken(uid, token);
-  });
-  FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+  await _initNotificationService(router);
 
   // Initialize global dependencies
   final appDeps = await AppDependencies.initialize(environment);
@@ -124,4 +112,52 @@ Future<void> handleBackgroundMessage(RemoteMessage message) async {
   appLogger.info(
     'Background/terminated message received — running in separate isolate: ${message.messageId}',
   );
+}
+
+/// Captures deep-link data from the notification that cold-started the app
+/// (terminated state) and stores it in [NotificationService] static fields
+/// so the splash screen can consume it after authentication.
+Future<void> _capturePendingNotificationData() async {
+  final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+  if (initialMessage == null) return;
+
+  final alertId = initialMessage.data['alertId'] as String?;
+  if (alertId != null && alertId.isNotEmpty) {
+    NotificationService.setPendingInitialAlertId(alertId);
+  }
+
+  final chatId = initialMessage.data['chatId'] as String?;
+  if (chatId != null && chatId.isNotEmpty) {
+    NotificationService.setPendingInitialChatData({
+      'chatId': chatId,
+      'username': initialMessage.data['username'] as String? ?? '',
+    });
+  }
+}
+
+/// Initialises the [NotificationService] with navigation callbacks and
+/// wires FCM token refresh persistence.
+Future<void> _initNotificationService(GoRouter router) async {
+  final notificationService = NotificationService();
+
+  await notificationService.init(
+    onNotificationTap: (alertId) => router.push('/alert-detail/$alertId'),
+    onChatNotificationTap: (chatData) {
+      final chatId = chatData['chatId'] ?? '';
+      final username = chatData['username'] ?? '';
+      if (chatId.isNotEmpty) {
+        router.push(
+          '/conversation/$chatId?username=${Uri.encodeComponent(username)}',
+        );
+      }
+    },
+  );
+
+  notificationService.listenToTokenRefresh((uid, token) async {
+    await UserProfileRepositoryImpl(
+      api: UserProfileApi(),
+    ).saveFcmToken(uid, token);
+  });
+
+  FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
 }

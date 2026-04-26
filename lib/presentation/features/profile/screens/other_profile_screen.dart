@@ -7,11 +7,14 @@ import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/extensions/context_extensions.dart';
 import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/presentation/features/chat/helpers/navigate_to_chat.dart';
 import 'package:safe_beacon/presentation/features/profile/cubits/profile_cubit.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class OtherProfileScreen extends StatefulWidget {
-  const OtherProfileScreen({super.key});
+  const OtherProfileScreen({super.key, required this.uid});
+
+  final String uid;
 
   @override
   State<OtherProfileScreen> createState() => _OtherProfileScreenState();
@@ -174,7 +177,14 @@ class _OtherProfileScreenState extends State<OtherProfileScreen> {
                               CustomFilledButton(
                                 text:
                                     '${l10n.initChatWith} ${(profile?.name).orDash()}',
-                                onPressed: () {},
+                                onPressed: () {
+                                  navigateToChat(
+                                    context,
+                                    otherUid: widget.uid,
+                                    otherDisplayName: displayName,
+                                    otherProfilePhoto: profile?.profilePhoto,
+                                  );
+                                },
                                 backgroundColor: colorScheme.tertiary,
                                 foregroundColor: colorScheme.onTertiary,
                                 colorText: colorScheme.onTertiary,

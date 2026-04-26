@@ -7,5 +7,6 @@ abstract class AlertDetailState with _$AlertDetailState {
     Alert? alert,
     AppFailure? failure,
     @Default('') String displayName,
+    String? displayProfilePhoto,
   }) = _AlertDetailState;
 }

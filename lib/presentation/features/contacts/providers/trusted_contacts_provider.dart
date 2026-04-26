@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:safe_beacon/data/repositories/contact_repository_impl.dart';
 import 'package:safe_beacon/data/repositories/contact_request_repository_impl.dart';
 import 'package:safe_beacon/data/repositories/user_profile_repository_impl.dart';
 import 'package:safe_beacon/data/sources/firebase/alerts/alert_api.dart';
+import 'package:safe_beacon/data/sources/firebase/chat/chat_api.dart';
 import 'package:safe_beacon/data/sources/firebase/contacts/contact_api.dart';
 import 'package:safe_beacon/data/sources/firebase/contacts/contact_request_api.dart';
 import 'package:safe_beacon/data/sources/firebase/guardian_mode/guardian_session_api.dart';
@@ -36,6 +38,7 @@ class TrustedContactsProvider extends StatelessWidget {
             api: ContactApi(),
             alertApi: AlertApi(),
             guardianSessionApi: GuardianSessionApi(),
+            chatApi: ChatApi(),
           ),
         ),
       ],
