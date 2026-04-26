@@ -7,6 +7,7 @@ class DropdownInputField<T> extends StatefulWidget {
   final ValueChanged<T?>? onChanged;
   final T? value;
   final String? errorText;
+  final bool alignedDropdown;
 
   const DropdownInputField({
     super.key,
@@ -15,6 +16,7 @@ class DropdownInputField<T> extends StatefulWidget {
     this.onChanged,
     this.value,
     this.errorText,
+    this.alignedDropdown = false,
   });
 
   @override
@@ -75,52 +77,66 @@ class _DropdownInputFieldState<T> extends State<DropdownInputField<T>> {
           borderRadius: BorderRadius.circular(14),
           child: Stack(
             children: [
-              Theme(
-                data: Theme.of(context).copyWith(
-                  highlightColor: colorScheme.tertiary.withValues(alpha: 0.12),
-                  focusColor: colorScheme.tertiary.withValues(alpha: 0.12),
-                  hoverColor: colorScheme.tertiary.withValues(alpha: 0.12),
-                ),
-                child: DropdownButtonFormField<T>(
-                  initialValue: _selected,
-                  items: _buildStyledItems(colorScheme),
-                  selectedItemBuilder: (_) => _buildSelectedItemWidgets(),
-                  onChanged: (value) {
-                    setState(() => _selected = value);
-                    widget.onChanged?.call(value);
-                  },
-                  style: const TextStyle(color: Colors.black),
-                  icon: Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    color: Colors.black.withValues(alpha: 0.5),
+              ButtonTheme(
+                alignedDropdown: widget.alignedDropdown,
+                child: Theme(
+                  data: Theme.of(context).copyWith(
+                    highlightColor: colorScheme.tertiary.withValues(
+                      alpha: 0.12,
+                    ),
+                    focusColor: colorScheme.tertiary.withValues(alpha: 0.12),
+                    hoverColor: colorScheme.tertiary.withValues(alpha: 0.12),
                   ),
-                  borderRadius: BorderRadius.circular(16),
-                  dropdownColor: colorScheme.surfaceContainer,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.white,
-                    contentPadding: const EdgeInsets.fromLTRB(12, 24, 12, 8),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: hasError
-                          ? BorderSide(color: Colors.red.shade700, width: 1.25)
-                          : BorderSide.none,
+                  child: DropdownButtonFormField<T>(
+                    initialValue: _selected,
+                    items: _buildStyledItems(colorScheme),
+                    selectedItemBuilder: (_) => _buildSelectedItemWidgets(),
+                    onChanged: (value) {
+                      setState(() => _selected = value);
+                      widget.onChanged?.call(value);
+                    },
+                    style: const TextStyle(color: Colors.black),
+                    icon: Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: Colors.black.withValues(alpha: 0.5),
                     ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: hasError
-                          ? BorderSide(color: Colors.red.shade700, width: 1.25)
-                          : BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(14),
-                      borderSide: hasError
-                          ? BorderSide(color: Colors.red.shade700, width: 1.25)
-                          : BorderSide(
-                              color: colorScheme.tertiary.withValues(
-                                alpha: 0.4,
+                    borderRadius: BorderRadius.circular(16),
+                    dropdownColor: colorScheme.surfaceContainer,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.fromLTRB(12, 24, 12, 8),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: hasError
+                            ? BorderSide(
+                                color: Colors.red.shade700,
+                                width: 1.25,
+                              )
+                            : BorderSide.none,
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: hasError
+                            ? BorderSide(
+                                color: Colors.red.shade700,
+                                width: 1.25,
+                              )
+                            : BorderSide.none,
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: hasError
+                            ? BorderSide(
+                                color: Colors.red.shade700,
+                                width: 1.25,
+                              )
+                            : BorderSide(
+                                color: colorScheme.tertiary.withValues(
+                                  alpha: 0.4,
+                                ),
                               ),
-                            ),
+                      ),
                     ),
                   ),
                 ),

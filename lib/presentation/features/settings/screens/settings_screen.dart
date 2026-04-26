@@ -10,6 +10,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  // TODO: These values should be loaded from user preferences and updated accordingly when changed. (put default values)
   bool _darkMode = false;
   bool _locationPermission = false;
   bool _notificationsPermission = false;
@@ -131,6 +132,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         DropdownInputField<String>(
                           hint: l10n.settingsLanguageHint,
                           value: _selectedLanguage,
+                          alignedDropdown: true,
                           onChanged: (value) {
                             setState(() => _selectedLanguage = value);
                             // TODO: Change app locale
