@@ -12,6 +12,7 @@ lcov --remove coverage/lcov.info \
   'lib/presentation/features/panic_button/widget/*' \
   'lib/presentation/features/guardian_mode/services/*' \
   'lib/presentation/shared/widgets/*' \
+  'lib/firebase_options.dart' \
   -o coverage/lcov.info
 genhtml coverage/lcov.info --output=coverage
 open coverage/index.html
