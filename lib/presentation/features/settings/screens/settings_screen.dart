@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -80,17 +81,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         icon: Icons.group_outlined,
                         title: l10n.yourTrustedContacts,
                         description: l10n.settingsTrustedContactsDescription,
-                        onPressed: () {
-                          // TODO: Navigate to trusted contacts screen
-                        },
+                        onPressed: () =>
+                            const TrustedContactsRoute().push(context),
                       ),
                       SettingsOption(
                         icon: Icons.group_outlined,
                         title: l10n.yourProtectedPeople,
                         description: l10n.settingsProtectedPeopleDescription,
-                        onPressed: () {
-                          // TODO: Navigate to protected people screen
-                        },
+                        onPressed: () =>
+                            const ProtectedPeopleRoute().push(context),
                       ),
                     ],
                   ),
