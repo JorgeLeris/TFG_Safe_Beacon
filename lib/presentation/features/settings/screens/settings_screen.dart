@@ -18,6 +18,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   static const double _horizontalPadding = 20;
 
+  void _showFutureDialog(BuildContext context, AppLocalizations l10n) {
+    CustomDialog.show(
+      context: context,
+      title: l10n.notAvailableYet,
+      content: Text(l10n.futureUpdateContent),
+      buttonText: l10n.accept,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -170,6 +179,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             l10n.settingsViewPrivacyPoliciesDescription,
                         onPressed: () {
                           // TODO: Navigate to privacy policies screen
+                          _showFutureDialog(context, l10n);
                         },
                       ),
                     ],
@@ -205,7 +215,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         title: l10n.featuresSettings,
                         description: l10n.settingsFeaturesConfigDescription,
                         onPressed: () {
-                          // TODO: Navigate to features settings screen
+                          _showFutureDialog(context, l10n);
                         },
                       ),
                     ],
