@@ -113,7 +113,13 @@ class _SettingsOptionRowState extends State<_SettingsOptionRow> {
       children: [
         const Divider(height: 1),
         InkWell(
-          onTap: isSwitch ? null : widget.option.onPressed,
+          onTap: isSwitch
+              ? () {
+                  final newValue = !_switchValue;
+                  setState(() => _switchValue = newValue);
+                  widget.option.onSwitchChanged?.call(newValue);
+                }
+              : widget.option.onPressed,
           child: Padding(
             padding: EdgeInsets.symmetric(
               vertical: 16,
