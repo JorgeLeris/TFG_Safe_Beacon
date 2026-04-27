@@ -18,6 +18,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   static const double _horizontalPadding = 20;
 
+  void _showSuggestionsDialog(BuildContext context, AppLocalizations l10n) {
+    CustomDialog.show(
+      context: context,
+      title: l10n.suggestionsDialogTitle,
+      content: Text(l10n.suggestionsDialogContent),
+      buttonText: l10n.send,
+      dropdownHint: l10n.suggestionsDialogTypeHint,
+      dropdownItems: [
+        DropdownMenuItem(
+          value: 'suggestion',
+          child: Text(l10n.suggestionsDialogTypeSuggestion),
+        ),
+        DropdownMenuItem(
+          value: 'incident',
+          child: Text(l10n.suggestionsDialogTypeIncident),
+        ),
+      ],
+      inputHint: l10n.suggestionsDialogDescriptionHint,
+      onFormButtonPressed: (type, description) {
+        Navigator.of(context, rootNavigator: true).pop();
+        // TODO: Send suggestion/incident with [type] and [description]
+      },
+      secondButtonText: l10n.cancel,
+      onSecondButtonPressed: () =>
+          Navigator.of(context, rootNavigator: true).pop(),
+    );
+  }
+
   void _showFutureDialog(BuildContext context, AppLocalizations l10n) {
     CustomDialog.show(
       context: context,
@@ -197,7 +225,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         title: l10n.settingsSendSuggestions,
                         description: l10n.settingsSendSuggestionsDescription,
                         onPressed: () {
-                          // TODO: Navigate to suggestions / incidents form
+                          _showSuggestionsDialog(context, l10n);
                         },
                       ),
                     ],

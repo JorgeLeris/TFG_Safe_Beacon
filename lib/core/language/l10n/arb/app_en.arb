@@ -443,5 +443,11 @@
   "settingsViewPrivacyPoliciesDescription": "Access information about the use and protection of your personal data.",
   "settingsSuggestionsSection": "Suggestions and incidents",
   "settingsSendSuggestions": "Send suggestions and incidents",
-  "settingsSendSuggestionsDescription": "Access the form to send suggestions or report incidents."
+  "settingsSendSuggestionsDescription": "Access the form to send suggestions or report incidents.",
+  "suggestionsDialogTitle": "Suggestions / Incidents",
+  "suggestionsDialogContent": "Describe your suggestion or the problem you have found. We will review it as soon as possible.",
+  "suggestionsDialogTypeHint": "Type",
+  "suggestionsDialogTypeSuggestion": "Suggestion",
+  "suggestionsDialogTypeIncident": "Incident",
+  "suggestionsDialogDescriptionHint": "Description"
 }
