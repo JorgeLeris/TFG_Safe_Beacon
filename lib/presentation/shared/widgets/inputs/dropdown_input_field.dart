@@ -131,11 +131,7 @@ class _DropdownInputFieldState<T> extends State<DropdownInputField<T>> {
                                 color: Colors.red.shade700,
                                 width: 1.25,
                               )
-                            : BorderSide(
-                                color: colorScheme.tertiary.withValues(
-                                  alpha: 0.4,
-                                ),
-                              ),
+                            : BorderSide.none,
                       ),
                     ),
                   ),
