@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:safe_beacon/core/language/language.dart';
 import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
@@ -15,9 +16,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _darkMode = false;
   bool _locationPermission = false;
   bool _notificationsPermission = false;
-  String? _selectedLanguage = 'es';
+  String? _selectedLanguage;
 
   static const double _horizontalPadding = 20;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _selectedLanguage ??= context
+        .read<LanguageCubit>()
+        .state
+        .locale
+        .languageCode;
+  }
 
   void _showSuggestionsDialog(BuildContext context, AppLocalizations l10n) {
     CustomDialog.show(
@@ -170,8 +181,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           value: _selectedLanguage,
                           alignedDropdown: true,
                           onChanged: (value) {
+                            if (value == null) return;
                             setState(() => _selectedLanguage = value);
-                            // TODO: Change app locale
+                            context.read<LanguageCubit>().changeLocale(
+                              Locale(value),
+                            );
                           },
                           items: [
                             DropdownMenuItem(
