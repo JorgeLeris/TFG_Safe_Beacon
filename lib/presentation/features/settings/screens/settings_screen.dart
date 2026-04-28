@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safe_beacon/core/language/language.dart';
+import 'package:safe_beacon/core/theme/theme.dart';
 import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
@@ -13,7 +14,6 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   // TODO: These values should be loaded from user preferences and updated accordingly when changed. (put default values)
-  bool _darkMode = false;
   bool _locationPermission = false;
   bool _notificationsPermission = false;
   String? _selectedLanguage;
@@ -70,6 +70,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final themeMode = context.watch<ThemeCubit>().state.themeMode;
+    final isDark =
+        themeMode == ThemeMode.dark ||
+        (themeMode == ThemeMode.system &&
+            MediaQuery.platformBrightnessOf(context) == Brightness.dark);
 
     return Scaffold(
       appBar: const CustomAppBar(),
@@ -116,10 +121,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         icon: Icons.dark_mode_outlined,
                         title: l10n.settingsEnableDarkMode,
                         description: l10n.settingsEnableDarkModeDescription,
-                        switchValue: _darkMode,
+                        switchValue: isDark,
                         onSwitchChanged: (value) {
-                          setState(() => _darkMode = value);
-                          // TODO: Apply dark / light theme
+                          context.read<ThemeCubit>().setThemeMode(
+                            value ? ThemeMode.dark : ThemeMode.light,
+                          );
                         },
                       ),
                     ],
