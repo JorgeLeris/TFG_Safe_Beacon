@@ -16,19 +16,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   // TODO: These values should be loaded from user preferences and updated accordingly when changed. (put default values)
   bool _locationPermission = false;
   bool _notificationsPermission = false;
-  String? _selectedLanguage;
 
   static const double _horizontalPadding = 20;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _selectedLanguage ??= context
-        .read<LanguageCubit>()
-        .state
-        .locale
-        .languageCode;
-  }
 
   void _showSuggestionsDialog(BuildContext context, AppLocalizations l10n) {
     CustomDialog.show(
@@ -75,6 +64,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         themeMode == ThemeMode.dark ||
         (themeMode == ThemeMode.system &&
             MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+    final selectedLanguage = context
+        .watch<LanguageCubit>()
+        .state
+        .locale
+        .languageCode;
 
     return Scaffold(
       appBar: const CustomAppBar(),
@@ -184,11 +178,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         const SizedBox(height: 8),
                         DropdownInputField<String>(
                           hint: l10n.settingsLanguageHint,
-                          value: _selectedLanguage,
+                          value: selectedLanguage,
                           alignedDropdown: true,
                           onChanged: (value) {
                             if (value == null) return;
-                            setState(() => _selectedLanguage = value);
                             context.read<LanguageCubit>().changeLocale(
                               Locale(value),
                             );
