@@ -98,30 +98,7 @@ class SettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Section 2: Permissions
-                  SettingsOptionsList(
-                    sectionTitle: l10n.settingsPermissionsSection,
-                    horizontalPadding: _horizontalPadding,
-                    options: [
-                      SettingsOption(
-                        icon: Icons.location_on_outlined,
-                        title: l10n.settingsLocationPermission,
-                        description: l10n.settingsLocationPermissionDescription,
-                        onPressed: () => Geolocator.openAppSettings(),
-                      ),
-                      SettingsOption(
-                        icon: Icons.notifications_outlined,
-                        title: l10n.settingsNotificationsPermission,
-                        description:
-                            l10n.settingsNotificationsPermissionDescription,
-                        onPressed: () => Geolocator.openAppSettings(),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Section 3: Dark mode
+                  // Section 2: Dark mode
                   SettingsOptionsList(
                     sectionTitle: l10n.settingsDarkModeSection,
                     horizontalPadding: _horizontalPadding,
@@ -142,7 +119,7 @@ class SettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Section 4: Language
+                  // Section 3: Language
                   Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: _horizontalPadding,
@@ -187,6 +164,29 @@ class SettingsScreen extends StatelessWidget {
                         ),
                       ],
                     ),
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Section 4: Permissions
+                  SettingsOptionsList(
+                    sectionTitle: l10n.settingsPermissionsSection,
+                    horizontalPadding: _horizontalPadding,
+                    options: [
+                      SettingsOption(
+                        icon: Icons.location_on_outlined,
+                        title: l10n.settingsLocationPermission,
+                        description: l10n.settingsLocationPermissionDescription,
+                        onPressed: () => Geolocator.openAppSettings(),
+                      ),
+                      SettingsOption(
+                        icon: Icons.notifications_outlined,
+                        title: l10n.settingsNotificationsPermission,
+                        description:
+                            l10n.settingsNotificationsPermissionDescription,
+                        onPressed: () => Geolocator.openAppSettings(),
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 24),
