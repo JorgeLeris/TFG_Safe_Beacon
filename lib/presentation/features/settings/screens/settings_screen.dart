@@ -1,21 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:safe_beacon/core/language/language.dart';
 import 'package:safe_beacon/core/theme/theme.dart';
 import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
-
-  @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-class _SettingsScreenState extends State<SettingsScreen> {
-  // TODO: These values should be loaded from user preferences and updated accordingly when changed. (put default values)
-  bool _locationPermission = false;
-  bool _notificationsPermission = false;
 
   static const double _horizontalPadding = 20;
 
@@ -106,7 +98,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                   const SizedBox(height: 24),
 
-                  // Section 2: Dark mode
+                  // Section 2: Permissions
+                  SettingsOptionsList(
+                    sectionTitle: l10n.settingsPermissionsSection,
+                    horizontalPadding: _horizontalPadding,
+                    options: [
+                      SettingsOption(
+                        icon: Icons.location_on_outlined,
+                        title: l10n.settingsLocationPermission,
+                        description: l10n.settingsLocationPermissionDescription,
+                        onPressed: () => Geolocator.openAppSettings(),
+                      ),
+                      SettingsOption(
+                        icon: Icons.notifications_outlined,
+                        title: l10n.settingsNotificationsPermission,
+                        description:
+                            l10n.settingsNotificationsPermissionDescription,
+                        onPressed: () => Geolocator.openAppSettings(),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Section 3: Dark mode
                   SettingsOptionsList(
                     sectionTitle: l10n.settingsDarkModeSection,
                     horizontalPadding: _horizontalPadding,
@@ -120,37 +135,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           context.read<ThemeCubit>().setThemeMode(
                             value ? ThemeMode.dark : ThemeMode.light,
                           );
-                        },
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Section 3: Permissions
-                  SettingsOptionsList(
-                    sectionTitle: l10n.settingsPermissionsSection,
-                    horizontalPadding: _horizontalPadding,
-                    options: [
-                      SettingsOption(
-                        icon: Icons.location_on_outlined,
-                        title: l10n.settingsLocationPermission,
-                        description: l10n.settingsLocationPermissionDescription,
-                        switchValue: _locationPermission,
-                        onSwitchChanged: (value) {
-                          setState(() => _locationPermission = value);
-                          // TODO: Request / revoke location permission
-                        },
-                      ),
-                      SettingsOption(
-                        icon: Icons.notifications_outlined,
-                        title: l10n.settingsNotificationsPermission,
-                        description:
-                            l10n.settingsNotificationsPermissionDescription,
-                        switchValue: _notificationsPermission,
-                        onSwitchChanged: (value) {
-                          setState(() => _notificationsPermission = value);
-                          // TODO: Request / revoke notifications permission
                         },
                       ),
                     ],
