@@ -449,5 +449,7 @@
   "suggestionsDialogTypeHint": "Tipo",
   "suggestionsDialogTypeSuggestion": "Sugerencia",
   "suggestionsDialogTypeIncident": "Incidencia",
-  "suggestionsDialogDescriptionHint": "Descripción"
+  "suggestionsDialogDescriptionHint": "Descripción",
+  "suggestionsSentSuccess": "Enviado correctamente. ¡Gracias por tu aportación!",
+  "suggestionsSentError": "No se pudo enviar. Inténtalo de nuevo más tarde."
 }

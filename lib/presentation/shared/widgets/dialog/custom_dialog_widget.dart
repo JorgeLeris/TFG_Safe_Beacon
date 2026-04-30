@@ -18,6 +18,7 @@ class CustomDialog extends StatefulWidget {
     this.onInputButtonPressed,
     this.dropdownHint,
     this.dropdownItems,
+    this.dropdownInitialValue,
     this.onFormButtonPressed,
   });
 
@@ -39,6 +40,7 @@ class CustomDialog extends StatefulWidget {
 
   final String? dropdownHint;
   final List<DropdownMenuItem<String>>? dropdownItems;
+  final String? dropdownInitialValue;
 
   /// Called when the main button is pressed and both [dropdownHint] and
   /// [inputHint] are provided.
@@ -60,6 +62,7 @@ class CustomDialog extends StatefulWidget {
     ValueChanged<String>? onInputButtonPressed,
     String? dropdownHint,
     List<DropdownMenuItem<String>>? dropdownItems,
+    String? dropdownInitialValue,
     void Function(String? dropdownValue, String inputText)? onFormButtonPressed,
   }) {
     return showDialog(
@@ -79,6 +82,7 @@ class CustomDialog extends StatefulWidget {
         onInputButtonPressed: onInputButtonPressed,
         dropdownHint: dropdownHint,
         dropdownItems: dropdownItems,
+        dropdownInitialValue: dropdownInitialValue,
         onFormButtonPressed: onFormButtonPressed,
       ),
     );
@@ -95,6 +99,7 @@ class _CustomDialogState extends State<CustomDialog> {
   @override
   void initState() {
     super.initState();
+    _selectedDropdownValue = widget.dropdownInitialValue;
   }
 
   @override

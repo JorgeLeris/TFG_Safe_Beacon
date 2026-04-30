@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/language/language.dart';
 import 'package:safe_beacon/core/theme/theme.dart';
+import 'package:safe_beacon/data/sources/remote/emailjs/emailjs_service.dart';
 import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
@@ -12,6 +15,7 @@ class SettingsScreen extends StatelessWidget {
   static const double _horizontalPadding = 20;
 
   void _showSuggestionsDialog(BuildContext context, AppLocalizations l10n) {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     CustomDialog.show(
       context: context,
       title: l10n.suggestionsDialogTitle,
@@ -20,18 +24,36 @@ class SettingsScreen extends StatelessWidget {
       dropdownHint: l10n.suggestionsDialogTypeHint,
       dropdownItems: [
         DropdownMenuItem(
-          value: 'suggestion',
+          value: Constants.suggestionTypeKey,
           child: Text(l10n.suggestionsDialogTypeSuggestion),
         ),
         DropdownMenuItem(
-          value: 'incident',
+          value: Constants.incidentTypeKey,
           child: Text(l10n.suggestionsDialogTypeIncident),
         ),
       ],
+      dropdownInitialValue: Constants.suggestionTypeKey,
       inputHint: l10n.suggestionsDialogDescriptionHint,
       onFormButtonPressed: (type, description) {
         Navigator.of(context, rootNavigator: true).pop();
-        // TODO: Send suggestion/incident with [type] and [description]
+        final email =
+            FirebaseAuth.instance.currentUser?.email ?? '';
+        EmailJsService()
+            .sendFeedback(
+              type: FeedbackType.fromDropdownValue(type),
+              fromEmail: email,
+              message: description,
+            )
+            .then(
+              (_) => scaffoldMessenger.showSnackBar(
+                SnackBar(content: Text(l10n.suggestionsSentSuccess)),
+              ),
+            )
+            .catchError(
+              (_) => scaffoldMessenger.showSnackBar(
+                SnackBar(content: Text(l10n.suggestionsSentError)),
+              ),
+            );
       },
       secondButtonText: l10n.cancel,
       onSecondButtonPressed: () =>
