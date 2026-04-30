@@ -19,6 +19,7 @@ class CustomDialog extends StatefulWidget {
     this.dropdownHint,
     this.dropdownItems,
     this.dropdownInitialValue,
+    this.inputRequiredError,
     this.onFormButtonPressed,
   });
 
@@ -41,6 +42,7 @@ class CustomDialog extends StatefulWidget {
   final String? dropdownHint;
   final List<DropdownMenuItem<String>>? dropdownItems;
   final String? dropdownInitialValue;
+  final String? inputRequiredError;
 
   /// Called when the main button is pressed and both [dropdownHint] and
   /// [inputHint] are provided.
@@ -63,6 +65,7 @@ class CustomDialog extends StatefulWidget {
     String? dropdownHint,
     List<DropdownMenuItem<String>>? dropdownItems,
     String? dropdownInitialValue,
+    String? inputRequiredError,
     void Function(String? dropdownValue, String inputText)? onFormButtonPressed,
   }) {
     return showDialog(
@@ -83,6 +86,7 @@ class CustomDialog extends StatefulWidget {
         dropdownHint: dropdownHint,
         dropdownItems: dropdownItems,
         dropdownInitialValue: dropdownInitialValue,
+        inputRequiredError: inputRequiredError,
         onFormButtonPressed: onFormButtonPressed,
       ),
     );
@@ -95,6 +99,7 @@ class CustomDialog extends StatefulWidget {
 class _CustomDialogState extends State<CustomDialog> {
   final TextEditingController _inputController = TextEditingController();
   String? _selectedDropdownValue;
+  bool _inputError = false;
 
   @override
   void initState() {
@@ -205,8 +210,23 @@ class _CustomDialogState extends State<CustomDialog> {
                 if (hasInput) ...[
                   InputField(
                     hint: widget.inputHint!,
-                    onChanged: (v) => _inputController.text = v,
+                    onChanged: (v) {
+                      _inputController.text = v;
+                      if (_inputError && v.trim().isNotEmpty) {
+                        setState(() => _inputError = false);
+                      }
+                    },
                   ),
+                  if (_inputError) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      widget.inputRequiredError ?? '',
+                      style: TextStyle(
+                        color: colorScheme.error,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 16),
                 ],
 
@@ -215,6 +235,11 @@ class _CustomDialogState extends State<CustomDialog> {
                   text: widget.buttonText,
                   onPressed: () {
                     if (hasForm) {
+                      if (_inputController.text.trim().isEmpty &&
+                          widget.inputRequiredError != null) {
+                        setState(() => _inputError = true);
+                        return;
+                      }
                       widget.onFormButtonPressed?.call(
                         _selectedDropdownValue,
                         _inputController.text,

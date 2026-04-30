@@ -450,6 +450,7 @@
   "suggestionsDialogTypeSuggestion": "Sugerencia",
   "suggestionsDialogTypeIncident": "Incidencia",
   "suggestionsDialogDescriptionHint": "Descripción",
+  "suggestionsDialogDescriptionRequired": "La descripción no puede estar vacía.",
   "suggestionsSentSuccess": "Enviado correctamente. ¡Gracias por tu aportación!",
   "suggestionsSentError": "No se pudo enviar. Inténtalo de nuevo más tarde."
 }

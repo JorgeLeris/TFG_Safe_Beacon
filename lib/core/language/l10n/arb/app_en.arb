@@ -450,6 +450,7 @@
   "suggestionsDialogTypeSuggestion": "Suggestion",
   "suggestionsDialogTypeIncident": "Incident",
   "suggestionsDialogDescriptionHint": "Description",
+  "suggestionsDialogDescriptionRequired": "Description cannot be empty.",
   "suggestionsSentSuccess": "Sent successfully. Thank you for your feedback!",
   "suggestionsSentError": "Could not send. Please try again later."
 }

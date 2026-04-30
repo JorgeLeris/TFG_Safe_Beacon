@@ -34,6 +34,7 @@ class SettingsScreen extends StatelessWidget {
       ],
       dropdownInitialValue: Constants.suggestionTypeKey,
       inputHint: l10n.suggestionsDialogDescriptionHint,
+      inputRequiredError: l10n.suggestionsDialogDescriptionRequired,
       onFormButtonPressed: (type, description) {
         Navigator.of(context, rootNavigator: true).pop();
         final email =
