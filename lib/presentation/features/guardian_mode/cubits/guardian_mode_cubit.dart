@@ -293,7 +293,6 @@ class GuardianModeCubit extends Cubit<GuardianModeCubitState> {
   /// Checks prerequisites (location permission + trusted contacts) before
   /// allowing navigation to the guardian mode screen.
   Future<void> requestNavigate() async {
-    // TODO: manage disable case in feature configuration - add to state other disabled cases (more permission cases)
     emit(
       state.copyWith(
         isChecking: true,

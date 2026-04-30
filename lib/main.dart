@@ -14,6 +14,7 @@ import 'package:safe_beacon/app/config/environment.dart';
 import 'package:safe_beacon/app/monitoring/logging.dart';
 import 'package:safe_beacon/app/router/app_router.dart';
 import 'package:safe_beacon/core/language/language.dart';
+import 'package:safe_beacon/core/theme/theme.dart';
 import 'package:safe_beacon/data/repositories/app_settings_repository.dart';
 import 'package:safe_beacon/data/repositories/user_profile_repository_impl.dart';
 import 'package:safe_beacon/data/sources/firebase/profile/user_profile_api.dart';
@@ -55,6 +56,9 @@ Future<void> mainCommon(Environment environment) async {
   // Get initial locale (saved, device, or default)
   final locale = await _getInitialAppLocale(appDeps.appSettingsRepository);
 
+  // Get initial theme mode (saved preference, or system default)
+  final themeMode = await _getInitialThemeMode(appDeps.appSettingsRepository);
+
   // Set up logging
   setupLogging();
 
@@ -69,12 +73,22 @@ Future<void> mainCommon(Environment environment) async {
         RepositoryProvider.value(value: appDeps.sharedPreferences),
         RepositoryProvider.value(value: appDeps.appSettingsRepository),
       ],
-      child: BlocProvider(
-        create: (_) => LanguageCubit(
-          locale: locale,
-          appSettingsRepository: appDeps.appSettingsRepository,
-          interceptor: appDeps.languageInterceptor,
-        ),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => LanguageCubit(
+              locale: locale,
+              appSettingsRepository: appDeps.appSettingsRepository,
+              interceptor: appDeps.languageInterceptor,
+            ),
+          ),
+          BlocProvider(
+            create: (_) => ThemeCubit(
+              themeMode: themeMode,
+              appSettingsRepository: appDeps.appSettingsRepository,
+            ),
+          ),
+        ],
         child: SafeArea(
           left: false,
           right: false,
@@ -104,6 +118,19 @@ Future<Locale> _getInitialAppLocale(
   }
 
   return Locale.fromSubtags(languageCode: appLanguage);
+}
+
+/// Returns the initial [ThemeMode] for the app.
+///
+/// If the user has previously saved a preference it is used; otherwise
+/// [ThemeMode.system] is returned so the app follows the device setting.
+Future<ThemeMode> _getInitialThemeMode(
+  AppSettingsRepository settingsRepository,
+) async {
+  final saved = await settingsRepository.getThemeMode();
+  if (saved == 'dark') return ThemeMode.dark;
+  if (saved == 'light') return ThemeMode.light;
+  return ThemeMode.system;
 }
 
 // Necessary for background message handling, must be a top-level function — runs in a separate isolate

@@ -16,6 +16,11 @@ class CustomDialog extends StatefulWidget {
     this.onSecondButtonPressed,
     this.inputHint,
     this.onInputButtonPressed,
+    this.dropdownHint,
+    this.dropdownItems,
+    this.dropdownInitialValue,
+    this.inputRequiredError,
+    this.onFormButtonPressed,
   });
 
   final String title;
@@ -34,6 +39,16 @@ class CustomDialog extends StatefulWidget {
   final String? inputHint;
   final ValueChanged<String>? onInputButtonPressed;
 
+  final String? dropdownHint;
+  final List<DropdownMenuItem<String>>? dropdownItems;
+  final String? dropdownInitialValue;
+  final String? inputRequiredError;
+
+  /// Called when the main button is pressed and both [dropdownHint] and
+  /// [inputHint] are provided.
+  final void Function(String? dropdownValue, String inputText)?
+  onFormButtonPressed;
+
   static Future<void> show({
     required BuildContext context,
     required String title,
@@ -47,6 +62,11 @@ class CustomDialog extends StatefulWidget {
     VoidCallback? onSecondButtonPressed,
     String? inputHint,
     ValueChanged<String>? onInputButtonPressed,
+    String? dropdownHint,
+    List<DropdownMenuItem<String>>? dropdownItems,
+    String? dropdownInitialValue,
+    String? inputRequiredError,
+    void Function(String? dropdownValue, String inputText)? onFormButtonPressed,
   }) {
     return showDialog(
       context: context,
@@ -63,6 +83,11 @@ class CustomDialog extends StatefulWidget {
         onSecondButtonPressed: onSecondButtonPressed,
         inputHint: inputHint,
         onInputButtonPressed: onInputButtonPressed,
+        dropdownHint: dropdownHint,
+        dropdownItems: dropdownItems,
+        dropdownInitialValue: dropdownInitialValue,
+        inputRequiredError: inputRequiredError,
+        onFormButtonPressed: onFormButtonPressed,
       ),
     );
   }
@@ -73,6 +98,14 @@ class CustomDialog extends StatefulWidget {
 
 class _CustomDialogState extends State<CustomDialog> {
   final TextEditingController _inputController = TextEditingController();
+  String? _selectedDropdownValue;
+  bool _inputError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedDropdownValue = widget.dropdownInitialValue;
+  }
 
   @override
   void dispose() {
@@ -86,6 +119,11 @@ class _CustomDialogState extends State<CustomDialog> {
     final textTheme = context.textTheme;
     final hasInput = widget.inputHint != null;
     final hasSecondButton = widget.secondButtonText != null;
+    final bool hasDropdown =
+        widget.dropdownHint != null &&
+        widget.dropdownItems != null &&
+        widget.dropdownItems!.isNotEmpty;
+    final bool hasForm = hasDropdown && hasInput;
 
     return PopScope(
       canPop: widget.dismissible,
@@ -122,7 +160,8 @@ class _CustomDialogState extends State<CustomDialog> {
                     ),
                     if (widget.dismissible)
                       IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed: () =>
+                            Navigator.of(context, rootNavigator: true).pop(),
                         icon: Icon(Icons.close, color: colorScheme.onSurface),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
@@ -154,12 +193,40 @@ class _CustomDialogState extends State<CustomDialog> {
                   const SizedBox(height: 8),
                 ],
 
+                // Optional dropdown
+                if (hasDropdown) ...[
+                  DropdownInputField<String>(
+                    hint: widget.dropdownHint!,
+                    alignedDropdown: true,
+                    items: widget.dropdownItems!,
+                    value: _selectedDropdownValue,
+                    onChanged: (v) =>
+                        setState(() => _selectedDropdownValue = v),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+
                 // Optional input field above the main button
                 if (hasInput) ...[
                   InputField(
                     hint: widget.inputHint!,
-                    onChanged: (v) => _inputController.text = v,
+                    onChanged: (v) {
+                      _inputController.text = v;
+                      if (_inputError && v.trim().isNotEmpty) {
+                        setState(() => _inputError = false);
+                      }
+                    },
                   ),
+                  if (_inputError) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      widget.inputRequiredError ?? '',
+                      style: TextStyle(
+                        color: colorScheme.error,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 16),
                 ],
 
@@ -167,11 +234,24 @@ class _CustomDialogState extends State<CustomDialog> {
                 CustomFilledButton(
                   text: widget.buttonText,
                   onPressed: () {
-                    if (hasInput) {
+                    if (hasForm) {
+                      if (_inputController.text.trim().isEmpty &&
+                          widget.inputRequiredError != null) {
+                        setState(() => _inputError = true);
+                        return;
+                      }
+                      widget.onFormButtonPressed?.call(
+                        _selectedDropdownValue,
+                        _inputController.text,
+                      );
+                    } else if (hasInput) {
                       widget.onInputButtonPressed?.call(_inputController.text);
                     } else {
                       (widget.onButtonPressed ??
-                          () => Navigator.of(context).pop())();
+                          () => Navigator.of(
+                            context,
+                            rootNavigator: true,
+                          ).pop())();
                     }
                   },
                   backgroundColor: colorScheme.secondary,
@@ -191,7 +271,7 @@ class _CustomDialogState extends State<CustomDialog> {
                     text: widget.secondButtonText!,
                     onPressed:
                         widget.onSecondButtonPressed ??
-                        () => Navigator.of(context).pop(),
+                        () => Navigator.of(context, rootNavigator: true).pop(),
                     backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,
                     colorText: colorScheme.onPrimary,

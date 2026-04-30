@@ -5,7 +5,10 @@ lcov --remove coverage/lcov.info \
   '*.g.dart' \
   '*.freezed.dart' \
   'lib/data/sources/*' \
-  'lib/core/*' \
+  'lib/core/constants/*' \
+  'lib/core/extensions/*' \
+  'lib/core/language/generated/*' \
+  'lib/core/language/l10n/*' \
   'lib/app/*' \
   'lib/domain/*' \
   'lib/notification_service.dart' \
