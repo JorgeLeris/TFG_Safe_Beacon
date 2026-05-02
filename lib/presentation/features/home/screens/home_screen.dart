@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
+import 'package:safe_beacon/presentation/features/fall_detection/providers/fall_detection_provider.dart';
 import 'package:safe_beacon/presentation/features/fall_detection/widgets/fall_detection_card.dart';
 import 'package:safe_beacon/presentation/features/guardian_mode/cubits/guardian_mode_cubit.dart';
 import 'package:safe_beacon/presentation/features/guardian_mode/routes/guardian_mode_routes.dart';
@@ -423,7 +424,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   const SizedBox(height: 12),
 
                   // Fall detection card
-                  const FallDetectionCard(),
+                  const FallDetectionProvider(
+                    child: FallDetectionCard(),
+                  ),
 
                   const SizedBox(height: 24),
                 ],

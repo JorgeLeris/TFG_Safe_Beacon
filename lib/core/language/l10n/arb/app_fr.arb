@@ -316,6 +316,16 @@
       }
     }
   },
+  "notificationFallDetectionBody": "Votre personne protégée {username} a subi une chute détectée automatiquement.",
+  "@notificationFallDetectionBody": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "fallDetectionDisabledNoContacts": "Ajoutez des contacts de confiance pour activer",
+  "fallDetectionDisabledNoPermission": "L'autorisation de localisation est requise",
   "guardianModeMissingDataTitle": "Données manquantes",
   "guardianModeMissingDataContent": "Avant d'activer le Mode Gardien, ajoutez une destination ou une durée estimée pour pouvoir surveiller votre trajet.",
   "guardianModeEstimatedTimeDialogTitle": "Temps estimé",

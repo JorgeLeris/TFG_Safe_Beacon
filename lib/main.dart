@@ -14,13 +14,13 @@ import 'package:safe_beacon/app/config/environment.dart';
 import 'package:safe_beacon/app/monitoring/logging.dart';
 import 'package:safe_beacon/app/router/app_router.dart';
 import 'package:safe_beacon/core/language/language.dart';
+import 'package:safe_beacon/core/services/background_service_initializer.dart';
 import 'package:safe_beacon/core/theme/theme.dart';
 import 'package:safe_beacon/data/repositories/app_settings_repository.dart';
 import 'package:safe_beacon/data/repositories/user_profile_repository_impl.dart';
 import 'package:safe_beacon/data/sources/firebase/profile/user_profile_api.dart';
 import 'package:safe_beacon/firebase_options.dart';
 import 'package:safe_beacon/notification_service.dart';
-import 'package:safe_beacon/presentation/features/guardian_mode/services/guardian_background_service.dart';
 import 'package:safe_beacon/presentation/features/panic_button/widget/panic_widget_service.dart';
 
 Future<void> mainCommon(Environment environment) async {
@@ -32,8 +32,8 @@ Future<void> mainCommon(Environment environment) async {
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Initialize background service for guardian mode checks.
-  await GuardianBackgroundServiceManager.initialize();
+  // Initialize background service for guardian mode and fall detection checks.
+  await BackgroundServiceInitializer.initialize();
 
   // Load environment variables
   await dotenv.load();

@@ -316,6 +316,16 @@
       }
     }
   },
+  "notificationFallDetectionBody": "Your protected person {username} has suffered an automatically detected fall.",
+  "@notificationFallDetectionBody": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "fallDetectionDisabledNoContacts": "Add trusted contacts to enable",
+  "fallDetectionDisabledNoPermission": "Location permission is required",
   "guardianModeMissingDataTitle": "Missing data",
   "guardianModeMissingDataContent": "Before activating Guardian Mode, add a destination or an estimated duration to monitor your journey.",
   "guardianModeEstimatedTimeDialogTitle": "Estimated time",
