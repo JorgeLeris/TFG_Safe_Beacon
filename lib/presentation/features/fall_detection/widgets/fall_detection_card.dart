@@ -14,8 +14,8 @@ class FallDetectionCard extends StatefulWidget {
 
 class _FallDetectionCardState extends State<FallDetectionCard> {
   // TODO: replace with real fall detection state
-  bool _isEnabled = true;
-  final bool _hasFallAlert = true;
+  bool _isEnabled = false;
+  final bool _hasFallAlert = false;
 
   // ==============================================
   // MARK: - Dialog
@@ -49,14 +49,19 @@ class _FallDetectionCardState extends State<FallDetectionCard> {
     required AppLocalizations l10n,
   }) {
     if (_isEnabled && _hasFallAlert) {
+      final reddishWhite = Color.alphaBlend(
+        colorScheme.error.withValues(alpha: 0.20),
+        Colors.white,
+      );
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: colorScheme.error.withValues(alpha: 0.12),
+          color: colorScheme.error.withValues(alpha: 0.20),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: colorScheme.error.withValues(alpha: 0.4),
+            color: colorScheme.error,
+            width: 1.2,
           ),
         ),
         child: Row(
@@ -66,7 +71,7 @@ class _FallDetectionCardState extends State<FallDetectionCard> {
               padding: const EdgeInsets.only(top: 1),
               child: Icon(
                 Icons.warning_amber_rounded,
-                color: colorScheme.error,
+                color: reddishWhite,
                 size: 20,
               ),
             ),
@@ -78,7 +83,7 @@ class _FallDetectionCardState extends State<FallDetectionCard> {
                   Text(
                     l10n.fallDetectionStatusFallDetected,
                     style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.error,
+                      color: reddishWhite,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -86,7 +91,7 @@ class _FallDetectionCardState extends State<FallDetectionCard> {
                   Text(
                     l10n.fallDetectionStatusAlertGenerated,
                     style: textTheme.bodySmall?.copyWith(
-                      color: colorScheme.error.withValues(alpha: 0.8),
+                      color: reddishWhite.withValues(alpha: 0.85),
                     ),
                   ),
                 ],
@@ -102,7 +107,11 @@ class _FallDetectionCardState extends State<FallDetectionCard> {
         ? l10n.fallDetectionStatusNoFalls
         : l10n.fallDetectionStatusInactive;
     final itemColor =
-        _isEnabled ? fgColor : fgColor.withValues(alpha: 0.55);
+        _isEnabled ? fgColor : fgColor.withValues(alpha: 0.6);
+    final borderColor =
+        _isEnabled ? fgColor.withValues(alpha: 0.5) : fgColor.withValues(alpha: 0.25);
+    final bgColor =
+        _isEnabled ? fgColor.withValues(alpha: 0.18) : fgColor.withValues(alpha: 0.08);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -110,8 +119,9 @@ class _FallDetectionCardState extends State<FallDetectionCard> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: fgColor.withValues(alpha: _isEnabled ? 0.15 : 0.08),
+        color: bgColor,
         borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: borderColor, width: 1.0),
       ),
       child: Row(
         children: [
