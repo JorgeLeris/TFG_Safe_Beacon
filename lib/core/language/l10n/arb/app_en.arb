@@ -452,5 +452,16 @@
   "suggestionsDialogDescriptionHint": "Description",
   "suggestionsDialogDescriptionRequired": "Description cannot be empty.",
   "suggestionsSentSuccess": "Sent successfully. Thank you for your feedback!",
-  "suggestionsSentError": "Could not send. Please try again later."
+  "suggestionsSentError": "Could not send. Please try again later.",
+
+  "fallDetectionTitle": "Automatic fall detection",
+  "fallDetectionDescription": "Activating this mode will generate an alert when a fall of the device is detected. It deactivates when the detection ends.",
+  "fallDetectionDeactivateTitle": "Deactivate detection",
+  "fallDetectionDeactivateContent": "If you deactivate automatic fall detection, no more fall detections will be performed and any previously generated alerts will be deactivated.",
+  "fallDetectionDeactivateButton": "End detection",
+  "fallDetectionJustificationHint": "Justification",
+  "fallDetectionStatusInactive": "Detection inactive",
+  "fallDetectionStatusNoFalls": "No falls detected",
+  "fallDetectionStatusFallDetected": "Fall detected",
+  "fallDetectionStatusAlertGenerated": "An alert has been generated."
 }

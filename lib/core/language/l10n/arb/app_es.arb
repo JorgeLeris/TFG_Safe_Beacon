@@ -452,5 +452,16 @@
   "suggestionsDialogDescriptionHint": "Descripción",
   "suggestionsDialogDescriptionRequired": "La descripción no puede estar vacía.",
   "suggestionsSentSuccess": "Enviado correctamente. ¡Gracias por tu aportación!",
-  "suggestionsSentError": "No se pudo enviar. Inténtalo de nuevo más tarde."
+  "suggestionsSentError": "No se pudo enviar. Inténtalo de nuevo más tarde.",
+
+  "fallDetectionTitle": "Detección de caídas automática",
+  "fallDetectionDescription": "Al activar este modo se generará una alerta cuando se detecte una caída del dispositivo. Esta se desactiva al finalizar la detección.",
+  "fallDetectionDeactivateTitle": "Desactivar detección",
+  "fallDetectionDeactivateContent": "Si decides desactivar la detección de caídas automática, ya no se realizarán más detecciones de caídas y las alertas que se hayan generado con anterioridad pasarán a estar desactivadas.",
+  "fallDetectionDeactivateButton": "Finalizar detección",
+  "fallDetectionJustificationHint": "Justificación",
+  "fallDetectionStatusInactive": "Detección desactivada",
+  "fallDetectionStatusNoFalls": "Sin caídas detectadas",
+  "fallDetectionStatusFallDetected": "Caída detectada",
+  "fallDetectionStatusAlertGenerated": "Se ha generado una alerta."
 }

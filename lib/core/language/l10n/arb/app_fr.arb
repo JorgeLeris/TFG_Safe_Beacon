@@ -452,5 +452,16 @@
   "suggestionsDialogDescriptionHint": "Description",
   "suggestionsDialogDescriptionRequired": "La description ne peut pas être vide.",
   "suggestionsSentSuccess": "Envoyé avec succès. Merci pour votre contribution !",
-  "suggestionsSentError": "Impossible d'envoyer. Veuillez réessayer plus tard."
+  "suggestionsSentError": "Impossible d'envoyer. Veuillez réessayer plus tard.",
+
+  "fallDetectionTitle": "Détection automatique des chutes",
+  "fallDetectionDescription": "L'activation de ce mode génère une alerte lorsqu'une chute du dispositif est détectée. Elle se désactive à la fin de la détection.",
+  "fallDetectionDeactivateTitle": "Désactiver la détection",
+  "fallDetectionDeactivateContent": "Si vous désactivez la détection automatique des chutes, aucune nouvelle détection ne sera effectuée et les alertes précédemment générées seront désactivées.",
+  "fallDetectionDeactivateButton": "Terminer la détection",
+  "fallDetectionJustificationHint": "Justification",
+  "fallDetectionStatusInactive": "Détection désactivée",
+  "fallDetectionStatusNoFalls": "Aucune chute détectée",
+  "fallDetectionStatusFallDetected": "Chute détectée",
+  "fallDetectionStatusAlertGenerated": "Une alerte a été générée."
 }
