@@ -473,5 +473,9 @@
   "fallDetectionStatusInactive": "Detección desactivada",
   "fallDetectionStatusNoFalls": "Sin caídas detectadas",
   "fallDetectionStatusFallDetected": "Caída detectada",
-  "fallDetectionStatusAlertGenerated": "Se ha generado una alerta."
+  "fallDetectionStatusAlertGenerated": "Se ha generado una alerta.",
+  "fallDetectionBlockedByGuardianTitle": "Modo guardián activo",
+  "fallDetectionBlockedByGuardianContent": "El modo guardián ya está en funcionamiento. Finaliza el modo guardián antes de activar la detección de caídas.",
+  "guardianModeBlockedByFallDetectionTitle": "Detección de caídas activa",
+  "guardianModeBlockedByFallDetectionContent": "La detección automática de caídas ya está en funcionamiento. Descáctivala antes de iniciar el modo guardián."
 }

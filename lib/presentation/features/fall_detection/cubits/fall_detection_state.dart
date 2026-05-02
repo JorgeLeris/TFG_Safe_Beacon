@@ -14,6 +14,7 @@ enum FallDetectionDisabledReason {
   noTrustedContacts,
   locationPermissionDenied,
   locationPermissionDeniedForever,
+  guardianModeRunning,
 }
 
 @freezed

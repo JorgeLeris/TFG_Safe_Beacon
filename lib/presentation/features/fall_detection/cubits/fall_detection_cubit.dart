@@ -10,6 +10,7 @@ import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/domain/common/result.dart';
 import 'package:safe_beacon/domain/contacts/contact_repository.dart';
 import 'package:safe_beacon/presentation/features/fall_detection/services/fall_detection_background_service.dart';
+import 'package:safe_beacon/presentation/features/guardian_mode/services/guardian_background_service.dart';
 
 part 'fall_detection_state.dart';
 part 'fall_detection_cubit.freezed.dart';
@@ -72,7 +73,20 @@ class FallDetectionCubit extends Cubit<FallDetectionCubitState> {
       return;
     }
 
-    // 2. Not running — check prerequisites before showing the inactive state.
+    // 2. Check if guardian mode is running — both features share a single
+    // background service and cannot be active simultaneously.
+    final guardianRunning = await GuardianBackgroundServiceManager.isRunning();
+    if (guardianRunning) {
+      emit(
+        state.copyWith(
+          status: FallDetectionStatus.disabled,
+          disabledReason: FallDetectionDisabledReason.guardianModeRunning,
+        ),
+      );
+      return;
+    }
+
+    // 3. Not running — check prerequisites before showing the inactive state.
     final permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       emit(
@@ -127,6 +141,20 @@ class FallDetectionCubit extends Cubit<FallDetectionCubitState> {
   /// [locale] is used inside the background isolate to produce localised notification strings.
   Future<void> activate(String locale) async {
     emit(state.copyWith(isActivating: true, failure: null));
+
+    // Check that guardian mode is not running — both features share a single
+    // background service and cannot be active simultaneously.
+    final guardianRunning = await GuardianBackgroundServiceManager.isRunning();
+    if (guardianRunning) {
+      emit(
+        state.copyWith(
+          isActivating: false,
+          status: FallDetectionStatus.disabled,
+          disabledReason: FallDetectionDisabledReason.guardianModeRunning,
+        ),
+      );
+      return;
+    }
 
     final started = await FallDetectionBackgroundServiceManager.startChecks(
       uid: _uid,

@@ -5,6 +5,7 @@ enum GuardianModeBlockedReason {
   noTrustedContacts,
   locationPermissionDenied,
   locationPermissionDeniedForever,
+  fallDetectionRunning,
 }
 
 @freezed

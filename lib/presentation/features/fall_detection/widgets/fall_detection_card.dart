@@ -64,6 +64,16 @@ class FallDetectionCard extends StatelessWidget {
           },
           secondButtonText: l10n.cancel,
         );
+      case FallDetectionDisabledReason.guardianModeRunning:
+        CustomDialog.show(
+          context: context,
+          title: l10n.fallDetectionBlockedByGuardianTitle,
+          content: Text(l10n.fallDetectionBlockedByGuardianContent),
+          buttonText: l10n.accept,
+          onButtonPressed: () {
+            Navigator.of(context, rootNavigator: true).pop();
+          },
+        );
     }
   }
 
@@ -379,6 +389,8 @@ class FallDetectionCard extends StatelessWidget {
       FallDetectionDisabledReason.locationPermissionDenied ||
       FallDetectionDisabledReason.locationPermissionDeniedForever =>
         l10n.fallDetectionDisabledNoPermission,
+      FallDetectionDisabledReason.guardianModeRunning =>
+        l10n.fallDetectionBlockedByGuardianTitle,
     };
   }
 }

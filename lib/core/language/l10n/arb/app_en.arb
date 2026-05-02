@@ -473,5 +473,9 @@
   "fallDetectionStatusInactive": "Detection inactive",
   "fallDetectionStatusNoFalls": "No falls detected",
   "fallDetectionStatusFallDetected": "Fall detected",
-  "fallDetectionStatusAlertGenerated": "An alert has been generated."
+  "fallDetectionStatusAlertGenerated": "An alert has been generated.",
+  "fallDetectionBlockedByGuardianTitle": "Guardian mode active",
+  "fallDetectionBlockedByGuardianContent": "Guardian mode is already running. End guardian mode before activating fall detection.",
+  "guardianModeBlockedByFallDetectionTitle": "Fall detection active",
+  "guardianModeBlockedByFallDetectionContent": "Automatic fall detection is already running. Deactivate it before starting guardian mode."
 }
