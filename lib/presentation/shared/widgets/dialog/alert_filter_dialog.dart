@@ -8,7 +8,7 @@ import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
 enum AlertStatusFilter { all, active, inactive }
 
-enum AlertFunctionalityFilter { all, panicButton, guardianMode }
+enum AlertFunctionalityFilter { all, panicButton, guardianMode, fallDetection }
 
 class AlertFilters {
   const AlertFilters({
@@ -200,6 +200,12 @@ class _AlertFilterDialogState extends State<AlertFilterDialog> {
                 _FilterChip<AlertFunctionalityFilter>(
                   label: l10n.guardianMode,
                   value: AlertFunctionalityFilter.guardianMode,
+                  groupValue: _functionality,
+                  onSelected: (v) => setState(() => _functionality = v),
+                ),
+                _FilterChip<AlertFunctionalityFilter>(
+                  label: l10n.sensors,
+                  value: AlertFunctionalityFilter.fallDetection,
                   groupValue: _functionality,
                   onSelected: (v) => setState(() => _functionality = v),
                 ),
