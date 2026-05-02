@@ -129,7 +129,7 @@
   "notAvailable": "Indisponible",
   "panicButton": "Bouton de panique",
   "guardianMode": "Mode gardien",
-  "sensors": "Capteurs",
+  "sensors": "Chutes",
   "panicButtonInfoContent": "Cette fonctionnalité envoie des alertes immédiates à vos contacts de confiance avec votre position actuelle. Utilisez-la uniquement en cas d'urgence.",
   "guardianModeInfoContent": "Activez cette fonctionnalité lorsque vous souhaitez une sécurité accrue lors d'un trajet.\n\nL'application surveille votre itinéraire et le temps estimé. En cas de déviations ou de retards, vos contacts de confiance recevront une alerte automatique.",
   "guardianModeNoContactsContent": "Le mode gardien nécessite au moins un contact de confiance pour partager votre itinéraire. Rendez-vous dans la section contacts pour en ajouter un.",
