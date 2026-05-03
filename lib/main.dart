@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:safe_beacon/app/app.dart';
 import 'package:safe_beacon/app/config/app_dependencies.dart';
@@ -13,12 +14,13 @@ import 'package:safe_beacon/app/config/environment.dart';
 import 'package:safe_beacon/app/monitoring/logging.dart';
 import 'package:safe_beacon/app/router/app_router.dart';
 import 'package:safe_beacon/core/language/language.dart';
+import 'package:safe_beacon/core/services/background_service_initializer.dart';
+import 'package:safe_beacon/core/theme/theme.dart';
 import 'package:safe_beacon/data/repositories/app_settings_repository.dart';
 import 'package:safe_beacon/data/repositories/user_profile_repository_impl.dart';
 import 'package:safe_beacon/data/sources/firebase/profile/user_profile_api.dart';
 import 'package:safe_beacon/firebase_options.dart';
 import 'package:safe_beacon/notification_service.dart';
-import 'package:safe_beacon/presentation/features/guardian_mode/services/guardian_background_service.dart';
 import 'package:safe_beacon/presentation/features/panic_button/widget/panic_widget_service.dart';
 
 Future<void> mainCommon(Environment environment) async {
@@ -30,8 +32,8 @@ Future<void> mainCommon(Environment environment) async {
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Initialize background service for guardian mode checks.
-  await GuardianBackgroundServiceManager.initialize();
+  // Initialize background service for guardian mode and fall detection checks.
+  await BackgroundServiceInitializer.initialize();
 
   // Load environment variables
   await dotenv.load();
@@ -39,33 +41,23 @@ Future<void> mainCommon(Environment environment) async {
   // Initialize home-screen widget service.
   await PanicWidgetService.init();
 
-  // Check if the app was launched by tapping a notification (terminated state).
-  final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-  final initialAlertId = initialMessage?.data['alertId'] as String?;
-  if (initialAlertId != null && initialAlertId.isNotEmpty) {
-    NotificationService.setPendingInitialAlertId(initialAlertId);
-  }
+  // Capture any deep-link data from the notification that cold-started the app.
+  await _capturePendingNotificationData();
 
   // Build the app router with dependencies
   final router = buildAppRouter();
 
   // Initialize notification service
-  final notificationService = NotificationService();
-  await notificationService.init(
-    onNotificationTap: (alertId) => router.push('/alert-detail/$alertId'),
-  );
-  notificationService.listenToTokenRefresh((uid, token) async {
-    await UserProfileRepositoryImpl(
-      api: UserProfileApi(),
-    ).saveFcmToken(uid, token);
-  });
-  FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
+  await _initNotificationService(router);
 
   // Initialize global dependencies
   final appDeps = await AppDependencies.initialize(environment);
 
   // Get initial locale (saved, device, or default)
   final locale = await _getInitialAppLocale(appDeps.appSettingsRepository);
+
+  // Get initial theme mode (saved preference, or system default)
+  final themeMode = await _getInitialThemeMode(appDeps.appSettingsRepository);
 
   // Set up logging
   setupLogging();
@@ -81,12 +73,22 @@ Future<void> mainCommon(Environment environment) async {
         RepositoryProvider.value(value: appDeps.sharedPreferences),
         RepositoryProvider.value(value: appDeps.appSettingsRepository),
       ],
-      child: BlocProvider(
-        create: (_) => LanguageCubit(
-          locale: locale,
-          appSettingsRepository: appDeps.appSettingsRepository,
-          interceptor: appDeps.languageInterceptor,
-        ),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => LanguageCubit(
+              locale: locale,
+              appSettingsRepository: appDeps.appSettingsRepository,
+              interceptor: appDeps.languageInterceptor,
+            ),
+          ),
+          BlocProvider(
+            create: (_) => ThemeCubit(
+              themeMode: themeMode,
+              appSettingsRepository: appDeps.appSettingsRepository,
+            ),
+          ),
+        ],
         child: SafeArea(
           left: false,
           right: false,
@@ -118,10 +120,71 @@ Future<Locale> _getInitialAppLocale(
   return Locale.fromSubtags(languageCode: appLanguage);
 }
 
+/// Returns the initial [ThemeMode] for the app.
+///
+/// If the user has previously saved a preference it is used; otherwise
+/// [ThemeMode.system] is returned so the app follows the device setting.
+Future<ThemeMode> _getInitialThemeMode(
+  AppSettingsRepository settingsRepository,
+) async {
+  final saved = await settingsRepository.getThemeMode();
+  if (saved == 'dark') return ThemeMode.dark;
+  if (saved == 'light') return ThemeMode.light;
+  return ThemeMode.system;
+}
+
 // Necessary for background message handling, must be a top-level function — runs in a separate isolate
 // Terminated/Background: app is closed or in background
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
   appLogger.info(
     'Background/terminated message received — running in separate isolate: ${message.messageId}',
   );
+}
+
+/// Captures deep-link data from the notification that cold-started the app
+/// (terminated state) and stores it in [NotificationService] static fields
+/// so the splash screen can consume it after authentication.
+Future<void> _capturePendingNotificationData() async {
+  final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
+  if (initialMessage == null) return;
+
+  final alertId = initialMessage.data['alertId'] as String?;
+  if (alertId != null && alertId.isNotEmpty) {
+    NotificationService.setPendingInitialAlertId(alertId);
+  }
+
+  final chatId = initialMessage.data['chatId'] as String?;
+  if (chatId != null && chatId.isNotEmpty) {
+    NotificationService.setPendingInitialChatData({
+      'chatId': chatId,
+      'username': initialMessage.data['username'] as String? ?? '',
+    });
+  }
+}
+
+/// Initialises the [NotificationService] with navigation callbacks and
+/// wires FCM token refresh persistence.
+Future<void> _initNotificationService(GoRouter router) async {
+  final notificationService = NotificationService();
+
+  await notificationService.init(
+    onNotificationTap: (alertId) => router.push('/alert-detail/$alertId'),
+    onChatNotificationTap: (chatData) {
+      final chatId = chatData['chatId'] ?? '';
+      final username = chatData['username'] ?? '';
+      if (chatId.isNotEmpty) {
+        router.push(
+          '/conversation/$chatId?username=${Uri.encodeComponent(username)}',
+        );
+      }
+    },
+  );
+
+  notificationService.listenToTokenRefresh((uid, token) async {
+    await UserProfileRepositoryImpl(
+      api: UserProfileApi(),
+    ).saveFcmToken(uid, token);
+  });
+
+  FirebaseMessaging.onBackgroundMessage(handleBackgroundMessage);
 }

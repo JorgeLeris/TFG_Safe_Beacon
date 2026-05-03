@@ -3,7 +3,7 @@
   "appTitle": "safe_beacon",
   "tabHome": "Inicio",
   "tabControl": "Panel",
-  "tabChat": "Chat",
+  "tabChat": "Chats",
   "tabSettings": "Ajustes",
   "tabProfile": "Perfil",
   "appName": "SafeBeacon",
@@ -34,7 +34,7 @@
   "logout": "Cerrar sesión",
   "save": "Guardar",
   "finishRegistration": "Finalizar registro",
-  "initChatWith": "Iniciar chat con ",
+  "initChatWith": "Iniciar chat con",
   "emailRequired": "El correo es obligatorio",
   "emailInvalid": "Introduce un correo válido",
   "passwordRequired": "La contraseña es obligatoria",
@@ -129,7 +129,7 @@
   "notAvailable": "No disponible",
   "panicButton": "Botón del pánico",
   "guardianMode": "Modo guardián",
-  "sensors": "Sensores",
+  "sensors": "Caídas",
   "panicButtonInfoContent": "Esta función envía alertas inmediatas a tus contactos de confianza con tu ubicación actual. Utilízala únicamente en situaciones de emergencia.",
   "guardianModeInfoContent": "Activa esta función cuando quieras mayor seguridad durante un trayecto.\n\nLa app controla tu ruta y el tiempo estimado. Si hay desvíos o retrasos, tus contactos de confianza recibirán un aviso automáticamente.",
   "guardianModeNoContactsContent": "El modo guardián necesita al menos un contacto de confianza para compartir tu ruta. Ve a la sección de contactos para añadir uno.",
@@ -316,6 +316,16 @@
       }
     }
   },
+  "notificationFallDetectionBody": "Tu persona protegida {username} ha sufrido una caída detectada automáticamente.",
+  "@notificationFallDetectionBody": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "fallDetectionDisabledNoContacts": "Añade contactos de confianza para activar",
+  "fallDetectionDisabledNoPermission": "Se necesita permiso de ubicación",
   "guardianModeMissingDataTitle": "Faltan datos",
   "guardianModeMissingDataContent": "Antes de activar el Modo Guardián, añade un destino o una duración estimada para poder supervisar tu recorrido.",
   "guardianModeEstimatedTimeDialogTitle": "Tiempo estimado",
@@ -406,5 +416,66 @@
   "followUpCurrentLocationLabel": "Ubicación actual",
   "followUpLastLocationLabel": "Última ubicación",
   "followUpOriginLabel": "Origen",
-  "followUpDestinationLabel": "Destino"
+  "followUpDestinationLabel": "Destino",
+  "noChatsTitle": "Aún no hay chats",
+  "noChatsDescription": "Todavía no tienes ninguna conversación. Puedes iniciar un chat desde el perfil de un contacto o desde los detalles de una alerta o seguimiento de tus personas protegidas.",
+  "searchChat": "Buscar chat",
+  "youPrefix": "Tú",
+  "chatWithHeader": "Chat con {username}",
+  "@chatWithHeader": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "typeMessageHint": "Escribe un mensaje",
+  "noMessagesYet": "Todavía no hay mensajes.",
+  "settingsContactListsSection": "Listas de contactos",
+  "settingsTrustedContactsDescription": "Accede a tu lista de contactos de confianza para añadir nuevos o gestionar los existentes.",
+  "settingsProtectedPeopleDescription": "Accede a la lista de personas protegidas para gestionarlas y aceptar o rechazar solicitudes.",
+  "settingsDarkModeSection": "Modo oscuro",
+  "settingsEnableDarkMode": "Activar modo oscuro",
+  "settingsEnableDarkModeDescription": "Cambia entre modo claro y oscuro según tu preferencia de visualización.",
+  "settingsPermissionsSection": "Permisos",
+  "settingsLocationPermission": "Permiso de ubicación",
+  "settingsLocationPermissionDescription": "Activa o desactiva el acceso a tu ubicación para habilitar funciones que dependen de ello.",
+  "settingsNotificationsPermission": "Permiso de notificaciones",
+  "settingsNotificationsPermissionDescription": "Activa o desactiva la recepción de notificaciones, incluyendo las alertas y mensajes del chat.",
+  "settingsLanguageSection": "Idioma",
+  "settingsLanguageHint": "Idioma",
+  "settingsLanguageSpanish": "Español",
+  "settingsLanguageEnglish": "Inglés",
+  "settingsLanguageFrench": "Francés",
+  "settingsFeaturesConfigDescription": "Habilita y deshabilita las funcionalidades o accede a las configuraciones de personalización.",
+  "settingsPrivacyPoliciesSection": "Políticas de privacidad",
+  "settingsViewPrivacyPolicies": "Ver políticas de privacidad",
+  "settingsViewPrivacyPoliciesDescription": "Accede a la información sobre el uso y protección de tus datos personales.",
+  "settingsSuggestionsSection": "Sugerencias e incidencias",
+  "settingsSendSuggestions": "Enviar sugerencias e incidencias",
+  "settingsSendSuggestionsDescription": "Accede al formulario para enviar sugerencias o reportar incidencias.",
+  "suggestionsDialogTitle": "Sugerencias / Incidencias",
+  "suggestionsDialogContent": "Describe tu sugerencia o el problema que has encontrado. Lo revisaremos lo antes posible.",
+  "suggestionsDialogTypeHint": "Tipo",
+  "suggestionsDialogTypeSuggestion": "Sugerencia",
+  "suggestionsDialogTypeIncident": "Incidencia",
+  "suggestionsDialogDescriptionHint": "Descripción",
+  "suggestionsDialogDescriptionRequired": "La descripción no puede estar vacía.",
+  "suggestionsSentSuccess": "Enviado correctamente. ¡Gracias por tu aportación!",
+  "suggestionsSentError": "No se pudo enviar. Inténtalo de nuevo más tarde.",
+
+  "fallDetectionTitle": "Detección de caídas automática",
+  "fallDetectionDescription": "Al activar este modo se generará una alerta cuando se detecte una caída del dispositivo. Esta se desactiva al finalizar la detección.",
+  "fallDetectionDeactivateTitle": "Desactivar detección",
+  "fallDetectionDeactivateContent": "Si decides desactivar la detección de caídas automática, ya no se realizarán más detecciones de caídas y las alertas que se hayan generado con anterioridad pasarán a estar desactivadas.",
+  "fallDetectionDeactivateButton": "Finalizar detección",
+  "fallDetectionJustificationHint": "Justificación",
+  "fallDetectionStatusInactive": "Detección desactivada",
+  "fallDetectionStatusNoFalls": "Sin caídas detectadas",
+  "fallDetectionStatusFallDetected": "Caída detectada",
+  "fallDetectionStatusAlertGenerated": "Se ha generado una alerta.",
+  "fallDetectionBlockedByGuardianTitle": "Modo guardián activo",
+  "fallDetectionBlockedByGuardianContent": "El modo guardián ya está en funcionamiento. Finaliza el modo guardián antes de activar la detección de caídas.",
+  "guardianModeBlockedByFallDetectionTitle": "Detección de caídas activa",
+  "guardianModeBlockedByFallDetectionContent": "La detección automática de caídas ya está en funcionamiento. Descáctivala antes de iniciar el modo guardián."
 }

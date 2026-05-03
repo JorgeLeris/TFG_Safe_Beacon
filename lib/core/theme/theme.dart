@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-// TODO: Add cubit to manage the dark mode state (by default, if nothing is saved locally, use the device setting; otherwise, use the one saved in local storage).
+export 'cubit/theme_cubit.dart';
 
 ThemeData buildTheme({Brightness brightness = Brightness.light}) {
   final isDark = brightness == Brightness.dark;

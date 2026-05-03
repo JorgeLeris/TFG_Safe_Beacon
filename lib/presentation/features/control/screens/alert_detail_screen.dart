@@ -6,6 +6,7 @@ import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/core/helpers/helpers.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/alerts/entities/alert.dart';
+import 'package:safe_beacon/presentation/features/chat/helpers/navigate_to_chat.dart';
 import 'package:safe_beacon/presentation/features/control/cubits/alert_detail_cubit.dart';
 import 'package:safe_beacon/presentation/features/control/widgets/alert_detail_dialog.dart';
 import 'package:safe_beacon/presentation/features/control/widgets/alert_map.dart';
@@ -299,9 +300,12 @@ class AlertDetailScreen extends StatelessWidget {
   }
 
   Widget _buildContactButton(
+    BuildContext context,
     AppLocalizations l10n,
     ColorScheme colorScheme,
     String displayName,
+    String otherUid,
+    String? otherProfilePhoto,
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -309,7 +313,12 @@ class AlertDetailScreen extends StatelessWidget {
         text: l10n.startChatWith(displayName.capitalized()),
         icon: Icons.chat_outlined,
         onPressed: () {
-          // TODO: navigate to chat with user
+          navigateToChat(
+            context,
+            otherUid: otherUid,
+            otherDisplayName: displayName,
+            otherProfilePhoto: otherProfilePhoto,
+          );
         },
         backgroundColor: colorScheme.tertiary,
         foregroundColor: colorScheme.onTertiary,
@@ -357,6 +366,7 @@ class AlertDetailScreen extends StatelessWidget {
 
           final alert = state.alert!;
           final displayName = state.displayName;
+          final displayProfilePhoto = state.displayProfilePhoto;
           final hasCoordinates =
               alert.latitude != 0.0 || alert.longitude != 0.0;
 
@@ -422,7 +432,14 @@ class AlertDetailScreen extends StatelessWidget {
                         textTheme,
                         colorScheme,
                       ),
-                      _buildContactButton(l10n, colorScheme, displayName),
+                      _buildContactButton(
+                        context,
+                        l10n,
+                        colorScheme,
+                        displayName,
+                        alert.ownerUid,
+                        displayProfilePhoto,
+                      ),
                     ],
                   ),
                 ),

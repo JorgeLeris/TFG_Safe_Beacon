@@ -12,6 +12,7 @@ import 'package:safe_beacon/domain/contacts/contact_repository.dart';
 import 'package:safe_beacon/domain/guardian_mode/entities/guardian_coordinate.dart';
 import 'package:safe_beacon/domain/guardian_mode/entities/guardian_session.dart';
 import 'package:safe_beacon/domain/guardian_mode/guardian_session_repository.dart';
+import 'package:safe_beacon/presentation/features/fall_detection/services/fall_detection_background_service.dart';
 import 'package:safe_beacon/presentation/features/guardian_mode/services/guardian_background_service.dart';
 
 part 'guardian_mode_state.dart';
@@ -293,7 +294,6 @@ class GuardianModeCubit extends Cubit<GuardianModeCubitState> {
   /// Checks prerequisites (location permission + trusted contacts) before
   /// allowing navigation to the guardian mode screen.
   Future<void> requestNavigate() async {
-    // TODO: manage disable case in feature configuration - add to state other disabled cases (more permission cases)
     emit(
       state.copyWith(
         isChecking: true,
@@ -302,6 +302,19 @@ class GuardianModeCubit extends Cubit<GuardianModeCubitState> {
         showPermissionDeniedDialog: false,
       ),
     );
+
+    // Check that fall detection is not running — both features share a single
+    // background service and cannot be active simultaneously.
+    final fallRunning = await FallDetectionBackgroundServiceManager.isRunning();
+    if (fallRunning) {
+      emit(
+        state.copyWith(
+          isChecking: false,
+          blockedReason: GuardianModeBlockedReason.fallDetectionRunning,
+        ),
+      );
+      return;
+    }
 
     // Check location permission first.
     final permission = await Geolocator.checkPermission();

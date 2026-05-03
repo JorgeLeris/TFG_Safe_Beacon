@@ -21,6 +21,7 @@ class App extends StatelessWidget {
       title: 'safe_beacon',
       theme: buildTheme(),
       darkTheme: buildTheme(brightness: Brightness.dark),
+      themeMode: context.select((ThemeCubit cubit) => cubit.state.themeMode),
       routerConfig: router,
       debugShowCheckedModeBanner: false,
       locale: context.select((LanguageCubit cubit) => cubit.state.locale),

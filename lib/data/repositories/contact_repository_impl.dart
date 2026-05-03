@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:safe_beacon/app/monitoring/logging.dart';
 import 'package:safe_beacon/data/sources/firebase/alerts/alert_api.dart';
+import 'package:safe_beacon/data/sources/firebase/chat/chat_api.dart';
 import 'package:safe_beacon/data/sources/firebase/contacts/contact_api.dart';
 import 'package:safe_beacon/data/sources/firebase/contacts/dto/contact_dto.dart';
 import 'package:safe_beacon/data/sources/firebase/guardian_mode/guardian_session_api.dart';
@@ -15,13 +16,16 @@ class ContactRepositoryImpl implements ContactRepository {
     required ContactApi api,
     required AlertApi alertApi,
     required GuardianSessionApi guardianSessionApi,
+    required ChatApi chatApi,
   }) : _api = api,
        _alertApi = alertApi,
-       _guardianSessionApi = guardianSessionApi;
+       _guardianSessionApi = guardianSessionApi,
+       _chatApi = chatApi;
 
   final ContactApi _api;
   final AlertApi _alertApi;
   final GuardianSessionApi _guardianSessionApi;
+  final ChatApi _chatApi;
 
   /// Creates a contact relationship between [protectedPersonUid] and [trustedContactUid].
   @override
@@ -139,6 +143,16 @@ class ContactRepositoryImpl implements ContactRepository {
       appLogger.fine(
         'Cascade complete: removed ${contact.dto.trustedContactUid} '
         'from guardian sessions of ${contact.dto.protectedPersonUid}',
+      );
+
+      // Cascade: delete the chat between the two parties.
+      await _chatApi.deleteChatBetween(
+        contact.dto.protectedPersonUid,
+        contact.dto.trustedContactUid,
+      );
+      appLogger.fine(
+        'Cascade complete: deleted chat between '
+        '${contact.dto.protectedPersonUid} and ${contact.dto.trustedContactUid}',
       );
 
       return const Result.success(null);

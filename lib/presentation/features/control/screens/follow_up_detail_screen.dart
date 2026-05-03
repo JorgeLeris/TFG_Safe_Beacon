@@ -6,6 +6,7 @@ import 'package:safe_beacon/core/extensions/duration_extensions.dart';
 import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/guardian_mode/entities/guardian_session.dart';
+import 'package:safe_beacon/presentation/features/chat/helpers/navigate_to_chat.dart';
 import 'package:safe_beacon/presentation/features/control/cubits/follow_up_detail_cubit.dart';
 import 'package:safe_beacon/presentation/features/control/widgets/follow_up_map.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
@@ -354,9 +355,12 @@ class FollowUpDetailScreen extends StatelessWidget {
   }
 
   Widget _buildContactButton(
+    BuildContext context,
     AppLocalizations l10n,
     ColorScheme colorScheme,
     String displayName,
+    String otherUid,
+    String? otherProfilePhoto,
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -364,7 +368,12 @@ class FollowUpDetailScreen extends StatelessWidget {
         text: l10n.startChatWith(displayName.capitalized()),
         icon: Icons.chat_outlined,
         onPressed: () {
-          // TODO: Navigate to chat with user.
+          navigateToChat(
+            context,
+            otherUid: otherUid,
+            otherDisplayName: displayName,
+            otherProfilePhoto: otherProfilePhoto,
+          );
         },
         backgroundColor: colorScheme.tertiary,
         foregroundColor: colorScheme.onTertiary,
@@ -412,6 +421,7 @@ class FollowUpDetailScreen extends StatelessWidget {
 
           final session = state.session!;
           final displayName = state.displayName;
+          final displayProfilePhoto = state.profilePhoto;
 
           final startPoint = LatLng(
             session.originLocation.latitude,
@@ -505,7 +515,14 @@ class FollowUpDetailScreen extends StatelessWidget {
                         textTheme,
                         colorScheme,
                       ),
-                      _buildContactButton(l10n, colorScheme, displayName),
+                      _buildContactButton(
+                        context,
+                        l10n,
+                        colorScheme,
+                        displayName,
+                        session.ownerUid,
+                        displayProfilePhoto,
+                      ),
                     ],
                   ),
                 ),

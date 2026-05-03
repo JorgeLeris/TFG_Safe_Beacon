@@ -5,6 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
 import 'package:safe_beacon/presentation/features/contacts/routes/contacts_routes.dart';
+import 'package:safe_beacon/presentation/features/fall_detection/cubits/fall_detection_cubit.dart';
+import 'package:safe_beacon/presentation/features/fall_detection/providers/fall_detection_provider.dart';
+import 'package:safe_beacon/presentation/features/fall_detection/widgets/fall_detection_card.dart';
 import 'package:safe_beacon/presentation/features/guardian_mode/cubits/guardian_mode_cubit.dart';
 import 'package:safe_beacon/presentation/features/guardian_mode/routes/guardian_mode_routes.dart';
 import 'package:safe_beacon/presentation/features/panic_button/cubits/panic_button_cubit.dart';
@@ -267,6 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
       const GuardianModeRoute().push(context).then((_) {
         if (context.mounted) {
           context.read<PanicButtonCubit>().loadAlertState();
+          context.read<FallDetectionCubit>().loadState();
         }
       });
     } else if (state.permissionJustGranted) {
@@ -313,6 +317,16 @@ class _HomeScreenState extends State<HomeScreen> {
           },
           secondButtonText: l10n.cancel,
         );
+      case GuardianModeBlockedReason.fallDetectionRunning:
+        CustomDialog.show(
+          context: context,
+          title: l10n.guardianModeBlockedByFallDetectionTitle,
+          content: Text(l10n.guardianModeBlockedByFallDetectionContent),
+          buttonText: l10n.accept,
+          onButtonPressed: () {
+            Navigator.of(context, rootNavigator: true).pop();
+          },
+        );
       case null:
         break;
     }
@@ -340,16 +354,18 @@ class _HomeScreenState extends State<HomeScreen> {
     final l10n = context.l10n;
     final colorScheme = Theme.of(context).colorScheme;
 
-    return BlocListener<GuardianModeCubit, GuardianModeCubitState>(
-      listenWhen: (prev, curr) =>
-          prev.isChecking != curr.isChecking ||
-          (!prev.canNavigate && curr.canNavigate) ||
-          (!prev.permissionJustGranted && curr.permissionJustGranted) ||
-          (prev.blockedReason != curr.blockedReason &&
-              curr.blockedReason != null) ||
-          (!prev.showPermissionDeniedDialog && curr.showPermissionDeniedDialog),
-      listener: _onGuardianModeStateChanged,
-      child: BlocConsumer<PanicButtonCubit, PanicButtonCubitState>(
+    return FallDetectionProvider(
+      child: BlocListener<GuardianModeCubit, GuardianModeCubitState>(
+        listenWhen: (prev, curr) =>
+            prev.isChecking != curr.isChecking ||
+            (!prev.canNavigate && curr.canNavigate) ||
+            (!prev.permissionJustGranted && curr.permissionJustGranted) ||
+            (prev.blockedReason != curr.blockedReason &&
+                curr.blockedReason != null) ||
+            (!prev.showPermissionDeniedDialog &&
+                curr.showPermissionDeniedDialog),
+        listener: _onGuardianModeStateChanged,
+        child: BlocConsumer<PanicButtonCubit, PanicButtonCubitState>(
         listenWhen: (prev, curr) =>
             (prev.isLoading && !curr.isLoading) ||
             (prev.isActivating && !curr.isActivating) ||
@@ -419,6 +435,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
 
+                  const SizedBox(height: 12),
+
+                  // Fall detection card
+                  const FallDetectionCard(),
+
                   const SizedBox(height: 24),
                 ],
               ),
@@ -426,6 +447,7 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
       ),
+    ),
     );
   }
 }

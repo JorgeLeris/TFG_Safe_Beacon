@@ -3,7 +3,7 @@
   "appTitle": "safe_beacon",
   "tabHome": "Accueil",
   "tabControl": "Tableau",
-  "tabChat": "Chat",
+  "tabChat": "Chats",
   "tabSettings": "Paramètres",
   "tabProfile": "Profil",
   "appName": "SafeBeacon",
@@ -34,7 +34,7 @@
   "logout": "Déconnexion",
   "save": "Sauvegarder",
   "finishRegistration": "Finaliser l'inscription",
-  "initChatWith": "Commencer une conversation avec ",
+  "initChatWith": "Commencer une conversation avec",
   "emailRequired": "L'adresse e-mail est requise",
   "emailInvalid": "Veuillez entrer une adresse e-mail valide",
   "passwordRequired": "Le mot de passe est requis",
@@ -129,7 +129,7 @@
   "notAvailable": "Indisponible",
   "panicButton": "Bouton de panique",
   "guardianMode": "Mode gardien",
-  "sensors": "Capteurs",
+  "sensors": "Chutes",
   "panicButtonInfoContent": "Cette fonctionnalité envoie des alertes immédiates à vos contacts de confiance avec votre position actuelle. Utilisez-la uniquement en cas d'urgence.",
   "guardianModeInfoContent": "Activez cette fonctionnalité lorsque vous souhaitez une sécurité accrue lors d'un trajet.\n\nL'application surveille votre itinéraire et le temps estimé. En cas de déviations ou de retards, vos contacts de confiance recevront une alerte automatique.",
   "guardianModeNoContactsContent": "Le mode gardien nécessite au moins un contact de confiance pour partager votre itinéraire. Rendez-vous dans la section contacts pour en ajouter un.",
@@ -316,6 +316,16 @@
       }
     }
   },
+  "notificationFallDetectionBody": "Votre personne protégée {username} a subi une chute détectée automatiquement.",
+  "@notificationFallDetectionBody": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "fallDetectionDisabledNoContacts": "Ajoutez des contacts de confiance pour activer",
+  "fallDetectionDisabledNoPermission": "L'autorisation de localisation est requise",
   "guardianModeMissingDataTitle": "Données manquantes",
   "guardianModeMissingDataContent": "Avant d'activer le Mode Gardien, ajoutez une destination ou une durée estimée pour pouvoir surveiller votre trajet.",
   "guardianModeEstimatedTimeDialogTitle": "Temps estimé",
@@ -406,5 +416,66 @@
   "followUpCurrentLocationLabel": "Localisation actuelle",
   "followUpLastLocationLabel": "Dernière localisation",
   "followUpOriginLabel": "Origine",
-  "followUpDestinationLabel": "Destination"
+  "followUpDestinationLabel": "Destination",
+  "noChatsTitle": "Aucune conversation",
+  "noChatsDescription": "Vous n'avez pas encore de conversations. Vous pouvez en démarrer une depuis le profil d'un contact ou depuis les détails d'une alerte ou d'un suivi de vos personnes protégées.",
+  "searchChat": "Rechercher un chat",
+  "youPrefix": "Vous",
+  "chatWithHeader": "Chat avec {username}",
+  "@chatWithHeader": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "typeMessageHint": "Tapez un message",
+  "noMessagesYet": "Pas encore de messages.",
+  "settingsContactListsSection": "Listes de contacts",
+  "settingsTrustedContactsDescription": "Accédez à votre liste de contacts de confiance pour en ajouter de nouveaux ou gérer les existants.",
+  "settingsProtectedPeopleDescription": "Accédez à la liste des personnes protégées pour les gérer et accepter ou refuser les demandes.",
+  "settingsDarkModeSection": "Mode sombre",
+  "settingsEnableDarkMode": "Activer le mode sombre",
+  "settingsEnableDarkModeDescription": "Basculez entre le mode clair et le mode sombre selon vos préférences d'affichage.",
+  "settingsPermissionsSection": "Autorisations",
+  "settingsLocationPermission": "Permission de localisation",
+  "settingsLocationPermissionDescription": "Activez ou désactivez l'accès à votre localisation pour activer les fonctionnalités qui en dépendent.",
+  "settingsNotificationsPermission": "Permission de notifications",
+  "settingsNotificationsPermissionDescription": "Activez ou désactivez la réception des notifications, y compris les alertes et les messages du chat.",
+  "settingsLanguageSection": "Langue",
+  "settingsLanguageHint": "Langue",
+  "settingsLanguageSpanish": "Espagnol",
+  "settingsLanguageEnglish": "Anglais",
+  "settingsLanguageFrench": "Français",
+  "settingsFeaturesConfigDescription": "Activez et désactivez les fonctionnalités ou accédez aux paramètres de personnalisation.",
+  "settingsPrivacyPoliciesSection": "Politiques de confidentialité",
+  "settingsViewPrivacyPolicies": "Voir les politiques de confidentialité",
+  "settingsViewPrivacyPoliciesDescription": "Accédez aux informations sur l'utilisation et la protection de vos données personnelles.",
+  "settingsSuggestionsSection": "Suggestions et incidents",
+  "settingsSendSuggestions": "Envoyer des suggestions et incidents",
+  "settingsSendSuggestionsDescription": "Accédez au formulaire pour envoyer des suggestions ou signaler des incidents.",
+  "suggestionsDialogTitle": "Suggestions / Incidents",
+  "suggestionsDialogContent": "Décrivez votre suggestion ou le problème que vous avez rencontré. Nous l'examinerons dans les plus brefs délais.",
+  "suggestionsDialogTypeHint": "Type",
+  "suggestionsDialogTypeSuggestion": "Suggestion",
+  "suggestionsDialogTypeIncident": "Incident",
+  "suggestionsDialogDescriptionHint": "Description",
+  "suggestionsDialogDescriptionRequired": "La description ne peut pas être vide.",
+  "suggestionsSentSuccess": "Envoyé avec succès. Merci pour votre contribution !",
+  "suggestionsSentError": "Impossible d'envoyer. Veuillez réessayer plus tard.",
+
+  "fallDetectionTitle": "Détection automatique des chutes",
+  "fallDetectionDescription": "L'activation de ce mode génère une alerte lorsqu'une chute du dispositif est détectée. Elle se désactive à la fin de la détection.",
+  "fallDetectionDeactivateTitle": "Désactiver la détection",
+  "fallDetectionDeactivateContent": "Si vous désactivez la détection automatique des chutes, aucune nouvelle détection ne sera effectuée et les alertes précédemment générées seront désactivées.",
+  "fallDetectionDeactivateButton": "Terminer la détection",
+  "fallDetectionJustificationHint": "Justification",
+  "fallDetectionStatusInactive": "Détection désactivée",
+  "fallDetectionStatusNoFalls": "Aucune chute détectée",
+  "fallDetectionStatusFallDetected": "Chute détectée",
+  "fallDetectionStatusAlertGenerated": "Une alerte a été générée.",
+  "fallDetectionBlockedByGuardianTitle": "Mode gardien actif",
+  "fallDetectionBlockedByGuardianContent": "Le mode gardien est déjà en cours. Terminez le mode gardien avant d'activer la détection des chutes.",
+  "guardianModeBlockedByFallDetectionTitle": "Détection des chutes active",
+  "guardianModeBlockedByFallDetectionContent": "La détection automatique des chutes est déjà en cours. Désactivez-la avant de démarrer le mode gardien."
 }

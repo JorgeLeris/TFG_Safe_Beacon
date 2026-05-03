@@ -1,5 +1,8 @@
 /// A class containing constant values used throughout the application.
 abstract final class Constants {
+
+  // MARK: - User fields
+  
   /// Male value for dropdown fields.
   static const maleFieldKey = 'male';
 
@@ -12,11 +15,15 @@ abstract final class Constants {
   /// Regular expression for validating email addresses.
   static final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
 
+  // MARK: - Alert types
+
   /// Panic Button alert type key.
   static const String panicButtonAlertTypeKey = 'panic_button';
 
   /// Guardian Mode alert type key.
   static const String guardianModeAlertTypeKey = 'guardian_mode';
+
+  // MARK: - Mapping
 
   /// OpenStreetMap tile URL.
   static const String openStreetMapTileUrl =
@@ -39,4 +46,16 @@ abstract final class Constants {
   /// Returns the Google Maps search URL for the given coordinates.
   static String googleMapsUrl(double latitude, double longitude) =>
       'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+
+  // MARK: - EmailJS
+
+  /// Suggestion type key for the feedback dropdown.
+  static const String suggestionTypeKey = 'suggestion';
+
+  /// Incident type key for the feedback dropdown.
+  static const String incidentTypeKey = 'incident';
+
+  /// EmailJS REST API endpoint.
+  static const String emailJsUrl =
+      'https://api.emailjs.com/api/v1.0/email/send';
 }

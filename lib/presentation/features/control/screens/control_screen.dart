@@ -69,6 +69,7 @@ class _ControlScreenState extends State<ControlScreen> {
       AlertFunctionalityFilter.all => true,
       AlertFunctionalityFilter.panicButton => type == AlertType.panic,
       AlertFunctionalityFilter.guardianMode => type == AlertType.guardian,
+      AlertFunctionalityFilter.fallDetection => type == AlertType.sensors,
     };
   }
 
@@ -449,12 +450,11 @@ class _ControlScreenState extends State<ControlScreen> {
                 // Section 2: tabs
                 Expanded(
                   child: CustomTabView(
-                    tabs: [l10n.alerts, l10n.followUps, l10n.history],
+                    tabs: [l10n.alerts, l10n.followUps],
                     onTabChanged: _onTabChanged,
                     children: [
                       _buildAlertsList(context, l10n, state),
                       _buildFollowUpsList(context, l10n, state),
-                      const Placeholder(),
                     ],
                   ),
                 ),

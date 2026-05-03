@@ -3,7 +3,7 @@
   "appTitle": "safe_beacon",
   "tabHome": "Home",
   "tabControl": "Dashboard",
-  "tabChat": "Chat",
+  "tabChat": "Chats",
   "tabSettings": "Settings",
   "tabProfile": "Profile",
   "appName": "SafeBeacon",
@@ -34,7 +34,7 @@
   "logout": "Logout",
   "save": "Save",
   "finishRegistration": "Finish Registration",
-  "initChatWith": "Initiate chat with ",
+  "initChatWith": "Initiate chat with",
   "emailRequired": "Email is required",
   "emailInvalid": "Please enter a valid email",
   "passwordRequired": "Password is required",
@@ -129,7 +129,7 @@
   "notAvailable": "Not available",
   "panicButton": "Panic button",
   "guardianMode": "Guardian mode",
-  "sensors": "Sensors",
+  "sensors": "Falls",
   "panicButtonInfoContent": "This feature sends immediate alerts to your trusted contacts with your current location. Use it only in emergency situations.",
   "guardianModeInfoContent": "Activate this feature when you want increased safety during a journey.\n\nThe app monitors your route and estimated time. If there are deviations or delays, your trusted contacts will receive an automatic alert.",
   "guardianModeNoContactsContent": "Guardian mode requires at least one trusted contact to share your route with. Go to the contacts section to add one.",
@@ -316,6 +316,16 @@
       }
     }
   },
+  "notificationFallDetectionBody": "Your protected person {username} has suffered an automatically detected fall.",
+  "@notificationFallDetectionBody": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "fallDetectionDisabledNoContacts": "Add trusted contacts to enable",
+  "fallDetectionDisabledNoPermission": "Location permission is required",
   "guardianModeMissingDataTitle": "Missing data",
   "guardianModeMissingDataContent": "Before activating Guardian Mode, add a destination or an estimated duration to monitor your journey.",
   "guardianModeEstimatedTimeDialogTitle": "Estimated time",
@@ -406,5 +416,66 @@
   "followUpCurrentLocationLabel": "Current location",
   "followUpLastLocationLabel": "Last location",
   "followUpOriginLabel": "Origin",
-  "followUpDestinationLabel": "Destination"
+  "followUpDestinationLabel": "Destination",
+  "noChatsTitle": "No chats yet",
+  "noChatsDescription": "You don't have any conversations yet. You can start a chat from a contact's profile or from the details of an alert or follow-up of your protected people.",
+  "searchChat": "Search chat",
+  "youPrefix": "You",
+  "chatWithHeader": "Chat with {username}",
+  "@chatWithHeader": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "typeMessageHint": "Type a message",
+  "noMessagesYet": "No messages yet.",
+  "settingsContactListsSection": "Contact lists",
+  "settingsTrustedContactsDescription": "Access your list of trusted contacts to add new ones or manage existing ones.",
+  "settingsProtectedPeopleDescription": "Access the list of protected people to manage them and accept or reject requests.",
+  "settingsDarkModeSection": "Dark mode",
+  "settingsEnableDarkMode": "Enable dark mode",
+  "settingsEnableDarkModeDescription": "Switch between light and dark mode according to your display preference.",
+  "settingsPermissionsSection": "Permissions",
+  "settingsLocationPermission": "Location permission",
+  "settingsLocationPermissionDescription": "Enable or disable access to your location to activate features that depend on it.",
+  "settingsNotificationsPermission": "Notifications permission",
+  "settingsNotificationsPermissionDescription": "Enable or disable receiving notifications, including alerts and chat messages.",
+  "settingsLanguageSection": "Language",
+  "settingsLanguageHint": "Language",
+  "settingsLanguageSpanish": "Spanish",
+  "settingsLanguageEnglish": "English",
+  "settingsLanguageFrench": "French",
+  "settingsFeaturesConfigDescription": "Enable and disable features or access customisation settings.",
+  "settingsPrivacyPoliciesSection": "Privacy policies",
+  "settingsViewPrivacyPolicies": "View privacy policies",
+  "settingsViewPrivacyPoliciesDescription": "Access information about the use and protection of your personal data.",
+  "settingsSuggestionsSection": "Suggestions and incidents",
+  "settingsSendSuggestions": "Send suggestions and incidents",
+  "settingsSendSuggestionsDescription": "Access the form to send suggestions or report incidents.",
+  "suggestionsDialogTitle": "Suggestions / Incidents",
+  "suggestionsDialogContent": "Describe your suggestion or the problem you have found. We will review it as soon as possible.",
+  "suggestionsDialogTypeHint": "Type",
+  "suggestionsDialogTypeSuggestion": "Suggestion",
+  "suggestionsDialogTypeIncident": "Incident",
+  "suggestionsDialogDescriptionHint": "Description",
+  "suggestionsDialogDescriptionRequired": "Description cannot be empty.",
+  "suggestionsSentSuccess": "Sent successfully. Thank you for your feedback!",
+  "suggestionsSentError": "Could not send. Please try again later.",
+
+  "fallDetectionTitle": "Automatic fall detection",
+  "fallDetectionDescription": "Activating this mode will generate an alert when a fall of the device is detected. It deactivates when the detection ends.",
+  "fallDetectionDeactivateTitle": "Deactivate detection",
+  "fallDetectionDeactivateContent": "If you deactivate automatic fall detection, no more fall detections will be performed and any previously generated alerts will be deactivated.",
+  "fallDetectionDeactivateButton": "End detection",
+  "fallDetectionJustificationHint": "Justification",
+  "fallDetectionStatusInactive": "Detection inactive",
+  "fallDetectionStatusNoFalls": "No falls detected",
+  "fallDetectionStatusFallDetected": "Fall detected",
+  "fallDetectionStatusAlertGenerated": "An alert has been generated.",
+  "fallDetectionBlockedByGuardianTitle": "Guardian mode active",
+  "fallDetectionBlockedByGuardianContent": "Guardian mode is already running. End guardian mode before activating fall detection.",
+  "guardianModeBlockedByFallDetectionTitle": "Fall detection active",
+  "guardianModeBlockedByFallDetectionContent": "Automatic fall detection is already running. Deactivate it before starting guardian mode."
 }

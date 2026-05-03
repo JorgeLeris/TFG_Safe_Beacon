@@ -9,8 +9,6 @@ import 'package:safe_beacon/presentation/features/panic_button/cubits/panic_butt
 import 'package:safe_beacon/presentation/features/panic_button/widget/panic_widget_service.dart';
 import 'package:safe_beacon/presentation/shared/widgets/widgets.dart';
 
-// TODO: manage disable case in feature configuration (also in home screen) - add to state other disabled cases
-
 class PanicButtonScreen extends StatefulWidget {
   const PanicButtonScreen({super.key});
 
@@ -280,15 +278,6 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
     );
   }
 
-  void _showFutureDialog(BuildContext context, AppLocalizations l10n) {
-    CustomDialog.show(
-      context: context,
-      title: l10n.notAvailableYet,
-      content: Text(l10n.futureUpdateContent),
-      buttonText: l10n.accept,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -339,7 +328,7 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 25),
 
                       // Panic button status card
                       Padding(
@@ -360,29 +349,29 @@ class _PanicButtonScreenState extends State<PanicButtonScreen> {
 
                       const SizedBox(height: 25),
 
-                      // Customization options
-                      SettingsOptionsList(
-                        horizontalPadding: 24,
-                        sectionTitle: l10n.customization,
-                        options: [
-                          SettingsOption(
-                            icon: Icons.settings_outlined,
-                            title: l10n.featuresSettings,
-                            description: l10n.featuresSettingsDescription,
-                            onPressed: () {
-                              _showFutureDialog(context, l10n);
-                            },
-                          ),
-                          SettingsOption(
-                            icon: Icons.lock_outline_rounded,
-                            title: l10n.deactivationPin,
-                            description: l10n.deactivationPinDescription,
-                            onPressed: () {
-                              _showFutureDialog(context, l10n);
-                            },
-                          ),
-                        ],
-                      ),
+                      // Customization options (hidden until implemented)
+                      // SettingsOptionsList(
+                      //   horizontalPadding: 24,
+                      //   sectionTitle: l10n.customization,
+                      //   options: [
+                      //     SettingsOption(
+                      //       icon: Icons.settings_outlined,
+                      //       title: l10n.featuresSettings,
+                      //       description: l10n.featuresSettingsDescription,
+                      //       onPressed: () {
+                      //         _showFutureDialog(context, l10n);
+                      //       },
+                      //     ),
+                      //     SettingsOption(
+                      //       icon: Icons.lock_outline_rounded,
+                      //       title: l10n.deactivationPin,
+                      //       description: l10n.deactivationPinDescription,
+                      //       onPressed: () {
+                      //         _showFutureDialog(context, l10n);
+                      //       },
+                      //     ),
+                      //   ],
+                      // ),
 
                       const SizedBox(height: 32),
                     ],
