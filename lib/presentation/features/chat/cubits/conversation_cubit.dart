@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:safe_beacon/app/monitoring/logging.dart';
+import 'package:safe_beacon/core/extensions/string_extensions.dart';
 import 'package:safe_beacon/domain/chat/chat_repository.dart';
 import 'package:safe_beacon/domain/chat/entities/message.dart';
 import 'package:safe_beacon/domain/common/app_failure.dart';
@@ -125,7 +126,12 @@ class ConversationCubit extends Cubit<ConversationState> {
       );
       String senderName = '';
       profileResult.when(
-        success: (profile) => senderName = profile.username ?? '',
+        success: (profile) {
+          final namePart = profile.name.capitalized();
+          final surnamePart = profile.surname?.capitalized() ?? '';
+          senderName =
+              surnamePart.isNotEmpty ? '$namePart $surnamePart' : namePart;
+        },
         failure: (_) {},
       );
 
