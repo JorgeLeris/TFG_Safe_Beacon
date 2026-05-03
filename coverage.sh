@@ -14,6 +14,7 @@ lcov --remove coverage/lcov.info \
   'lib/notification_service.dart' \
   'lib/presentation/features/panic_button/widget/*' \
   'lib/presentation/features/guardian_mode/services/*' \
+  'lib/presentation/features/fall_detection/services/*' \
   'lib/presentation/shared/widgets/*' \
   'lib/firebase_options.dart' \
   -o coverage/lcov.info

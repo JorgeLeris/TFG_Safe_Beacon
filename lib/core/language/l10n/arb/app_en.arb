@@ -129,7 +129,7 @@
   "notAvailable": "Not available",
   "panicButton": "Panic button",
   "guardianMode": "Guardian mode",
-  "sensors": "Sensors",
+  "sensors": "Falls",
   "panicButtonInfoContent": "This feature sends immediate alerts to your trusted contacts with your current location. Use it only in emergency situations.",
   "guardianModeInfoContent": "Activate this feature when you want increased safety during a journey.\n\nThe app monitors your route and estimated time. If there are deviations or delays, your trusted contacts will receive an automatic alert.",
   "guardianModeNoContactsContent": "Guardian mode requires at least one trusted contact to share your route with. Go to the contacts section to add one.",
@@ -316,6 +316,16 @@
       }
     }
   },
+  "notificationFallDetectionBody": "Your protected person {username} has suffered an automatically detected fall.",
+  "@notificationFallDetectionBody": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "fallDetectionDisabledNoContacts": "Add trusted contacts to enable",
+  "fallDetectionDisabledNoPermission": "Location permission is required",
   "guardianModeMissingDataTitle": "Missing data",
   "guardianModeMissingDataContent": "Before activating Guardian Mode, add a destination or an estimated duration to monitor your journey.",
   "guardianModeEstimatedTimeDialogTitle": "Estimated time",
@@ -452,5 +462,20 @@
   "suggestionsDialogDescriptionHint": "Description",
   "suggestionsDialogDescriptionRequired": "Description cannot be empty.",
   "suggestionsSentSuccess": "Sent successfully. Thank you for your feedback!",
-  "suggestionsSentError": "Could not send. Please try again later."
+  "suggestionsSentError": "Could not send. Please try again later.",
+
+  "fallDetectionTitle": "Automatic fall detection",
+  "fallDetectionDescription": "Activating this mode will generate an alert when a fall of the device is detected. It deactivates when the detection ends.",
+  "fallDetectionDeactivateTitle": "Deactivate detection",
+  "fallDetectionDeactivateContent": "If you deactivate automatic fall detection, no more fall detections will be performed and any previously generated alerts will be deactivated.",
+  "fallDetectionDeactivateButton": "End detection",
+  "fallDetectionJustificationHint": "Justification",
+  "fallDetectionStatusInactive": "Detection inactive",
+  "fallDetectionStatusNoFalls": "No falls detected",
+  "fallDetectionStatusFallDetected": "Fall detected",
+  "fallDetectionStatusAlertGenerated": "An alert has been generated.",
+  "fallDetectionBlockedByGuardianTitle": "Guardian mode active",
+  "fallDetectionBlockedByGuardianContent": "Guardian mode is already running. End guardian mode before activating fall detection.",
+  "guardianModeBlockedByFallDetectionTitle": "Fall detection active",
+  "guardianModeBlockedByFallDetectionContent": "Automatic fall detection is already running. Deactivate it before starting guardian mode."
 }

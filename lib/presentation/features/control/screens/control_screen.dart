@@ -69,6 +69,7 @@ class _ControlScreenState extends State<ControlScreen> {
       AlertFunctionalityFilter.all => true,
       AlertFunctionalityFilter.panicButton => type == AlertType.panic,
       AlertFunctionalityFilter.guardianMode => type == AlertType.guardian,
+      AlertFunctionalityFilter.fallDetection => type == AlertType.sensors,
     };
   }
 

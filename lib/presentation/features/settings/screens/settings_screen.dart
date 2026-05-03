@@ -252,21 +252,21 @@ class SettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Section 7: Customization
-                  SettingsOptionsList(
-                    sectionTitle: l10n.customization,
-                    horizontalPadding: _horizontalPadding,
-                    options: [
-                      SettingsOption(
-                        icon: Icons.settings_outlined,
-                        title: l10n.featuresSettings,
-                        description: l10n.settingsFeaturesConfigDescription,
-                        onPressed: () {
-                          _showFutureDialog(context, l10n);
-                        },
-                      ),
-                    ],
-                  ),
+                  // Section 7: Customization (hidden until implemented)
+                  // SettingsOptionsList(
+                  //   sectionTitle: l10n.customization,
+                  //   horizontalPadding: _horizontalPadding,
+                  //   options: [
+                  //     SettingsOption(
+                  //       icon: Icons.settings_outlined,
+                  //       title: l10n.featuresSettings,
+                  //       description: l10n.settingsFeaturesConfigDescription,
+                  //       onPressed: () {
+                  //         _showFutureDialog(context, l10n);
+                  //       },
+                  //     ),
+                  //   ],
+                  // ),
 
                   const SizedBox(height: 32),
                 ],

@@ -129,7 +129,7 @@
   "notAvailable": "Indisponible",
   "panicButton": "Bouton de panique",
   "guardianMode": "Mode gardien",
-  "sensors": "Capteurs",
+  "sensors": "Chutes",
   "panicButtonInfoContent": "Cette fonctionnalité envoie des alertes immédiates à vos contacts de confiance avec votre position actuelle. Utilisez-la uniquement en cas d'urgence.",
   "guardianModeInfoContent": "Activez cette fonctionnalité lorsque vous souhaitez une sécurité accrue lors d'un trajet.\n\nL'application surveille votre itinéraire et le temps estimé. En cas de déviations ou de retards, vos contacts de confiance recevront une alerte automatique.",
   "guardianModeNoContactsContent": "Le mode gardien nécessite au moins un contact de confiance pour partager votre itinéraire. Rendez-vous dans la section contacts pour en ajouter un.",
@@ -316,6 +316,16 @@
       }
     }
   },
+  "notificationFallDetectionBody": "Votre personne protégée {username} a subi une chute détectée automatiquement.",
+  "@notificationFallDetectionBody": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "fallDetectionDisabledNoContacts": "Ajoutez des contacts de confiance pour activer",
+  "fallDetectionDisabledNoPermission": "L'autorisation de localisation est requise",
   "guardianModeMissingDataTitle": "Données manquantes",
   "guardianModeMissingDataContent": "Avant d'activer le Mode Gardien, ajoutez une destination ou une durée estimée pour pouvoir surveiller votre trajet.",
   "guardianModeEstimatedTimeDialogTitle": "Temps estimé",
@@ -452,5 +462,20 @@
   "suggestionsDialogDescriptionHint": "Description",
   "suggestionsDialogDescriptionRequired": "La description ne peut pas être vide.",
   "suggestionsSentSuccess": "Envoyé avec succès. Merci pour votre contribution !",
-  "suggestionsSentError": "Impossible d'envoyer. Veuillez réessayer plus tard."
+  "suggestionsSentError": "Impossible d'envoyer. Veuillez réessayer plus tard.",
+
+  "fallDetectionTitle": "Détection automatique des chutes",
+  "fallDetectionDescription": "L'activation de ce mode génère une alerte lorsqu'une chute du dispositif est détectée. Elle se désactive à la fin de la détection.",
+  "fallDetectionDeactivateTitle": "Désactiver la détection",
+  "fallDetectionDeactivateContent": "Si vous désactivez la détection automatique des chutes, aucune nouvelle détection ne sera effectuée et les alertes précédemment générées seront désactivées.",
+  "fallDetectionDeactivateButton": "Terminer la détection",
+  "fallDetectionJustificationHint": "Justification",
+  "fallDetectionStatusInactive": "Détection désactivée",
+  "fallDetectionStatusNoFalls": "Aucune chute détectée",
+  "fallDetectionStatusFallDetected": "Chute détectée",
+  "fallDetectionStatusAlertGenerated": "Une alerte a été générée.",
+  "fallDetectionBlockedByGuardianTitle": "Mode gardien actif",
+  "fallDetectionBlockedByGuardianContent": "Le mode gardien est déjà en cours. Terminez le mode gardien avant d'activer la détection des chutes.",
+  "guardianModeBlockedByFallDetectionTitle": "Détection des chutes active",
+  "guardianModeBlockedByFallDetectionContent": "La détection automatique des chutes est déjà en cours. Désactivez-la avant de démarrer le mode gardien."
 }
