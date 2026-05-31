@@ -67,9 +67,6 @@ flutter:
     # TODO: Remove secrets from assets for production build and use secure storage instead
     - .env
     - secrets/tfg-safe-beacon-79fc5abcaca7.json
-    # TODO: Remove mocks from pubspec for production build
-    - assets/mocks/mock_index.json
-    - assets/mocks/
 
 flavorizr:
   app:
