@@ -23,6 +23,9 @@ abstract final class Constants {
   /// Guardian Mode alert type key.
   static const String guardianModeAlertTypeKey = 'guardian_mode';
 
+  /// Sensor alert type key.
+  static const String sensorsAlertTypeKey = 'sensors';
+
   // MARK: - Mapping
 
   /// OpenStreetMap tile URL.
