@@ -249,12 +249,17 @@ class _ConversationScreenState extends State<ConversationScreen> {
               child: InkWell(
                 customBorder: const CircleBorder(),
                 onTap: _sendMessage,
-                child: Padding(
-                  padding: const EdgeInsets.all(10),
-                  child: Icon(
-                    Icons.send_rounded,
-                    color: colorScheme.onTertiary,
-                    size: 22,
+                child: Semantics(
+                  label: l10n.sendMessage,
+                  button: true,
+                  excludeSemantics: true,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Icon(
+                      Icons.send_rounded,
+                      color: colorScheme.onTertiary,
+                      size: 22,
+                    ),
                   ),
                 ),
               ),

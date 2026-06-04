@@ -485,5 +485,6 @@
   "date": "Date",
   "selectProfilePhotoFromGallery": "Select profile photo from gallery",
   "moreInformation": "More information",
-  "you": "You"
+  "you": "You",
+  "sendMessage": "Send message"
 }

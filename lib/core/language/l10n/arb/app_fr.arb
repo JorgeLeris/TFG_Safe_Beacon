@@ -485,5 +485,6 @@
   "date": "Date",
   "selectProfilePhotoFromGallery": "Sélectionner une photo de profil depuis la galerie",
   "moreInformation": "Plus d'informations",
-  "you": "Vous"
+  "you": "Vous",
+  "sendMessage": "Envoyer un message"
 }
