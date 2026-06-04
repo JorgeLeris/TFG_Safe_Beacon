@@ -70,7 +70,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() => _selectedProfilePhoto = base64Encode(bytes));
   }
 
-  Widget _buildProfileAvatar(ColorScheme colorScheme) {
+  Widget _buildProfileAvatar(ColorScheme colorScheme, AppLocalizations l10n) {
     ImageProvider? imageProvider;
 
     if (_selectedProfilePhoto != null && _selectedProfilePhoto!.isNotEmpty) {
@@ -86,11 +86,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       }
     }
 
-    return CircleAvatar(
-      radius: 56,
-      backgroundColor: colorScheme.surfaceContainerHighest,
-      backgroundImage:
-          imageProvider ?? const AssetImage(AppImages.placeholderProfileImage),
+    final hasPhoto = imageProvider != null;
+
+    return Semantics(
+      label: hasPhoto ? l10n.profilePhoto : l10n.profilePhotoUnavailable,
+      image: true,
+      child: CircleAvatar(
+        radius: 56,
+        backgroundColor: colorScheme.surfaceContainerHighest,
+        backgroundImage:
+            imageProvider ??
+            const AssetImage(AppImages.placeholderProfileImage),
+      ),
     );
   }
 
@@ -155,7 +162,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                     color: colorScheme.onSurface,
                                   ),
                                 ),
-                                child: _buildProfileAvatar(colorScheme),
+                                child: _buildProfileAvatar(colorScheme, l10n),
                               ),
                               Positioned(
                                 bottom: 0,

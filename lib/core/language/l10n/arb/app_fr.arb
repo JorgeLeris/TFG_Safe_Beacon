@@ -478,5 +478,7 @@
   "guardianModeBlockedByFallDetectionTitle": "Détection des chutes active",
   "guardianModeBlockedByFallDetectionContent": "La détection automatique des chutes est déjà en cours. Désactivez-la avant de démarrer le mode gardien.",
   "updating": "Mise à jour...",
-  "update": "Mettre à jour"
+  "update": "Mettre à jour",
+  "profilePhoto": "Photo de profil",
+  "profilePhotoUnavailable": "Photo de profil non disponible"
 }

@@ -478,5 +478,7 @@
   "guardianModeBlockedByFallDetectionTitle": "Detección de caídas activa",
   "guardianModeBlockedByFallDetectionContent": "La detección automática de caídas ya está en funcionamiento. Descáctivala antes de iniciar el modo guardián.",
   "updating": "Actualizando...",
-  "update": "Actualizar"
+  "update": "Actualizar",
+  "profilePhoto": "Foto de perfil",
+  "profilePhotoUnavailable": "Foto de perfil no disponible"
 }

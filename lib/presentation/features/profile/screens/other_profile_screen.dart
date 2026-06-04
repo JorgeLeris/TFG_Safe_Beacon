@@ -40,7 +40,11 @@ class _OtherProfileScreenState extends State<OtherProfileScreen> {
     }
   }
 
-  Widget _buildProfileAvatar(String? profilePhoto, ColorScheme colorScheme) {
+  Widget _buildProfileAvatar(
+    String? profilePhoto,
+    ColorScheme colorScheme,
+    AppLocalizations l10n,
+  ) {
     ImageProvider? imageProvider;
 
     if (profilePhoto != null && profilePhoto.isNotEmpty) {
@@ -57,11 +61,18 @@ class _OtherProfileScreenState extends State<OtherProfileScreen> {
       }
     }
 
-    return CircleAvatar(
-      radius: 56,
-      backgroundColor: colorScheme.surfaceContainerHighest,
-      backgroundImage:
-          imageProvider ?? const AssetImage(AppImages.placeholderProfileImage),
+    final hasPhoto = imageProvider != null;
+
+    return Semantics(
+      label: hasPhoto ? l10n.profilePhoto : l10n.profilePhotoUnavailable,
+      image: true,
+      child: CircleAvatar(
+        radius: 56,
+        backgroundColor: colorScheme.surfaceContainerHighest,
+        backgroundImage:
+            imageProvider ??
+            const AssetImage(AppImages.placeholderProfileImage),
+      ),
     );
   }
 
@@ -119,6 +130,7 @@ class _OtherProfileScreenState extends State<OtherProfileScreen> {
                             child: _buildProfileAvatar(
                               profile?.profilePhoto,
                               colorScheme,
+                              l10n,
                             ),
                           ),
                         ),

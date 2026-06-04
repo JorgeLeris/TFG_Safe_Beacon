@@ -478,5 +478,7 @@
   "guardianModeBlockedByFallDetectionTitle": "Fall detection active",
   "guardianModeBlockedByFallDetectionContent": "Automatic fall detection is already running. Deactivate it before starting guardian mode.",
   "updating": "Updating...",
-  "update": "Update"
+  "update": "Update",
+  "profilePhoto": "Profile photo",
+  "profilePhotoUnavailable": "Profile photo unavailable"
 }
