@@ -167,22 +167,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               Positioned(
                                 bottom: 0,
                                 right: 0,
-                                child: GestureDetector(
-                                  onTap: _pickImage,
-                                  child: Container(
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: BoxDecoration(
-                                      color: colorScheme.tertiary,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: colorScheme.surface,
-                                        width: 1.5,
+                                child: Semantics(
+                                  label: l10n.selectProfilePhotoFromGallery,
+                                  button: true,
+                                  child: GestureDetector(
+                                    onTap: _pickImage,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: colorScheme.tertiary,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: colorScheme.surface,
+                                          width: 1.5,
+                                        ),
                                       ),
-                                    ),
-                                    child: Icon(
-                                      Icons.camera_alt,
-                                      size: 20,
-                                      color: colorScheme.onTertiary,
+                                      child: Icon(
+                                        Icons.camera_alt,
+                                        size: 20,
+                                        color: colorScheme.onTertiary,
+                                      ),
                                     ),
                                   ),
                                 ),

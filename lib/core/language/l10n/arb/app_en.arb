@@ -482,5 +482,6 @@
   "profilePhoto": "Profile photo",
   "profilePhotoUnavailable": "Profile photo unavailable",
   "profilePhotoTapToView": "Profile photo. Tap to view profile",
-  "date": "Date"
+  "date": "Date",
+  "selectProfilePhotoFromGallery": "Select profile photo from gallery"
 }
