@@ -480,5 +480,6 @@
   "updating": "Mise à jour...",
   "update": "Mettre à jour",
   "profilePhoto": "Photo de profil",
-  "profilePhotoUnavailable": "Photo de profil non disponible"
+  "profilePhotoUnavailable": "Photo de profil non disponible",
+  "profilePhotoTapToView": "Photo de profil. Appuyez pour voir le profil"
 }

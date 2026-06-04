@@ -480,5 +480,6 @@
   "updating": "Updating...",
   "update": "Update",
   "profilePhoto": "Profile photo",
-  "profilePhotoUnavailable": "Profile photo unavailable"
+  "profilePhotoUnavailable": "Profile photo unavailable",
+  "profilePhotoTapToView": "Profile photo. Tap to view profile"
 }
