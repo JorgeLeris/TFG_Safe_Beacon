@@ -483,5 +483,6 @@
   "profilePhotoUnavailable": "Foto de perfil no disponible",
   "profilePhotoTapToView": "Foto de perfil. Toca para ver perfil",
   "date": "Fecha",
-  "selectProfilePhotoFromGallery": "Seleccionar foto de perfil desde la galería"
+  "selectProfilePhotoFromGallery": "Seleccionar foto de perfil desde la galería",
+  "moreInformation": "Más información"
 }

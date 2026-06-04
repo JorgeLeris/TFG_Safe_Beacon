@@ -86,12 +86,16 @@ class _SectionHeaderState extends State<SectionHeader>
         ),
       );
     } else if (widget.trailingIcon != null) {
-      trailing = GestureDetector(
-        onTap: widget.onTrailingIconPressed,
-        child: Icon(
-          widget.trailingIcon,
-          color: colorScheme.onPrimary,
-          size: 25,
+      trailing = Semantics(
+        button: true,
+        label: l10n.moreInformation,
+        child: GestureDetector(
+          onTap: widget.onTrailingIconPressed,
+          child: Icon(
+            widget.trailingIcon,
+            color: colorScheme.onPrimary,
+            size: 25,
+          ),
         ),
       );
     }
