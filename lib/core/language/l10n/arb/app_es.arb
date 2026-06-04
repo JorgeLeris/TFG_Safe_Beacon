@@ -463,7 +463,6 @@
   "suggestionsDialogDescriptionRequired": "La descripción no puede estar vacía.",
   "suggestionsSentSuccess": "Enviado correctamente. ¡Gracias por tu aportación!",
   "suggestionsSentError": "No se pudo enviar. Inténtalo de nuevo más tarde.",
-
   "fallDetectionTitle": "Detección de caídas automática",
   "fallDetectionDescription": "Al activar este modo se generará una alerta cuando se detecte una caída del dispositivo. Esta se desactiva al finalizar la detección.",
   "fallDetectionDeactivateTitle": "Desactivar detección",
@@ -477,5 +476,7 @@
   "fallDetectionBlockedByGuardianTitle": "Modo guardián activo",
   "fallDetectionBlockedByGuardianContent": "El modo guardián ya está en funcionamiento. Finaliza el modo guardián antes de activar la detección de caídas.",
   "guardianModeBlockedByFallDetectionTitle": "Detección de caídas activa",
-  "guardianModeBlockedByFallDetectionContent": "La detección automática de caídas ya está en funcionamiento. Descáctivala antes de iniciar el modo guardián."
+  "guardianModeBlockedByFallDetectionContent": "La detección automática de caídas ya está en funcionamiento. Descáctivala antes de iniciar el modo guardián.",
+  "updating": "Actualizando...",
+  "update": "Actualizar"
 }
