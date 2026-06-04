@@ -484,5 +484,6 @@
   "profilePhotoTapToView": "Profile photo. Tap to view profile",
   "date": "Date",
   "selectProfilePhotoFromGallery": "Select profile photo from gallery",
-  "moreInformation": "More information"
+  "moreInformation": "More information",
+  "you": "You"
 }

@@ -484,5 +484,6 @@
   "profilePhotoTapToView": "Photo de profil. Appuyez pour voir le profil",
   "date": "Date",
   "selectProfilePhotoFromGallery": "Sélectionner une photo de profil depuis la galerie",
-  "moreInformation": "Plus d'informations"
+  "moreInformation": "Plus d'informations",
+  "you": "Vous"
 }

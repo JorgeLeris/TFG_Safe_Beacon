@@ -96,31 +96,36 @@ class _ConversationScreenState extends State<ConversationScreen> {
     ColorScheme colorScheme,
     TextTheme textTheme,
     String? otherProfilePhoto,
+    AppLocalizations l10n,
   ) {
     final isMe = message.senderUid == _currentUid;
 
     if (isMe) {
-      return Align(
-        alignment: Alignment.centerRight,
-        child: Container(
-          constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.72,
-          ),
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            color: colorScheme.tertiary,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(18),
-              topRight: Radius.circular(18),
-              bottomLeft: Radius.circular(18),
-              bottomRight: Radius.circular(4),
+      return Semantics(
+        label: '${l10n.you}: ${message.text}',
+        excludeSemantics: true,
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.72,
             ),
-          ),
-          child: Text(
-            message.text,
-            style: textTheme.bodyMedium?.copyWith(
-              color: colorScheme.onTertiary,
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: colorScheme.tertiary,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(18),
+                topRight: Radius.circular(18),
+                bottomLeft: Radius.circular(18),
+                bottomRight: Radius.circular(4),
+              ),
+            ),
+            child: Text(
+              message.text,
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.onTertiary,
+              ),
             ),
           ),
         ),
@@ -128,54 +133,58 @@ class _ConversationScreenState extends State<ConversationScreen> {
     }
 
     // Other person's bubble - with avatar on the left
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-                ),
-              ),
-              child: CircleAvatar(
-                radius: 16,
-                backgroundColor: colorScheme.surfaceContainerHighest,
-                backgroundImage: _resolveAvatar(otherProfilePhoto),
-              ),
-            ),
-            const SizedBox(width: 8),
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.65,
-              ),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 10,
-                ),
+    return Semantics(
+      label: '${widget.username}: ${message.text}',
+      excludeSemantics: true,
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
                 decoration: BoxDecoration(
-                  color: colorScheme.secondaryContainer,
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(18),
-                    topRight: Radius.circular(18),
-                    bottomLeft: Radius.circular(4),
-                    bottomRight: Radius.circular(18),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: colorScheme.outlineVariant.withValues(alpha: 0.5),
                   ),
                 ),
-                child: Text(
-                  message.text,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSecondaryContainer,
+                child: CircleAvatar(
+                  radius: 16,
+                  backgroundColor: colorScheme.surfaceContainerHighest,
+                  backgroundImage: _resolveAvatar(otherProfilePhoto),
+                ),
+              ),
+              const SizedBox(width: 8),
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.65,
+                ),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: colorScheme.secondaryContainer,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(18),
+                      topRight: Radius.circular(18),
+                      bottomLeft: Radius.circular(4),
+                      bottomRight: Radius.circular(18),
+                    ),
+                  ),
+                  child: Text(
+                    message.text,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colorScheme.onSecondaryContainer,
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -322,6 +331,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                       colorScheme,
                       textTheme,
                       state.otherProfilePhoto,
+                      l10n,
                     ),
                   );
                 },
