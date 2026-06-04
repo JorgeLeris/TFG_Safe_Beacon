@@ -191,7 +191,7 @@ class AlertListItem extends StatelessWidget {
                                 const SizedBox(width: 5),
                                 Expanded(
                                   child: Text(
-                                    'Fecha: $dateStr',
+                                    '${l10n.date}: $dateStr',
                                     style: textTheme.bodySmall?.copyWith(
                                       color: colorScheme.onSurface,
                                       fontWeight: FontWeight.w400,
