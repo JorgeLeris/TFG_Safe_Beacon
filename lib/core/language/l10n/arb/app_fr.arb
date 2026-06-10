@@ -444,8 +444,8 @@
   "settingsNotificationsPermissionDescription": "Activez ou désactivez la réception des notifications, y compris les alertes et les messages du chat.",
   "settingsLanguageSection": "Langue",
   "settingsLanguageHint": "Langue",
-  "settingsLanguageSpanish": "Espagnol",
-  "settingsLanguageEnglish": "Anglais",
+  "settingsLanguageSpanish": "Español",
+  "settingsLanguageEnglish": "English",
   "settingsLanguageFrench": "Français",
   "settingsFeaturesConfigDescription": "Activez et désactivez les fonctionnalités ou accédez aux paramètres de personnalisation.",
   "settingsPrivacyPoliciesSection": "Politiques de confidentialité",
@@ -463,7 +463,6 @@
   "suggestionsDialogDescriptionRequired": "La description ne peut pas être vide.",
   "suggestionsSentSuccess": "Envoyé avec succès. Merci pour votre contribution !",
   "suggestionsSentError": "Impossible d'envoyer. Veuillez réessayer plus tard.",
-
   "fallDetectionTitle": "Détection automatique des chutes",
   "fallDetectionDescription": "L'activation de ce mode génère une alerte lorsqu'une chute du dispositif est détectée. Elle se désactive à la fin de la détection.",
   "fallDetectionDeactivateTitle": "Désactiver la détection",
@@ -477,5 +476,15 @@
   "fallDetectionBlockedByGuardianTitle": "Mode gardien actif",
   "fallDetectionBlockedByGuardianContent": "Le mode gardien est déjà en cours. Terminez le mode gardien avant d'activer la détection des chutes.",
   "guardianModeBlockedByFallDetectionTitle": "Détection des chutes active",
-  "guardianModeBlockedByFallDetectionContent": "La détection automatique des chutes est déjà en cours. Désactivez-la avant de démarrer le mode gardien."
+  "guardianModeBlockedByFallDetectionContent": "La détection automatique des chutes est déjà en cours. Désactivez-la avant de démarrer le mode gardien.",
+  "updating": "Mise à jour...",
+  "update": "Mettre à jour",
+  "profilePhoto": "Photo de profil",
+  "profilePhotoUnavailable": "Photo de profil non disponible",
+  "profilePhotoTapToView": "Photo de profil. Appuyez pour voir le profil",
+  "date": "Date",
+  "selectProfilePhotoFromGallery": "Sélectionner une photo de profil depuis la galerie",
+  "moreInformation": "Plus d'informations",
+  "you": "Vous",
+  "sendMessage": "Envoyer un message"
 }

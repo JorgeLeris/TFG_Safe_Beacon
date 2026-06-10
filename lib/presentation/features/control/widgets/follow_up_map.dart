@@ -1,11 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/language/generated/l10n/app_localizations.dart';
+import 'package:safe_beacon/data/sources/remote/osrm/osrm_service.dart';
 import 'package:safe_beacon/presentation/shared/widgets/others/map_location_pin.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -41,6 +39,7 @@ class FollowUpMap extends StatefulWidget {
 
 class _FollowUpMapState extends State<FollowUpMap> {
   final MapController _mapController = MapController();
+  final OsrmService _osrmService = OsrmService();
   List<LatLng> _routePoints = [];
 
   @override
@@ -70,34 +69,11 @@ class _FollowUpMapState extends State<FollowUpMap> {
   }
 
   Future<void> _fetchRoute(LatLng from, LatLng to) async {
-    final url = Uri.parse(
-      '${Constants.osrmRoutingUrl}'
-      '${from.longitude},${from.latitude};'
-      '${to.longitude},${to.latitude}'
-      '?overview=full&geometries=geojson',
-    );
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body) as Map<String, dynamic>;
-        final routes = data['routes'] as List<dynamic>?;
-        if (routes != null && routes.isNotEmpty) {
-          // ignore: avoid_dynamic_calls
-          final geometry = routes[0]['geometry'] as Map<String, dynamic>;
-          final coordinates = geometry['coordinates'] as List<dynamic>;
-          final points = coordinates
-              .cast<List<dynamic>>()
-              .map(
-                (c) =>
-                    LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()),
-              )
-              .toList();
-          if (mounted) setState(() => _routePoints = points);
-        }
-      }
-    } catch (_) {
-      // Silently ignore routing errors.
+    final result = await _osrmService.fetchRoute(from, to);
+    if (result != null && mounted) {
+      setState(() => _routePoints = result.points);
     }
+    // Silently ignore routing errors.
   }
 
   List<Marker> get _markers {

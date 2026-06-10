@@ -445,8 +445,8 @@
   "settingsLanguageSection": "Idioma",
   "settingsLanguageHint": "Idioma",
   "settingsLanguageSpanish": "Español",
-  "settingsLanguageEnglish": "Inglés",
-  "settingsLanguageFrench": "Francés",
+  "settingsLanguageEnglish": "English",
+  "settingsLanguageFrench": "Français",
   "settingsFeaturesConfigDescription": "Habilita y deshabilita las funcionalidades o accede a las configuraciones de personalización.",
   "settingsPrivacyPoliciesSection": "Políticas de privacidad",
   "settingsViewPrivacyPolicies": "Ver políticas de privacidad",
@@ -463,7 +463,6 @@
   "suggestionsDialogDescriptionRequired": "La descripción no puede estar vacía.",
   "suggestionsSentSuccess": "Enviado correctamente. ¡Gracias por tu aportación!",
   "suggestionsSentError": "No se pudo enviar. Inténtalo de nuevo más tarde.",
-
   "fallDetectionTitle": "Detección de caídas automática",
   "fallDetectionDescription": "Al activar este modo se generará una alerta cuando se detecte una caída del dispositivo. Esta se desactiva al finalizar la detección.",
   "fallDetectionDeactivateTitle": "Desactivar detección",
@@ -477,5 +476,15 @@
   "fallDetectionBlockedByGuardianTitle": "Modo guardián activo",
   "fallDetectionBlockedByGuardianContent": "El modo guardián ya está en funcionamiento. Finaliza el modo guardián antes de activar la detección de caídas.",
   "guardianModeBlockedByFallDetectionTitle": "Detección de caídas activa",
-  "guardianModeBlockedByFallDetectionContent": "La detección automática de caídas ya está en funcionamiento. Descáctivala antes de iniciar el modo guardián."
+  "guardianModeBlockedByFallDetectionContent": "La detección automática de caídas ya está en funcionamiento. Descáctivala antes de iniciar el modo guardián.",
+  "updating": "Actualizando...",
+  "update": "Actualizar",
+  "profilePhoto": "Foto de perfil",
+  "profilePhotoUnavailable": "Foto de perfil no disponible",
+  "profilePhotoTapToView": "Foto de perfil. Toca para ver perfil",
+  "date": "Fecha",
+  "selectProfilePhotoFromGallery": "Seleccionar foto de perfil desde la galería",
+  "moreInformation": "Más información",
+  "you": "Tú",
+  "sendMessage": "Enviar mensaje"
 }

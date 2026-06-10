@@ -1,14 +1,13 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:safe_beacon/core/constants/constants.dart';
 import 'package:safe_beacon/core/language/generated/l10n/app_localizations.dart';
+import 'package:safe_beacon/data/sources/remote/osrm/osrm_service.dart';
 import 'package:safe_beacon/presentation/shared/widgets/others/map_location_pin.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -47,6 +46,7 @@ class GuardianModeMap extends StatefulWidget {
 class _GuardianModeMapState extends State<GuardianModeMap>
     with SingleTickerProviderStateMixin {
   final MapController _mapController = MapController();
+  final OsrmService _osrmService = OsrmService();
 
   // ==============================================
   // MARK: - Smooth location animation
@@ -109,43 +109,13 @@ class _GuardianModeMapState extends State<GuardianModeMap>
   }
 
   Future<void> _fetchRoute(LatLng from, LatLng to) async {
-    final url = Uri.parse(
-      '${Constants.osrmRoutingUrl}'
-      '${from.longitude},${from.latitude};'
-      '${to.longitude},${to.latitude}'
-      '?overview=full&geometries=geojson',
-    );
-    var routeSucceeded = false;
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body) as Map<String, dynamic>;
-        final routes = data['routes'] as List<dynamic>?;
-        if (routes != null && routes.isNotEmpty) {
-          // ignore: avoid_dynamic_calls
-          final geometry = routes[0]['geometry'] as Map<String, dynamic>;
-          final coordinates = geometry['coordinates'] as List<dynamic>;
-          final points = coordinates
-              .cast<List<dynamic>>()
-              .map(
-                (c) =>
-                    LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()),
-              )
-              .toList();
-          // ignore: avoid_dynamic_calls
-          final durationSecs = (routes[0]['duration'] as num).toDouble();
-          final estimated = Duration(seconds: (durationSecs * 1.25).round());
-          if (mounted) {
-            widget.onRouteChanged?.call(points);
-            widget.onEstimatedDurationChanged?.call(estimated);
-          }
-          routeSucceeded = true;
-        }
+    final result = await _osrmService.fetchRoute(from, to);
+    if (result != null) {
+      if (mounted) {
+        widget.onRouteChanged?.call(result.points);
+        widget.onEstimatedDurationChanged?.call(result.estimatedDuration);
       }
-    } catch (_) {
-      // Fall through to distance-based estimation.
-    }
-    if (!routeSucceeded) {
+    } else {
       final distMeters = const Distance()(from, to);
       const walkSpeedMs = 5000.0 / 3600.0;
       final fallback = Duration(
@@ -488,6 +458,7 @@ class _GuardianFullscreenMapPage extends StatefulWidget {
 class _GuardianFullscreenMapPageState extends State<_GuardianFullscreenMapPage>
     with SingleTickerProviderStateMixin {
   final MapController _mapController = MapController();
+  final OsrmService _osrmService = OsrmService();
   late LatLng? _destinationPoint;
   late List<LatLng> _routePoints;
 
@@ -558,44 +529,14 @@ class _GuardianFullscreenMapPageState extends State<_GuardianFullscreenMapPage>
   }
 
   Future<void> _fetchRoute(LatLng from, LatLng to) async {
-    final url = Uri.parse(
-      '${Constants.osrmRoutingUrl}'
-      '${from.longitude},${from.latitude};'
-      '${to.longitude},${to.latitude}'
-      '?overview=full&geometries=geojson',
-    );
-    var routeSucceeded = false;
-    try {
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body) as Map<String, dynamic>;
-        final routes = data['routes'] as List<dynamic>?;
-        if (routes != null && routes.isNotEmpty) {
-          // ignore: avoid_dynamic_calls
-          final geometry = routes[0]['geometry'] as Map<String, dynamic>;
-          final coordinates = geometry['coordinates'] as List<dynamic>;
-          final points = coordinates
-              .cast<List<dynamic>>()
-              .map(
-                (c) =>
-                    LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()),
-              )
-              .toList();
-          // ignore: avoid_dynamic_calls
-          final durationSecs = (routes[0]['duration'] as num).toDouble();
-          final estimated = Duration(seconds: (durationSecs * 1.25).round());
-          if (mounted) {
-            setState(() => _routePoints = points);
-            widget.onRouteChanged?.call(points);
-            widget.onEstimatedDurationChanged?.call(estimated);
-          }
-          routeSucceeded = true;
-        }
+    final result = await _osrmService.fetchRoute(from, to);
+    if (result != null) {
+      if (mounted) {
+        setState(() => _routePoints = result.points);
+        widget.onRouteChanged?.call(result.points);
+        widget.onEstimatedDurationChanged?.call(result.estimatedDuration);
       }
-    } catch (_) {
-      // Fall through to distance-based estimation.
-    }
-    if (!routeSucceeded) {
+    } else {
       final distMeters = const Distance()(from, to);
       const walkSpeedMs = 5000.0 / 3600.0;
       final fallback = Duration(

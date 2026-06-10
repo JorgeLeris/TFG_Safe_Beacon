@@ -60,6 +60,7 @@ class AlertListItem extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = context.l10n;
 
     final statusColor = alert.isActive
         ? (isDark ? const Color(0xFF66BB6A) : const Color(0xFF2E7D32))
@@ -81,27 +82,31 @@ class AlertListItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Avatar
-        GestureDetector(
-          onTap: onProfileTap,
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: colorScheme.onSurface.withValues(alpha: 0.15),
-                width: 1.25,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
+        Semantics(
+          label: l10n.profilePhotoTapToView,
+          button: true,
+          child: GestureDetector(
+            onTap: onProfileTap,
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: colorScheme.onSurface.withValues(alpha: 0.15),
+                  width: 1.25,
                 ),
-              ],
-            ),
-            child: CircleAvatar(
-              radius: _avatarRadius,
-              backgroundColor: colorScheme.surfaceContainerHighest,
-              backgroundImage: _resolveImage(),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.15),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: CircleAvatar(
+                radius: _avatarRadius,
+                backgroundColor: colorScheme.surfaceContainerHighest,
+                backgroundImage: _resolveImage(),
+              ),
             ),
           ),
         ),
@@ -186,7 +191,7 @@ class AlertListItem extends StatelessWidget {
                                 const SizedBox(width: 5),
                                 Expanded(
                                   child: Text(
-                                    'Fecha: $dateStr',
+                                    '${l10n.date}: $dateStr',
                                     style: textTheme.bodySmall?.copyWith(
                                       color: colorScheme.onSurface,
                                       fontWeight: FontWeight.w400,
