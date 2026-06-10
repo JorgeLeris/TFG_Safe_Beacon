@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:safe_beacon/core/assets/assets.dart';
+import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 
 /// Data model for a single chat entry.
 class ChatItem {
@@ -68,13 +69,14 @@ class ChatListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = context.l10n;
 
     final hasUnread = chat.unreadCount > 0;
-    final unreadLabel =
-        chat.unreadCount > 99 ? '99+' : '${chat.unreadCount}';
+    final unreadLabel = chat.unreadCount > 99 ? '99+' : '${chat.unreadCount}';
 
-    final lastMessagePrefix =
-        chat.lastMessageIsFromMe ? '$youLabel: ' : '${chat.username}: ';
+    final lastMessagePrefix = chat.lastMessageIsFromMe
+        ? '$youLabel: '
+        : '${chat.username}: ';
 
     return Stack(
       clipBehavior: Clip.none,
@@ -85,27 +87,31 @@ class ChatListItem extends StatelessWidget {
             // ------------------------------------------------------------------
             // Avatar
             // ------------------------------------------------------------------
-            GestureDetector(
-              onTap: onProfileTap,
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: colorScheme.onSurface.withValues(alpha: 0.15),
-                    width: 1.25,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.15),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
+            Semantics(
+              label: l10n.profilePhotoTapToView,
+              button: true,
+              child: GestureDetector(
+                onTap: onProfileTap,
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: colorScheme.onSurface.withValues(alpha: 0.15),
+                      width: 1.25,
                     ),
-                  ],
-                ),
-                child: CircleAvatar(
-                  radius: _avatarRadius,
-                  backgroundColor: colorScheme.surfaceContainerHighest,
-                  backgroundImage: _resolveImage(),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: CircleAvatar(
+                    radius: _avatarRadius,
+                    backgroundColor: colorScheme.surfaceContainerHighest,
+                    backgroundImage: _resolveImage(),
+                  ),
                 ),
               ),
             ),
@@ -163,8 +169,9 @@ class ChatListItem extends StatelessWidget {
                                     maxLines: 1,
                                     text: TextSpan(
                                       style: textTheme.bodySmall?.copyWith(
-                                        color: colorScheme.onSurface
-                                            .withValues(alpha: 0.65),
+                                        color: colorScheme.onSurface.withValues(
+                                          alpha: 0.65,
+                                        ),
                                       ),
                                       children: [
                                         TextSpan(
@@ -213,7 +220,9 @@ class ChatListItem extends StatelessWidget {
                 color: Colors.red,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.75),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.outlineVariant.withValues(alpha: 0.75),
                   width: 1.25,
                 ),
               ),

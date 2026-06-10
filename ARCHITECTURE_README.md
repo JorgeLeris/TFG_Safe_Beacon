@@ -137,7 +137,7 @@ La aplicación sigue principios de **Clean Architecture** adaptados a Flutter, c
 
 #### **Data Layer**
 - Implementación de repositorios
-- Clientes HTTP con Retrofit/Dio
+- Clientes HTTP con Retrofit/Dio o Firebase
 - Transformación de DTOs a entidades de dominio
 - Gestión de caché y persistencia local
 - **Depende solo de Domain**
@@ -160,7 +160,7 @@ data/
 **Cuándo usar DataSources**:
 - ✅ Feature necesita cache local + llamadas remotas
 - ✅ Quieres poder cambiar la implementación de storage (SharedPrefs → Hive → SQLite)
-- ✅ Necesitas testear Repository sin mockear Retrofit/Dio
+- ✅ Necesitas testear Repository sin mockear Retrofit/Dio o Firebase
 
 **Cuándo NO usarlos**:
 - ❌ Feature solo hace llamadas remotas sin cache
@@ -183,7 +183,7 @@ Para features simples, el Repository puede usar directamente el API client sin a
    └─> Llama al repository
    
 3. REPOSITORY
-   └─> Ejecuta llamada a API (Retrofit/Dio)
+   └─> Ejecuta llamada a API (Retrofit/Dio o Firebase)
    └─> Aplica interceptores (auth, language, logging, mock)
    └─> Transforma DTO → Entity
    └─> Retorna Result<Entity, AppFailure>
@@ -256,8 +256,6 @@ Los repositorios **siempre** retornan `Result`, nunca lanzan excepciones a la ca
 
 ### Networking
 - **dio** - Cliente HTTP configurable
-- **retrofit** - API client type-safe
-- **retrofit_generator**
 
 ### Navigation
 - **go_router** - Routing declarativo
@@ -286,7 +284,7 @@ Los repositorios **siempre** retornan `Result`, nunca lanzan excepciones a la ca
 # Obtener dependencias
 flutter pub get
 
-# Generar código (rutas, freezed, json_serializable, retrofit)
+# Generar código (rutas, freezed, json_serializable)
 dart run build_runner build --delete-conflicting-outputs
 
 # Ejecutar en modo desarrollo
@@ -355,7 +353,6 @@ class MiEntidad with _$MiEntidad {
 ```dart
 // lib/data/sources/remote/mi_feature/mi_feature_api.dart
 import 'package:dio/dio.dart';
-import 'package:retrofit/retrofit.dart';
 
 part 'mi_feature_api.g.dart';
 

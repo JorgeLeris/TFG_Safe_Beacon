@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 
 class SectionHeader extends StatefulWidget {
   const SectionHeader({
@@ -61,31 +62,40 @@ class _SectionHeaderState extends State<SectionHeader>
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = context.l10n;
 
     // Determine which trailing widget to show (refresh takes priority)
     Widget? trailing;
 
     if (widget.onRefresh != null) {
-      trailing = GestureDetector(
-        onTap: _isRefreshing ? null : _handleRefresh,
-        child: RotationTransition(
-          turns: _controller,
-          child: Icon(
-            Icons.refresh_rounded,
-            color: colorScheme.onPrimary.withValues(
-              alpha: _isRefreshing ? 0.5 : 1.0,
+      trailing = Semantics(
+        button: true,
+        label: _isRefreshing ? l10n.updating : l10n.update,
+        child: GestureDetector(
+          onTap: _isRefreshing ? null : _handleRefresh,
+          child: RotationTransition(
+            turns: _controller,
+            child: Icon(
+              Icons.refresh_rounded,
+              color: colorScheme.onPrimary.withValues(
+                alpha: _isRefreshing ? 0.5 : 1.0,
+              ),
+              size: 25,
             ),
-            size: 25,
           ),
         ),
       );
     } else if (widget.trailingIcon != null) {
-      trailing = GestureDetector(
-        onTap: widget.onTrailingIconPressed,
-        child: Icon(
-          widget.trailingIcon,
-          color: colorScheme.onPrimary,
-          size: 25,
+      trailing = Semantics(
+        button: true,
+        label: l10n.moreInformation,
+        child: GestureDetector(
+          onTap: widget.onTrailingIconPressed,
+          child: Icon(
+            widget.trailingIcon,
+            color: colorScheme.onPrimary,
+            size: 25,
+          ),
         ),
       );
     }

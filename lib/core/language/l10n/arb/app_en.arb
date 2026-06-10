@@ -444,9 +444,9 @@
   "settingsNotificationsPermissionDescription": "Enable or disable receiving notifications, including alerts and chat messages.",
   "settingsLanguageSection": "Language",
   "settingsLanguageHint": "Language",
-  "settingsLanguageSpanish": "Spanish",
+  "settingsLanguageSpanish": "Español",
   "settingsLanguageEnglish": "English",
-  "settingsLanguageFrench": "French",
+  "settingsLanguageFrench": "Français",
   "settingsFeaturesConfigDescription": "Enable and disable features or access customisation settings.",
   "settingsPrivacyPoliciesSection": "Privacy policies",
   "settingsViewPrivacyPolicies": "View privacy policies",
@@ -463,7 +463,6 @@
   "suggestionsDialogDescriptionRequired": "Description cannot be empty.",
   "suggestionsSentSuccess": "Sent successfully. Thank you for your feedback!",
   "suggestionsSentError": "Could not send. Please try again later.",
-
   "fallDetectionTitle": "Automatic fall detection",
   "fallDetectionDescription": "Activating this mode will generate an alert when a fall of the device is detected. It deactivates when the detection ends.",
   "fallDetectionDeactivateTitle": "Deactivate detection",
@@ -477,5 +476,15 @@
   "fallDetectionBlockedByGuardianTitle": "Guardian mode active",
   "fallDetectionBlockedByGuardianContent": "Guardian mode is already running. End guardian mode before activating fall detection.",
   "guardianModeBlockedByFallDetectionTitle": "Fall detection active",
-  "guardianModeBlockedByFallDetectionContent": "Automatic fall detection is already running. Deactivate it before starting guardian mode."
+  "guardianModeBlockedByFallDetectionContent": "Automatic fall detection is already running. Deactivate it before starting guardian mode.",
+  "updating": "Updating...",
+  "update": "Update",
+  "profilePhoto": "Profile photo",
+  "profilePhotoUnavailable": "Profile photo unavailable",
+  "profilePhotoTapToView": "Profile photo. Tap to view profile",
+  "date": "Date",
+  "selectProfilePhotoFromGallery": "Select profile photo from gallery",
+  "moreInformation": "More information",
+  "you": "You",
+  "sendMessage": "Send message"
 }

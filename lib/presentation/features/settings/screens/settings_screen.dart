@@ -62,15 +62,6 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  void _showFutureDialog(BuildContext context, AppLocalizations l10n) {
-    CustomDialog.show(
-      context: context,
-      title: l10n.notAvailableYet,
-      content: Text(l10n.futureUpdateContent),
-      buttonText: l10n.accept,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
@@ -214,27 +205,7 @@ class SettingsScreen extends StatelessWidget {
 
                   const SizedBox(height: 24),
 
-                  // Section 5: Privacy policies
-                  SettingsOptionsList(
-                    sectionTitle: l10n.settingsPrivacyPoliciesSection,
-                    horizontalPadding: _horizontalPadding,
-                    options: [
-                      SettingsOption(
-                        icon: Icons.visibility_outlined,
-                        title: l10n.settingsViewPrivacyPolicies,
-                        description:
-                            l10n.settingsViewPrivacyPoliciesDescription,
-                        onPressed: () {
-                          // TODO: Navigate to privacy policies screen
-                          _showFutureDialog(context, l10n);
-                        },
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Section 6: Suggestions and incidents
+                  // Section 5: Suggestions and incidents
                   SettingsOptionsList(
                     sectionTitle: l10n.settingsSuggestionsSection,
                     horizontalPadding: _horizontalPadding,
@@ -250,7 +221,26 @@ class SettingsScreen extends StatelessWidget {
                     ],
                   ),
 
-                  const SizedBox(height: 24),
+                  // const SizedBox(height: 24),
+
+                  // Section 6: Privacy policies (hidden until implemented)
+                  // SettingsOptionsList(
+                  //   sectionTitle: l10n.settingsPrivacyPoliciesSection,
+                  //   horizontalPadding: _horizontalPadding,
+                  //   options: [
+                  //     SettingsOption(
+                  //       icon: Icons.visibility_outlined,
+                  //       title: l10n.settingsViewPrivacyPolicies,
+                  //       description:
+                  //           l10n.settingsViewPrivacyPoliciesDescription,
+                  //       onPressed: () {
+                  //         _showFutureDialog(context, l10n);
+                  //       },
+                  //     ),
+                  //   ],
+                  // ),
+
+                  // const SizedBox(height: 24),
 
                   // Section 7: Customization (hidden until implemented)
                   // SettingsOptionsList(

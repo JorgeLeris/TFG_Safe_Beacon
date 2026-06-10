@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:safe_beacon/core/assets/assets.dart';
+import 'package:safe_beacon/core/language/l10n/app_localizations.dart';
 
 class UserListItem extends StatelessWidget {
   const UserListItem({
@@ -40,6 +41,7 @@ class UserListItem extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = context.l10n;
 
     final deleteColor = isDark
         ? const Color(0xFFFF6B6B)
@@ -103,25 +105,32 @@ class UserListItem extends StatelessWidget {
           left: 0,
           top: 0,
           bottom: 0,
-          child: GestureDetector(
-            onTap: onProfileTap,
-            child: Center(
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: colorScheme.secondary, width: 2.5),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.15),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2),
+          child: Semantics(
+            label: l10n.profilePhotoTapToView,
+            button: true,
+            child: GestureDetector(
+              onTap: onProfileTap,
+              child: Center(
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: colorScheme.secondary,
+                      width: 2.5,
                     ),
-                  ],
-                ),
-                child: CircleAvatar(
-                  radius: _avatarRadius,
-                  backgroundColor: colorScheme.surfaceContainerHighest,
-                  backgroundImage: _resolveImage(),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: CircleAvatar(
+                    radius: _avatarRadius,
+                    backgroundColor: colorScheme.surfaceContainerHighest,
+                    backgroundImage: _resolveImage(),
+                  ),
                 ),
               ),
             ),

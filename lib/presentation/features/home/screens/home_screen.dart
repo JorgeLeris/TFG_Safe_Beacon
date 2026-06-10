@@ -355,16 +355,52 @@ class _HomeScreenState extends State<HomeScreen> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return FallDetectionProvider(
-      child: BlocListener<GuardianModeCubit, GuardianModeCubitState>(
-        listenWhen: (prev, curr) =>
-            prev.isChecking != curr.isChecking ||
-            (!prev.canNavigate && curr.canNavigate) ||
-            (!prev.permissionJustGranted && curr.permissionJustGranted) ||
-            (prev.blockedReason != curr.blockedReason &&
-                curr.blockedReason != null) ||
-            (!prev.showPermissionDeniedDialog &&
-                curr.showPermissionDeniedDialog),
-        listener: _onGuardianModeStateChanged,
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<GuardianModeCubit, GuardianModeCubitState>(
+            listenWhen: (prev, curr) =>
+                prev.isChecking != curr.isChecking ||
+                (!prev.canNavigate && curr.canNavigate) ||
+                (!prev.permissionJustGranted && curr.permissionJustGranted) ||
+                (prev.blockedReason != curr.blockedReason &&
+                    curr.blockedReason != null) ||
+                (!prev.showPermissionDeniedDialog &&
+                    curr.showPermissionDeniedDialog),
+            listener: _onGuardianModeStateChanged,
+          ),
+          // When fall detection's location permission is granted, also refresh the panic button.
+          BlocListener<FallDetectionCubit, FallDetectionCubitState>(
+            listenWhen: (prev, curr) =>
+                (prev.disabledReason ==
+                        FallDetectionDisabledReason.locationPermissionDenied ||
+                    prev.disabledReason ==
+                        FallDetectionDisabledReason
+                            .locationPermissionDeniedForever) &&
+                curr.disabledReason !=
+                    FallDetectionDisabledReason.locationPermissionDenied &&
+                curr.disabledReason !=
+                    FallDetectionDisabledReason
+                        .locationPermissionDeniedForever &&
+                curr.status != FallDetectionStatus.loading,
+            listener: (context, _) =>
+                context.read<PanicButtonCubit>().loadAlertState(),
+          ),
+          // When the panic button's location permission is granted, also refresh fall detection.
+          BlocListener<PanicButtonCubit, PanicButtonCubitState>(
+            listenWhen: (prev, curr) =>
+                (prev.disabledReason ==
+                        DisabledReason.locationPermissionDenied ||
+                    prev.disabledReason ==
+                        DisabledReason.locationPermissionDeniedForever) &&
+                curr.disabledReason !=
+                    DisabledReason.locationPermissionDenied &&
+                curr.disabledReason !=
+                    DisabledReason.locationPermissionDeniedForever &&
+                !curr.isLoading,
+            listener: (context, _) =>
+                context.read<FallDetectionCubit>().loadState(),
+          ),
+        ],
         child: BlocConsumer<PanicButtonCubit, PanicButtonCubitState>(
         listenWhen: (prev, curr) =>
             (prev.isLoading && !curr.isLoading) ||

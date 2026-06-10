@@ -93,27 +93,31 @@ class FollowUpListItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Profile photo
-        GestureDetector(
-          onTap: onProfileTap,
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: colorScheme.onSurface.withValues(alpha: 0.15),
-                width: 1.25,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
+        Semantics(
+          label: l10n.profilePhotoTapToView,
+          button: true,
+          child: GestureDetector(
+            onTap: onProfileTap,
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: colorScheme.onSurface.withValues(alpha: 0.15),
+                  width: 1.25,
                 ),
-              ],
-            ),
-            child: CircleAvatar(
-              radius: _avatarRadius,
-              backgroundColor: colorScheme.surfaceContainerHighest,
-              backgroundImage: _resolveImage(),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.15),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: CircleAvatar(
+                radius: _avatarRadius,
+                backgroundColor: colorScheme.surfaceContainerHighest,
+                backgroundImage: _resolveImage(),
+              ),
             ),
           ),
         ),
@@ -209,7 +213,7 @@ class FollowUpListItem extends StatelessWidget {
                                 const SizedBox(width: 5),
                                 Expanded(
                                   child: Text(
-                                    'Fecha: $dateStr',
+                                    '${l10n.date}: $dateStr',
                                     style: textTheme.bodySmall?.copyWith(
                                       color: colorScheme.onSurface,
                                       fontWeight: FontWeight.w400,
